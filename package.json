@@ -1,0 +1,10 @@
+{
+  "name": "elmskak",
+  "version": "0.0.0",
+  "description": "elm chess",
+  "main": "index.js",
+  "repository": "https://github.com/proc0/elmskak",
+  "author": "proc0 <alanvx@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
