@@ -1,10 +1,10 @@
 module Notation.FEN exposing (toModel, initialBoard)
 
--- Parses Forsythe Edwards Notation (FEN) representations
--- of chess game state into Game.Model instances
+-- Forsythe Edwards Notation (FEN) -> GameModel
 
-import Game exposing (..)
 import Array exposing (..)
+import Data.Main exposing (..)
+import Data.Game exposing (..)
 import String
 import Regex
 
@@ -102,14 +102,12 @@ fromRow row =
     expand row
         |> String.toList
         |> List.map toPlacement
-        |> Array.fromList
 
 
 parsePieces : String -> Board
 parsePieces s =
     String.split "/" s
         |> List.map fromRow
-        |> Array.fromList
 
 
 maybeContains str value =
@@ -121,14 +119,14 @@ maybeContains str value =
             False
 
 
-toModel : String -> Game.Model
+toModel : String -> GameModel
 toModel fen =
     let
         parts =
             String.split " " fen
                 |> Array.fromList
     in
-        Game.Model (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts)))
+        GameModel (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts)))
             --(maybeContains (Array.get 1 parts) "w")
             --(maybeContains (Array.get 2 parts) "Q")
             --(maybeContains (Array.get 2 parts) "K")
