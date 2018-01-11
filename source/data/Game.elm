@@ -1,18 +1,24 @@
 module Data.Game exposing (..)
 
-type alias Board = List Rank
+type alias GameModel =
+    { board : Board 
+    }
 
-type alias Rank = List Square
+type alias Board 
+    = List Rank
+
+type alias Rank 
+    = List Square
 
 type Square
     = Vacant
-    | Occupied Color Piece
-
-type Color
-    = White
-    | Black
+    | Occupied Piece
 
 type Piece
+    = White Figure
+    | Black Figure
+
+type Figure
     = Pawn
     | Rook
     | Bishop
@@ -20,19 +26,17 @@ type Piece
     | Queen
     | King
 
-type alias Position =
-    { x : Int
-    , y : Int 
-    }
+--
+
+type alias History 
+    = List Move
 
 type alias Move =
     ( Position
     , Position 
     )
 
-type alias History =
-    List Move
-
-type alias GameModel =
-    { board : Board
+type alias Position =
+    { x : Int
+    , y : Int 
     }
