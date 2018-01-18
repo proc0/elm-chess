@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Tuple exposing (..)
 import Mouse exposing (..)
+import Debug exposing (..)
 import SvgParser exposing (parse)
 
 import Data.Main exposing (..)
@@ -16,58 +17,58 @@ import View.Assets.Pieces exposing (..)
 
 board : Model -> Html Msg
 board model =
-    div [ onMouseUp ]
+    div [ onMouseUp, onMouseDown ]
         [ renderBoard model ]
 
 renderBoard : Model -> Html Msg 
-renderBoard model =
-    let chessboard = List.map2 rank (List.range 0 7) model.game.board |> List.concat
-    in div [] chessboard
+renderBoard { game } =
+    let chessboard = List.map renderRank game.board
+    in div [class "board"] chessboard
 
-rank : Int -> Rank -> List (Html Msg)
-rank x r = List.map2 (tile x) (List.range 0 7) r
+renderRank : Rank -> Html Msg
+renderRank r = div [class "rank"] (List.map renderSquare r)
 
-tile : Int -> Int -> Square -> Html Msg
-tile x y sq =
-    let xStr = (x * squareSize) |> px
-        yStr = (y * squareSize) |> px
-        bgColor = squareColor x y
-        bgTile = div
-            [ style
-                [ "position"        => "absolute"
-                , "top"             => xStr
-                , "left"            => yStr
-                , "width"           => px squareSize
-                , "height"          => px squareSize
-                , "backgroundColor" => bgColor
-                ]
-            ]
-    in case sq of
-            Vacant -> bgTile []
-            Occupied p -> bgTile [piece x y p]
+renderSquare : Square -> Html Msg
+renderSquare sq = case sq of
+                     Vacant pos -> (tile pos) []
+                     Occupied pos pc -> (tile pos) [renderPiece pos pc]
 
-piece : Int -> Int -> Piece -> Html Msg
-piece x y p = let 
-    getPiece : String -> G.Figure -> String
-    getPiece c f = getPieceSrc (c ++ String.fromChar (getPieceChar f))
-    pieceSrc = 
-        case p of
-             Black f -> getPiece "b_" f
-             White f -> getPiece "w_" f
-              -- parse SVG from String
-              in case (parse pieceSrc) of
-                      Ok svg -> svg
-                      Err e  -> text e
+renderPiece : G.Position -> Piece -> Html Msg
+renderPiece pos piece = 
+    let pieceSvg : String
+        pieceSvg = case piece of
+                        Black fig -> getPiece "b_" fig
+                        White fig -> getPiece "w_" fig
+    -- parse SVG from String
+    in case parse pieceSvg of
+            Ok svg -> svg
+            Err e  -> text e
 
-squareColor : Int -> Int -> String
-squareColor x y =
-    let black = isBlack x y
-    in if black 
-       then fst squareColors
-       else snd squareColors
+tile : G.Position -> List (Html Msg) -> Html Msg
+tile {x,y} = div []
 
-px : Int -> String
-px value = (toString value) ++ "px"
+--squareColor : Int -> Int -> String
+--squareColor x y =
+--    let black = isBlack x y
+--    in if black 
+--       then fst squareColors
+--       else snd squareColors
 
-isBlack : Int -> Int -> Bool
-isBlack x y = (rem (x + y) 2) == 0
+--px : Int -> String
+--px value = (toString value) ++ "px"
+
+--isBlack : Int -> Int -> Bool
+--isBlack x y = (rem (x + y) 2) == 0
+
+--tile : G.Position -> List (Html Msg) -> Html Msg
+--tile {x,y} = div []
+            --[ style
+            --[ 
+            ----"position"        => "absolute"
+            ----, "top"             => px (x * squareSize)
+            ----, "left"            => px (y * squareSize)
+            -- "width"           => px squareSize
+            --, "height"          => px squareSize
+            --, "backgroundColor" => squareColor x y
+            --]
+            --]

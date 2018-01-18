@@ -1,7 +1,9 @@
 module Data.Game exposing (..)
 
 type alias GameModel =
-    { board : Board 
+    { board : Board
+    , select : Square
+    , history : History
     }
 
 type alias Board 
@@ -11,8 +13,8 @@ type alias Rank
     = List Square
 
 type Square
-    = Vacant
-    | Occupied Piece
+    = Vacant Position
+    | Occupied Position Piece
 
 type Piece
     = White Figure
@@ -25,6 +27,7 @@ type Figure
     | Knight
     | Queen
     | King
+    | Zebra
 
 --
 
@@ -32,8 +35,8 @@ type alias History
     = List Move
 
 type alias Move =
-    ( Position
-    , Position 
+    ( Square
+    , Square 
     )
 
 type alias Position =

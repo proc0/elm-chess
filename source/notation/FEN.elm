@@ -5,6 +5,8 @@ module Notation.FEN exposing (toModel, initialBoard)
 import Array exposing (..)
 import Data.Main exposing (..)
 import Data.Game exposing (..)
+import Toolkit exposing (..)
+import Settings exposing (..)
 import String
 import Regex
 
@@ -35,8 +37,7 @@ toModel : String -> GameModel
 toModel fen =
     let parts =
         String.split " " fen |> Array.fromList
-    in
-        GameModel (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts)))
+    in GameModel (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))) (Vacant {x=0,y=0}) []
             --(maybeContains (Array.get 1 parts) "w")
             --(maybeContains (Array.get 2 parts) "Q")
             --(maybeContains (Array.get 2 parts) "K")
@@ -48,21 +49,22 @@ toModel fen =
 
 parsePieces : String -> Board
 parsePieces s =
-    String.split "/" s
-        |> List.map fromRow
+    String.split "/" s |> List.map2 mapRank boardside
 
-fromRow : String -> Rank
-fromRow row =
-    expand row
-        |> String.toList
-        |> List.map toPiece
+mapRank : Int -> String -> Rank
+mapRank x row =
+    let pieces = expand row 
+                 |> String.toList
+        posons = List.map2 (,) (List.repeat 8 x) boardside
+                 |> List.map toPosition                
+    in List.map2 toPiece posons pieces
 
-maybeContains str value =
-    case str of
-        Just s ->
-            String.contains value s
-        Nothing ->
-            False
+--maybeContains str value =
+--    case str of
+--        Just s ->
+--            String.contains value s
+--        Nothing ->
+--            False
 
 expand : String -> String
 expand s =
@@ -71,18 +73,20 @@ expand s =
 expandMatch { match } =
     String.repeat (Result.withDefault 0 (String.toInt match)) " "
 
-toPiece : Char -> Square
-toPiece c = case c of 
-                'p' -> Occupied (Black Pawn)
-                'n' -> Occupied (Black Knight)
-                'b' -> Occupied (Black Bishop)
-                'r' -> Occupied (Black Rook)
-                'q' -> Occupied (Black Queen)
-                'k' -> Occupied (Black King)
-                'P' -> Occupied (White Pawn)
-                'N' -> Occupied (White Knight)
-                'B' -> Occupied (White Bishop)
-                'R' -> Occupied (White Rook)
-                'Q' -> Occupied (White Queen)
-                'K' -> Occupied (White King)
-                otherwise -> Vacant
+toPiece : Position -> Char -> Square
+toPiece pos ch = 
+        let o piece = Occupied pos <| piece
+        in case ch of 
+                'p' -> o <| Black Pawn
+                'n' -> o <| Black Knight
+                'b' -> o <| Black Bishop
+                'r' -> o <| Black Rook
+                'q' -> o <| Black Queen
+                'k' -> o <| Black King
+                'P' -> o <| White Pawn
+                'N' -> o <| White Knight
+                'B' -> o <| White Bishop
+                'R' -> o <| White Rook
+                'Q' -> o <| White Queen
+                'K' -> o <| White King
+                _   ->      Vacant pos

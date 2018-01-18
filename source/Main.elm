@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Debug exposing (..)
+import Mouse exposing (..)
 
 import Data.Main exposing (..)
 import Data.Game exposing (..)
@@ -18,7 +19,13 @@ main = Html.program
     }
 
 init : ( Model, Cmd Msg )
-init = Model (FEN.toModel initialBoard) ! []
+init = (Model (FEN.toModel initialBoard) (Mouse.Position 200 200) Nothing) ! []
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions model = 
+    case model.drag of
+        Nothing ->
+          Sub.none
+
+        Just _ ->
+          Sub.batch [ Mouse.moves DragAt, Mouse.ups DragEnd ]

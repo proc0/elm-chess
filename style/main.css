@@ -1,0 +1,22 @@
+.board .rank {
+    width: 512px;   
+}
+
+.board .rank div {
+    float: left;
+    width: 64px;
+    height: 64px;
+    background-color: #E8E5E1;
+}
+
+.board .rank:nth-of-type(odd) > div:nth-of-type(even) {
+    background: #D8A367;
+}
+
+.board .rank:nth-of-type(even) > div:nth-of-type(odd) {
+    background: #D8A367;
+}
+
+.board .rank div svg {
+    cursor: -webkit-grab;
+}
