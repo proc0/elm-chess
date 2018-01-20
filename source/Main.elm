@@ -6,26 +6,30 @@ import Mouse exposing (..)
 
 import Data.Main exposing (..)
 import Data.Game exposing (..)
-import Time.Main as Time exposing (..)
+import Frame.Main as Frame exposing (..)
 import View.Main as View exposing (..)
 import Notation.FEN as FEN exposing (..)
 
 main : Program Never Model Msg
 main = Html.program
     { init = init
-    , view = View.board
-    , update = Time.update
+    , view = View.render
+    , update = Frame.update
     , subscriptions = subscriptions
     }
 
 init : ( Model, Cmd Msg )
-init = (Model (FEN.toModel initialBoard) (Mouse.Position 200 200) Nothing) ! []
+init = let initBoard = FEN.toModel initialBoard
+           initPosition = Mouse.Position 200 200
+       in Model initBoard initPosition Nothing ! []
 
 subscriptions : Model -> Sub Msg
 subscriptions model = 
     case model.drag of
         Nothing ->
           Sub.none
-
         Just _ ->
-          Sub.batch [ Mouse.moves DragAt, Mouse.ups DragEnd ]
+          Sub.batch 
+            [ Mouse.moves PieceDrag
+            , Mouse.ups PieceDrop 
+            ]

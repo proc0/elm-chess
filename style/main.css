@@ -1,22 +1,28 @@
-.board .rank {
-    width: 512px;   
+body {
+    margin: 0;
 }
 
-.board .rank div {
+rank {
+    display: flex;
+    width: 512px;
+}
+
+rank square {
     float: left;
     width: 64px;
     height: 64px;
     background-color: #E8E5E1;
 }
 
-.board .rank:nth-of-type(odd) > div:nth-of-type(even) {
+/* dark squares */
+rank:nth-of-type(odd) > square:nth-of-type(even),
+rank:nth-of-type(even) > square:nth-of-type(odd) {
     background: #D8A367;
 }
 
-.board .rank:nth-of-type(even) > div:nth-of-type(odd) {
-    background: #D8A367;
-}
-
-.board .rank div svg {
+pieces piece {
+    display: flex;
+    position: absolute;
     cursor: -webkit-grab;
+    padding: 9px;
 }

@@ -11,64 +11,70 @@ import Data.Main exposing (..)
 import Data.Game as G exposing (..)
 import Settings exposing (..)
 import Toolkit exposing (..)
-import Time.Main as Time exposing (..)
+import Frame.Main as Frame exposing (..)
 import Notation.FEN as FEN exposing (..)
 import View.Assets.Pieces exposing (..)
 
-board : Model -> Html Msg
-board model =
-    div [ onMouseUp, onMouseDown ]
-        [ renderBoard model ]
+render : Model -> Html Msg
+render model =
+    node "main" 
+        [ onMouseDown 
+        ]
+        [ r_pieces model
+        , r_board model 
+        ]
 
-renderBoard : Model -> Html Msg 
-renderBoard { game } =
-    let chessboard = List.map renderRank game.board
-    in div [class "board"] chessboard
+-- render pieces
 
-renderRank : Rank -> Html Msg
-renderRank r = div [class "rank"] (List.map renderSquare r)
+r_pieces : Model -> Html Msg
+r_pieces { game, position, drag } = 
+    let pieces = map_pieces (get_piece drag) game.board
+    in node "pieces" [] pieces
 
-renderSquare : Square -> Html Msg
-renderSquare sq = case sq of
-                     Vacant pos -> (tile pos) []
-                     Occupied pos pc -> (tile pos) [renderPiece pos pc]
+map_pieces : (Square -> Maybe (Html Msg)) -> Board -> List (Html Msg)
+map_pieces f b = List.map (\r -> filter_squares f r) b |> List.concat
 
-renderPiece : G.Position -> Piece -> Html Msg
-renderPiece pos piece = 
+filter_squares : (Square -> Maybe (Html Msg)) -> Rank -> List (Html Msg)
+filter_squares f r = List.filterMap (\s -> f s) r
+
+get_piece : Maybe Drag -> Square -> Maybe (Html Msg)
+get_piece dr sq =
+    let dragPos ppos = 
+        case dr of
+             Just {start,current} -> current
+             Nothing -> ppos
+    in case sq of
+            Occupied pos pc -> Just (r_piece (dragPos pos) pc)
+            Vacant pos -> Nothing
+
+r_piece : G.Position -> Piece -> Html Msg
+r_piece {x,y} piece = 
     let pieceSvg : String
         pieceSvg = case piece of
                         Black fig -> getPiece "b_" fig
                         White fig -> getPiece "w_" fig
     -- parse SVG from String
     in case parse pieceSvg of
-            Ok svg -> svg
-            Err e  -> text e
+            Ok svg -> node "piece" 
+                        [ style 
+                            [ "top" => px x
+                            , "left" => px y
+                            ]
+                        ] [svg]
+            Err e -> text e
 
-tile : G.Position -> List (Html Msg) -> Html Msg
-tile {x,y} = div []
+-- render board
 
---squareColor : Int -> Int -> String
---squareColor x y =
---    let black = isBlack x y
---    in if black 
---       then fst squareColors
---       else snd squareColors
+r_board : Model -> Html Msg 
+r_board { game } =
+    let chessboard = List.map (r_rank r_square) game.board
+    in node "board" [] chessboard
 
---px : Int -> String
---px value = (toString value) ++ "px"
+--r_rank : Rank -> Html Msg
+--r_rank r = map_rank r_square r
 
---isBlack : Int -> Int -> Bool
---isBlack x y = (rem (x + y) 2) == 0
+r_rank : (Square -> Html Msg) -> Rank -> Html Msg
+r_rank f r = node "rank" [] (List.map f r)
 
---tile : G.Position -> List (Html Msg) -> Html Msg
---tile {x,y} = div []
-            --[ style
-            --[ 
-            ----"position"        => "absolute"
-            ----, "top"             => px (x * squareSize)
-            ----, "left"            => px (y * squareSize)
-            -- "width"           => px squareSize
-            --, "height"          => px squareSize
-            --, "backgroundColor" => squareColor x y
-            --]
-            --]
+r_square : Square -> Html Msg
+r_square _ = node "square" [] []

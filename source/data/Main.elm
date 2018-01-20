@@ -15,8 +15,8 @@ type alias Drag =
     }
 
 type Msg = 
-    SquareClick Mouse.Position
-    | PieceMove Move
-    | DragStart Mouse.Position
-    | DragAt Mouse.Position
-    | DragEnd Mouse.Position
+    --SquareClick Mouse.Position
+    --| PieceMove Move
+      PieceLift Mouse.Position
+    | PieceDrag Mouse.Position
+    | PieceDrop Mouse.Position
