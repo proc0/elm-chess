@@ -5,10 +5,9 @@ import Debug exposing (..)
 import Mouse exposing (..)
 
 import Data.Main exposing (..)
-import Data.Game exposing (..)
 import Frame.Main as Frame exposing (..)
+import Model.Main as Model exposing (..)
 import View.Main as View exposing (..)
-import Notation.FEN as FEN exposing (..)
 
 main : Program Never Model Msg
 main = Html.program
@@ -19,9 +18,8 @@ main = Html.program
     }
 
 init : ( Model, Cmd Msg )
-init = let initBoard = FEN.toModel initialBoard
-           initPosition = Mouse.Position 200 200
-       in Model initBoard initPosition Nothing ! []
+init = let initBoard = Model.fromFEN initialBoard
+       in Model initBoard Nothing ! []
 
 subscriptions : Model -> Sub Msg
 subscriptions model = 

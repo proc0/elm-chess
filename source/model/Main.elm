@@ -1,4 +1,4 @@
-module Notation.FEN exposing (toModel, initialBoard)
+module Model.Main exposing (fromFEN, initialBoard)
 
 -- Forsythe Edwards Notation (FEN) -> GameModel
 
@@ -33,8 +33,8 @@ initialBoard =
 --castlingAvailable =
 --    "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/R3K2R w KQkq - 0 1"
 
-toModel : String -> GameModel
-toModel fen =
+fromFEN : String -> GameModel
+fromFEN fen =
     let parts =
         String.split " " fen |> Array.fromList
     in GameModel (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))) (Vacant {x=0,y=0}) []

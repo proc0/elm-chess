@@ -12,28 +12,17 @@ import Data.Game as Game exposing (..)
 import Settings exposing (..)
 import Toolkit exposing (..)
 
-onMouseUp : Attribute Msg
---onMouseUp = on "mouseup" (Json.map SquareClick Mouse.position)
-onMouseUp = on "mouseup" (Json.map PieceDrop Mouse.position)
-
 onMouseDown : Attribute Msg
 onMouseDown =
   on "mousedown" (Json.map PieceLift Mouse.position)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ({ game
-            , position
-            , drag } as model) =
-    let updated =
-        case msg of
-            --SquareClick _ -> Model game (getPosition model) Nothing
-            --SquareClick position ->
-            --    onSquareClicked (selectSquare position) model
-            PieceDrag curr -> Model game position (Maybe.map (\{start} -> Drag start curr) drag)
-            PieceDrop _   -> Model game (getPosition model) Nothing
-            PieceLift pos -> Model game position (Just (Drag pos pos))
-
-
+update msg ({ game, drag } as model) =
+    let nextDrag = case msg of
+                        PieceLift ps -> Just (Drag ps ps)
+                        PieceDrag ps -> Maybe.map (\{start} -> Drag start ps) drag
+                        PieceDrop _  -> Nothing             
+    in (Model game nextDrag, Cmd.none)
 
             --PieceMove move ->
             --        { game =
@@ -47,11 +36,10 @@ update msg ({ game
             --        , position = getPosition model
             --        , drag = Nothing     
             --        }
-    in (updated, Cmd.none)
 
-toGamePosition : Mouse.Position -> Game.Position
-toGamePosition position =
-    Game.Position (position.x // squareSize) (position.y // squareSize)
+--toGamePosition : Mouse.Position -> Game.Position
+--toGamePosition position =
+--    Game.Position (position.x // squareSize) (position.y // squareSize)
 
 --onSquareClicked : Game.Position -> Model -> ( Model, Cmd Msg )
 --onSquareClicked position model =
@@ -87,17 +75,15 @@ toGamePosition position =
 --            Just match -> match
 --            Nothing    -> Vacant pos
 
-getPosition : Model -> Mouse.Position
-getPosition {game, position, drag} =
-  case drag of
-    Nothing ->
-      position
+--getPosition : Model -> Mouse.Position
+--getPosition {game, position, drag} =
+--  case drag of
+--    Nothing -> position
 
-    Just {start,current} ->
-      let curPos = toPosition (current.x,current.y)
-      in Mouse.Position
-            (position.x + curPos.x - start.x)
-            (position.y + curPos.y - start.y)
+--    Just {start,current} ->
+--        let curPos = toPosition (current.x, current.y)
+--            gamPos = toPosition ((position.x + curPos.x - start.x), (position.y + curPos.y - start.y))
+--        in Mouse.Position gamPos.x gamPos.y
 
 --updateBoard : Move -> Board -> Board
 --updateBoard (m1, m2) board = 

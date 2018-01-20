@@ -2,76 +2,68 @@ module View.Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Tuple exposing (..)
-import Mouse exposing (..)
-import Debug exposing (..)
 import SvgParser exposing (parse)
+import Debug exposing (..)
 
 import Data.Main exposing (..)
 import Data.Game as G exposing (..)
 import Settings exposing (..)
 import Toolkit exposing (..)
 import Frame.Main as Frame exposing (..)
-import Notation.FEN as FEN exposing (..)
 import View.Assets.Pieces exposing (..)
 
 render : Model -> Html Msg
-render model =
+render { game } =
     node "main" 
         [ onMouseDown 
         ]
-        [ r_pieces model
-        , r_board model 
+        [ r_pieces game.board
+        , r_board game.board 
         ]
 
 -- render pieces
-
-r_pieces : Model -> Html Msg
-r_pieces { game, position, drag } = 
-    let pieces = map_pieces (get_piece drag) game.board
+----------------
+r_pieces : Board -> Html Msg
+r_pieces board = 
+    let pieces = map_board r_piece board
     in node "pieces" [] pieces
 
-map_pieces : (Square -> Maybe (Html Msg)) -> Board -> List (Html Msg)
-map_pieces f b = List.map (\r -> filter_squares f r) b |> List.concat
+map_board : (Square -> Maybe (Html Msg)) -> Board -> List (Html Msg)
+map_board f b = List.map (\r -> filter_rank f r) b |> List.concat
 
-filter_squares : (Square -> Maybe (Html Msg)) -> Rank -> List (Html Msg)
-filter_squares f r = List.filterMap (\s -> f s) r
+-- empty squares will be filtered
+filter_rank : (Square -> Maybe (Html Msg)) -> Rank -> List (Html Msg)
+filter_rank f r = List.filterMap (\s -> f s) r
 
-get_piece : Maybe Drag -> Square -> Maybe (Html Msg)
-get_piece dr sq =
-    let dragPos ppos = 
-        case dr of
-             Just {start,current} -> current
-             Nothing -> ppos
-    in case sq of
-            Occupied pos pc -> Just (r_piece (dragPos pos) pc)
-            Vacant pos -> Nothing
+-- render piece from square
+r_piece : Square -> Maybe (Html Msg)
+r_piece s = case s of
+                 Occupied ps pc -> Just (r_svg ps pc)
+                 Vacant ps -> Nothing
 
-r_piece : G.Position -> Piece -> Html Msg
-r_piece {x,y} piece = 
-    let pieceSvg : String
-        pieceSvg = case piece of
-                        Black fig -> getPiece "b_" fig
-                        White fig -> getPiece "w_" fig
+-- render svg piece
+r_svg : G.Position -> Piece -> Html Msg
+r_svg {x,y} piece = 
+    let svgTag : String
+        svgTag = case piece of
+                      Black figure -> getSvgTag "b_" figure
+                      White figure -> getSvgTag "w_" figure
     -- parse SVG from String
-    in case parse pieceSvg of
+    in case parse svgTag of
+            Err e -> text e
             Ok svg -> node "piece" 
                         [ style 
                             [ "top" => px x
                             , "left" => px y
                             ]
                         ] [svg]
-            Err e -> text e
 
 -- render board
-
-r_board : Model -> Html Msg 
-r_board { game } =
-    let chessboard = List.map (r_rank r_square) game.board
-    in node "board" [] chessboard
-
---r_rank : Rank -> Html Msg
---r_rank r = map_rank r_square r
+---------------
+r_board : Board -> Html Msg 
+r_board board =
+    let checker = List.map (r_rank r_square) board
+    in node "board" [] checker
 
 r_rank : (Square -> Html Msg) -> Rank -> Html Msg
 r_rank f r = node "rank" [] (List.map f r)
