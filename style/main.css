@@ -13,10 +13,6 @@ player piece {
     cursor: -webkit-grabbing;
 }
 
-board square.selected {
- background: #e6f14c;
-}
-
 rank {
     display: flex;
     width: 512px;
@@ -29,10 +25,20 @@ rank square {
     background-color: #E8E5E1;
 }
 
+rank square.selected {
+ background: #e6f14c;
+}
+
 /* dark squares */
 rank:nth-of-type(odd) > square:nth-of-type(even),
 rank:nth-of-type(even) > square:nth-of-type(odd) {
     background: #D8A367;
+}
+
+/* dark squares */
+rank:nth-of-type(odd) > square:nth-of-type(even).selected,
+rank:nth-of-type(even) > square:nth-of-type(odd).selected {
+    background: #d0da46;
 }
 
 pieces piece {

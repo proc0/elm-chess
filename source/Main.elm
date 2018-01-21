@@ -20,7 +20,7 @@ main = Html.program
 
 init : ( Model, Cmd Msg )
 init = let initBoard = fromFEN initialBoard
-       in Model initBoard (Occupied {x=0,y=0} (Black Rook)) Nothing ! []
+       in Model initBoard Nothing Nothing ! []
 
 subscriptions : Model -> Sub Msg
 subscriptions model = 

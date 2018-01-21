@@ -27,9 +27,10 @@ render { game, select, player } =
 r_player : Maybe Moving -> Html Msg
 r_player mv =
     let mv_piece = case mv of
-                        Just {current,piece} -> case piece of
-                                       Just p -> ([class "visible"], [r_svg2 (toPosition (current.y,current.x)) p])
-                                       Nothing -> ([], [])
+                        Just {current, piece} -> 
+                            case piece of
+                                Just pc -> ([class "visible"], [r_svg2 (toPosition (current.y,current.x)) pc])
+                                Nothing -> ([], [])
                         Nothing -> ([], [])
     in (uncurry (node "player")) mv_piece
 
@@ -88,7 +89,7 @@ r_svg2 {x,y} piece =
                         ] [svg]
 -- render board
 ---------------
-r_board : Square -> Board -> Html Msg 
+r_board : Maybe Square -> Board -> Html Msg 
 r_board selected board =
     let checker = List.map (r_rank (r_square selected)) board
     in node "board" [] checker
@@ -96,7 +97,16 @@ r_board selected board =
 r_rank : (Square -> Html Msg) -> Rank -> Html Msg
 r_rank f r = node "rank" [] (List.map f r)
 
-r_square : Square -> Square -> Html Msg
+r_square : Maybe Square -> Square -> Html Msg
 r_square sel sq = 
-    let attrs = if sel == sq then [class "selected"] else []
+    let attrs = 
+        case sel of
+            Just sl ->
+                case sl of
+                     Occupied pos pec -> 
+                        case sq of
+                            Occupied ps pc -> if pos == ps then [class "selected"] else []
+                            Vacant ps -> if pos == ps then [class "selected"] else []
+                     Vacant pos -> []
+            Nothing -> []
     in node "square" attrs []

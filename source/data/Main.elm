@@ -1,11 +1,11 @@
 module Data.Main exposing (..)
 
 import Mouse exposing (..)
-import Data.Game exposing (..)
+import Data.Game as Game exposing (..)
 
 type alias Model =
     { game : GameModel
-    , select : Square
+    , select : Maybe Square
     , player : Maybe Moving
     }
 

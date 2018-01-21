@@ -18,50 +18,69 @@ onMouseDown =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ game, select, player } as model) =
-    let nextMovement : Maybe Moving
+    let 
+        --logMovement = case msg of
+        --    Grab ps -> log "Grab" ps
+        --    Drag ps -> log "Drag" ps
+        --    Drop ps -> log "Drop" ps
+        --    PieceDrag pc ps -> log "PieceDrag" ps
+        --    PieceDrop pc ps -> log "PieceDrop" ps
+
+        nextMovement : Maybe Moving
         nextMovement = case msg of
-            Grab ps -> Just (startDrag ps game.board)
+            Grab ps -> startDrag ps player game.board
             Drag ps -> Maybe.map (updateDrag ps) player
             Drop _  -> Nothing
             PieceDrag pc ps -> Maybe.map (updateMoving ps pc) player
-            PieceDrop _ _ -> Nothing
+            PieceDrop pc ps -> Nothing
+
+        nextSelect : Maybe Square
+        nextSelect = case msg of
+            Grab ps -> Just (findSquare (toGamePosition ps) game.board)
+            PieceDrop pc ps -> select            
+            _ -> Nothing
 
         nextGame : GameModel
         nextGame = case msg of
             Grab ps -> 
                 case nextMovement of
-                     Just mv -> case mv.piece of
-                                    Just pc -> GameModel (removePiece pc mv.start game.board) game.history
+                     Just mv -> 
+                        case mv.piece of
+                            Just pc -> GameModel (removePiece pc mv.start game.board) game.history
+                            Nothing -> game
+                     -- case for moving piece clicking squares
+                     Nothing -> case select of
+                                    Just sq ->
+                                        case sq of
+                                            Occupied p f -> GameModel ((removePiece2 f p) <| (addPiece f ps) <| game.board) game.history
+                                            Vacant p -> game
                                     _ -> game
-                     _ -> game
-            PieceDrop pc ps -> GameModel (addPiece pc ps game.board) game.history       
+            Drop ps -> 
+                case select of
+                     Just sq -> 
+                        case sq of
+                            Occupied p f -> GameModel ((removePiece2 f p) <| (addPiece f ps) <| game.board) game.history
+                            Vacant p -> game
+                     Nothing -> game                     
+            PieceDrop pc ps -> GameModel (addPiece pc ps game.board) game.history     
             _ -> game 
-    in (Model nextGame select nextMovement, Cmd.none)
-        
-        --pieceLifted : Maybe Piece
-        --pieceLifted = case msg of
-        --    Grab ps -> 
-        --         case nextMovement of
-        --              Just mv -> mv.piece
-        --              Nothing -> Nothing
-        --    _ -> Nothing
+    in (Model nextGame nextSelect nextMovement, Cmd.none)
 
-        --nextGame : GameModel
-        --nextGame = 
-        --    case pieceLifted of
-        --         Just p -> 
-        --            GameModel (removePiece p game.board) game.select game.history
-        --         Nothing -> game
+startDrag : Mouse.Position -> Maybe Moving -> Board -> Maybe Moving
+startDrag ps pl board = 
+        let sq = findSquare (toGamePosition ps) board
+        in case sq of
+                Occupied p f -> Just (Moving ps ps (Just f))
+                Vacant p -> Nothing
 
-
-startDrag : Mouse.Position -> Board -> Moving
-startDrag ps board = Moving ps ps (findPiece ps board)
-        
 updateDrag : Mouse.Position -> Moving -> Moving
 updateDrag ps {start} = Moving start ps Nothing
 
 updateMoving : Mouse.Position -> Piece -> Moving -> Moving
 updateMoving ps pc {start} = Moving start ps (Just pc)
+
+stopMoving : Mouse.Position -> Piece -> Moving -> Maybe Moving
+stopMoving ps pc {start} = Just (Moving start ps Nothing)
 
 findPiece : Mouse.Position -> Board -> Maybe Piece
 findPiece ps board = 
@@ -85,25 +104,27 @@ findSquare pos board =
             Just match -> match
             Nothing -> Vacant pos
 
-------
+-- board manipulations
+----------------------
 
+removePiece : Piece -> Mouse.Position -> Board -> Board
+removePiece pc ps bd = updateBoard remPieceFromSquare pc ps bd
 
-removePiece : Piece -> Game.Position -> Board -> Board
-removePiece pc ps bd = updateBoard updateSquare pc ps bd
+removePiece2 : Piece -> Game.Position -> Board -> Board
+removePiece2 pc ps bd = updateBoard remPieceFromSquare2 pc ps bd
 
+addPiece : Piece -> Mouse.Position -> Board -> Board
+addPiece pc ps bd = updateBoard addPieceToSquare pc ps bd
+
+addPiece2 : Piece -> Game.Position -> Board -> Board
+addPiece2 pc ps bd = updateBoard addPieceToSquare2 pc ps bd
 
 updateBoard : (Piece -> Game.Position -> Square -> Square) -> Piece -> Game.Position -> Board -> Board
 updateBoard trans piece pos board =
     List.map ((\pc ps rk -> List.map (trans pc ps) rk) piece pos) board
 
---removePiece piece pos board = 
---    List.map (updateRank piece pos) board
-
---updateRank : Piece -> Game.Position -> Rank -> Rank
---updateRank pc ps rk = List.map (updateSquare pc ps) rk
-
-updateSquare : Piece -> Game.Position -> Square -> Square
-updateSquare pc pos sq = 
+remPieceFromSquare : Piece -> Game.Position -> Square -> Square
+remPieceFromSquare pc pos sq = 
         case sq of 
             Occupied ps pec -> 
                 if ps == (toGamePosition pos) && pec == pc 
@@ -111,18 +132,17 @@ updateSquare pc pos sq =
                 else Occupied ps pec
             Vacant ps -> Vacant ps
 
---------
+remPieceFromSquare2 : Piece -> Game.Position -> Square -> Square
+remPieceFromSquare2 pc pos sq = 
+        case sq of 
+            Occupied ps pec -> 
+                if ps == pos && pec == pc 
+                then Vacant ps 
+                else Occupied ps pec
+            Vacant ps -> Vacant ps
 
-addPiece : Piece -> Game.Position -> Board -> Board
-addPiece pc ps bd = updateBoard upSquare pc ps bd
---addPiece piece pos board = 
---    List.map (upRank piece pos) board
-
---upRank : Piece -> Game.Position -> Rank -> Rank
---upRank pc ps rk = List.map (upSquare pc ps) rk
-
-upSquare : Piece -> Game.Position -> Square -> Square
-upSquare pc mp sq =
+addPieceToSquare : Piece -> Mouse.Position -> Square -> Square
+addPieceToSquare pc mp sq =
         case sq of 
             Occupied ps pec ->
                 if ps == (toGamePosition mp)
@@ -132,66 +152,15 @@ upSquare pc mp sq =
                 if ps == (toGamePosition mp)
                 then Occupied ps pc 
                 else Vacant ps 
---PieceMove move ->
---        { game =
---           { board = updateBoard move game.board
---           , select = let m2 = snd move 
---                      in case m2 of
---                              Occupied pos pc -> findSquare pos game.board
---                              Vacant pos      -> findSquare pos game.board
---           , history = game.history
---           }
---        , position = getPosition model
---        , drag = Nothing     
---        }
 
---onSquareClicked : Game.Position -> Model -> ( Model, Cmd Msg )
---onSquareClicked position model =
---    let prevSelection = model.game.select
---        nextModel = processMouseUp position model
---    in case prevSelection of
---            Occupied _ _ -> update (PieceMove (prevSelection, nextModel.game.select)) model
---            Vacant _ -> ( nextModel, Cmd.none )
-
---processMouseUp : Game.Position -> Model -> Model
---processMouseUp position ({ game } as model) = 
---    { game = 
---        { board = game.board
---        , select = findSquare position game.board
---        , history = game.history
---        }
---    , position = getPosition model
---    , drag = Nothing  
---    }
-
-
---getPosition : Model -> Mouse.Position
---getPosition {game, position, drag} =
---  case drag of
---    Nothing -> position
-
---    Just {start,current} ->
---        let curPos = toPosition (current.x, current.y)
---            gamPos = toPosition ((position.x + curPos.x - start.x), (position.y + curPos.y - start.y))
---        in Mouse.Position gamPos.x gamPos.y
-
---updateBoard : Move -> Board -> Board
---updateBoard (m1, m2) board = 
---      let movingPc = case m1 of 
---                          Occupied ps pc -> Just pc
---                          Vacant ps -> Nothing
---      in case m2 of
---              Occupied ps pc -> case movingPc of
---                                     Just p -> List.map (updateRank p ps) board
---                                     Nothing -> board
---              Vacant ps -> board
-
---updateRank : Piece -> Game.Position -> Rank -> Rank
---updateRank pc ps rk = List.map (updateSquare pc ps) rk
-
---updateSquare : Piece -> Game.Position -> Square -> Square
---updateSquare pc pos sq = 
---      let isSq p = p.x == pos.x && p.y == pos.y
---      in case sq of 
---          Occupied ps pec -> if isSq ps then Occupied ps pc else Occupied ps pec
---          Vacant ps -> if isSq ps then Occupied ps pc else Vacant ps
+addPieceToSquare2 : Piece -> Game.Position -> Square -> Square
+addPieceToSquare2 pc mp sq =
+        case sq of 
+            Occupied ps pec ->
+                if ps == mp
+                then Occupied ps pc 
+                else Occupied ps pec
+            Vacant ps -> 
+                if ps == mp
+                then Occupied ps pc 
+                else Vacant ps 
