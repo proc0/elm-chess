@@ -3,6 +3,8 @@ module Model.Main exposing (fromFEN, initialBoard)
 -- Forsythe Edwards Notation (FEN) -> GameModel
 
 import Array exposing (..)
+import Debug exposing (..)
+
 import Data.Main exposing (..)
 import Data.Game exposing (..)
 import Toolkit exposing (..)
@@ -37,7 +39,7 @@ fromFEN : String -> GameModel
 fromFEN fen =
     let parts =
         String.split " " fen |> Array.fromList
-    in GameModel (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))) (Vacant {x=0,y=0}) []
+    in GameModel (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))) []
             --(maybeContains (Array.get 1 parts) "w")
             --(maybeContains (Array.get 2 parts) "Q")
             --(maybeContains (Array.get 2 parts) "K")
@@ -52,11 +54,11 @@ parsePieces s =
     String.split "/" s |> List.map2 mapRank boardside
 
 mapRank : Int -> String -> Rank
-mapRank x row =
+mapRank y row =
     let pieces = expand row 
                  |> String.toList
-        posons = List.map2 (,) (List.repeat 8 x) boardside
-                 |> List.map toPosition                
+        posons = List.map2 (,) boardside (List.repeat 8 y)
+                 |> List.map toPosition
     in List.map2 toPiece posons pieces
 
 --maybeContains str value =

@@ -5,6 +5,7 @@ import Debug exposing (..)
 import Mouse exposing (..)
 
 import Data.Main exposing (..)
+import Data.Game exposing (..)
 import Frame.Main as Frame exposing (..)
 import Model.Main as Model exposing (..)
 import View.Main as View exposing (..)
@@ -18,16 +19,22 @@ main = Html.program
     }
 
 init : ( Model, Cmd Msg )
-init = let initBoard = Model.fromFEN initialBoard
-       in Model initBoard Nothing ! []
+init = let initBoard = fromFEN initialBoard
+       in Model initBoard (Occupied {x=0,y=0} (Black Rook)) Nothing ! []
 
 subscriptions : Model -> Sub Msg
 subscriptions model = 
-    case model.drag of
-        Nothing ->
-          Sub.none
-        Just _ ->
-          Sub.batch 
-            [ Mouse.moves PieceDrag
-            , Mouse.ups PieceDrop 
-            ]
+    case model.player of
+        Nothing -> Sub.none
+        Just {current,piece} ->
+            case piece of 
+                 Just pc ->
+                    Sub.batch 
+                        [ Mouse.moves (PieceDrag pc)
+                        , Mouse.ups (PieceDrop pc) 
+                        ]                    
+                 Nothing ->
+                    Sub.batch 
+                        [ Mouse.moves Drag
+                        , Mouse.ups Drop 
+                        ]

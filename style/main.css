@@ -2,6 +2,21 @@ body {
     margin: 0;
 }
 
+player.visible {
+    position: absolute;
+    width: 512px;
+    height: 512px;
+    z-index: 2;
+}
+
+player piece {
+    cursor: -webkit-grabbing;
+}
+
+board square.selected {
+ background: #e6f14c;
+}
+
 rank {
     display: flex;
     width: 512px;
@@ -23,6 +38,6 @@ rank:nth-of-type(even) > square:nth-of-type(odd) {
 pieces piece {
     display: flex;
     position: absolute;
-    cursor: -webkit-grab;
     padding: 9px;
+    cursor: -webkit-grab;
 }

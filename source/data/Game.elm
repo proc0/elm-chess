@@ -2,7 +2,6 @@ module Data.Game exposing (..)
 
 type alias GameModel =
     { board : Board
-    , select : Square
     , history : History
     }
 

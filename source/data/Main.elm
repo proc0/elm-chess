@@ -5,15 +5,19 @@ import Data.Game exposing (..)
 
 type alias Model =
     { game : GameModel
-    , drag : Maybe Drag
+    , select : Square
+    , player : Maybe Moving
     }
 
-type alias Drag =
+type alias Moving =
     { start : Mouse.Position
     , current : Mouse.Position
+    , piece : Maybe Piece
     }
 
 type Msg = 
-      PieceLift Mouse.Position
-    | PieceDrag Mouse.Position
-    | PieceDrop Mouse.Position
+      Grab Mouse.Position
+    | Drag Mouse.Position
+    | Drop Mouse.Position
+    | PieceDrag Piece Mouse.Position
+    | PieceDrop Piece Mouse.Position
