@@ -50,9 +50,9 @@ filter_rank f r = List.filterMap (\s -> f s) r
 
 -- render piece from square
 r_piece : Square -> Maybe (Html Msg)
-r_piece s = case s of
-                 Occupied ps pc -> Just (r_svg ps pc)
-                 Vacant ps -> Nothing
+r_piece s = case s.piece of
+                 Just pc -> Just (r_svg s.pos pc)
+                 Nothing -> Nothing
 
 -- render svg piece
 r_svg : G.Position -> Piece -> Html Msg
@@ -100,13 +100,7 @@ r_rank f r = node "rank" [] (List.map f r)
 r_square : Maybe Square -> Square -> Html Msg
 r_square sel sq = 
     let attrs = 
-        case sel of
-            Just sl ->
-                case sl of
-                     Occupied pos pec -> 
-                        case sq of
-                            Occupied ps pc -> if pos == ps then [class "selected"] else []
-                            Vacant ps -> if pos == ps then [class "selected"] else []
-                     Vacant pos -> []
-            Nothing -> []
+        if sq.hilite 
+        then [class "selected"] 
+        else []
     in node "square" attrs []

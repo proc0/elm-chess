@@ -11,9 +11,16 @@ type alias Board
 type alias Rank 
     = List Square
 
-type Square
-    = Vacant Position
-    | Occupied Position Piece
+type alias Square = 
+    { pos : Position
+    , piece : Maybe Piece
+    , hilite : Bool
+    }
+
+type alias Position =
+    { x : Int
+    , y : Int 
+    }
 
 type Piece
     = White Figure
@@ -38,7 +45,3 @@ type alias Move =
     , Square 
     )
 
-type alias Position =
-    { x : Int
-    , y : Int 
-    }

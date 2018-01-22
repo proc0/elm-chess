@@ -77,18 +77,18 @@ expandMatch { match } =
 
 toPiece : Position -> Char -> Square
 toPiece pos ch = 
-        let o piece = Occupied pos <| piece
+        let sq piece = Square pos (Just piece) False
         in case ch of 
-                'p' -> o <| Black Pawn
-                'n' -> o <| Black Knight
-                'b' -> o <| Black Bishop
-                'r' -> o <| Black Rook
-                'q' -> o <| Black Queen
-                'k' -> o <| Black King
-                'P' -> o <| White Pawn
-                'N' -> o <| White Knight
-                'B' -> o <| White Bishop
-                'R' -> o <| White Rook
-                'Q' -> o <| White Queen
-                'K' -> o <| White King
-                _   ->      Vacant pos
+                'p' -> sq <| Black Pawn
+                'n' -> sq <| Black Knight
+                'b' -> sq <| Black Bishop
+                'r' -> sq <| Black Rook
+                'q' -> sq <| Black Queen
+                'k' -> sq <| Black King
+                'P' -> sq <| White Pawn
+                'N' -> sq <| White Knight
+                'B' -> sq <| White Bishop
+                'R' -> sq <| White Rook
+                'Q' -> sq <| White Queen
+                'K' -> sq <| White King
+                _   -> Square pos Nothing False
