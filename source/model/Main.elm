@@ -1,6 +1,6 @@
 module Model.Main exposing (fromFEN, initialBoard)
 
--- Forsythe Edwards Notation (FEN) -> GameModel
+-- Forsythe Edwards Notation (FEN) -> Chess model
 
 import Array exposing (..)
 import Debug exposing (..)
@@ -35,11 +35,11 @@ initialBoard =
 --castlingAvailable =
 --    "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/R3K2R w KQkq - 0 1"
 
-fromFEN : String -> GameModel
+fromFEN : String -> Chess
 fromFEN fen =
     let parts =
         String.split " " fen |> Array.fromList
-    in GameModel (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))) []
+    in Chess (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))) []
             --(maybeContains (Array.get 1 parts) "w")
             --(maybeContains (Array.get 2 parts) "Q")
             --(maybeContains (Array.get 2 parts) "K")

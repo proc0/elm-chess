@@ -1,6 +1,6 @@
 module Data.Game exposing (..)
 
-type alias GameModel =
+type alias Chess =
     { board : Board
     , history : History
     }
@@ -12,9 +12,9 @@ type alias Rank
     = List Square
 
 type alias Square = 
-    { pos : Position
+    { position : Position
     , piece : Maybe Piece
-    , hilite : Bool
+    , valid : Bool
     }
 
 type alias Position =

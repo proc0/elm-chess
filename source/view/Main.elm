@@ -29,7 +29,7 @@ r_player mv =
     let mv_piece = case mv of
                         Just {current, piece} -> 
                             case piece of
-                                Just pc -> ([class "visible"], [r_svg2 (toPosition (current.y,current.x)) pc])
+                                Just pc -> ([class "visible"], [r_dragSvg (toPosition (current.y,current.x)) pc])
                                 Nothing -> ([], [])
                         Nothing -> ([], [])
     in (uncurry (node "player")) mv_piece
@@ -51,42 +51,42 @@ filter_rank f r = List.filterMap (\s -> f s) r
 -- render piece from square
 r_piece : Square -> Maybe (Html Msg)
 r_piece s = case s.piece of
-                 Just pc -> Just (r_svg s.pos pc)
+                 Just pc -> Just (r_svg s.position pc)
                  Nothing -> Nothing
 
 -- render svg piece
 r_svg : G.Position -> Piece -> Html Msg
 r_svg {x,y} piece = 
-    let svgTag : String
-        svgTag = case piece of
-                      Black figure -> getSvgTag "b_" figure
-                      White figure -> getSvgTag "w_" figure
     -- parse SVG from String
-    in case parse svgTag of
-            Err e -> text e
-            Ok svg -> node "piece" 
-                        [ style 
-                            [ "left" => px (x * squareSize)
-                            , "top" => px (y * squareSize)
-                            ]
-                        ] [svg]
+    case parse (getPieceSvgPrefix piece) of
+        Err e -> text e
+        Ok svg -> node "piece" 
+                    [ style 
+                        [ "left" => px (x * squareSize)
+                        , "top" => px (y * squareSize)
+                        ]
+                    ] [svg]
 
-r_svg2 : G.Position -> Piece -> Html Msg
-r_svg2 {x,y} piece = 
-    let svgTag : String
-        svgTag = case piece of
-                      Black figure -> getSvgTag "b_" figure
-                      White figure -> getSvgTag "w_" figure
+-- dragable svg markup
+r_dragSvg : G.Position -> Piece -> Html Msg
+r_dragSvg {x,y} piece = 
     -- parse SVG from String
-    in case parse svgTag of
-            Err e -> text e
-            Ok svg -> node "piece" 
-                        [ style 
-                            [ "position" => "absolute"
-                            , "top" => px (x - 32)
-                            , "left" => px (y - 32)
-                            ]
-                        ] [svg]
+    case parse (getPieceSvgPrefix piece) of
+        Err e -> text e
+        Ok svg -> node "piece" 
+                    [ style 
+                        [ "position" => "absolute"
+                        , "top" => px (x - 32)
+                        , "left" => px (y - 32)
+                        ]
+                    ] [svg]
+
+getPieceSvgPrefix : Piece -> String
+getPieceSvgPrefix piece = 
+    case piece of
+        Black figure -> getSvgTag "b_" figure
+        White figure -> getSvgTag "w_" figure
+
 -- render board
 ---------------
 r_board : Maybe Square -> Board -> Html Msg 
@@ -100,7 +100,7 @@ r_rank f r = node "rank" [] (List.map f r)
 r_square : Maybe Square -> Square -> Html Msg
 r_square sel sq = 
     let attrs = 
-        if sq.hilite 
+        if sq.valid 
         then [class "selected"] 
         else []
     in node "square" attrs []

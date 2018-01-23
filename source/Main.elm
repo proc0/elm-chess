@@ -23,18 +23,14 @@ init = let initBoard = fromFEN initialBoard
        in Model initBoard Nothing Nothing ! []
 
 subscriptions : Model -> Sub Msg
-subscriptions model = 
-    case model.player of
+subscriptions {player} = 
+    case player of
         Nothing -> Sub.none
-        Just {current,piece} ->
+        Just {piece} ->
             case piece of 
-                 Just pc ->
+                Just p ->
                     Sub.batch 
-                        [ Mouse.moves (PieceDrag pc)
-                        , Mouse.ups (PieceDrop pc) 
+                        [ Mouse.moves (Drag p)
+                        , Mouse.ups (Drop p) 
                         ]                    
-                 Nothing ->
-                    Sub.batch 
-                        [ Mouse.moves Drag
-                        , Mouse.ups Drop 
-                        ]
+                Nothing -> Sub.none

@@ -6,14 +6,15 @@ getSvgTag : String -> G.Figure -> String
 getSvgTag prefix f = svgTag (prefix ++ String.fromChar (figCharMap f))
 
 figCharMap : G.Figure -> Char
-figCharMap fig = case fig of
-                        Pawn    -> 'p'
-                        Rook    -> 'r'
-                        Bishop  -> 'b'
-                        Knight  -> 'n'
-                        Queen   -> 'q'
-                        King    -> 'k'
-                        _       -> 'z'
+figCharMap fig = 
+    case fig of
+        Pawn    -> 'p'
+        Rook    -> 'r'
+        Bishop  -> 'b'
+        Knight  -> 'n'
+        Queen   -> 'q'
+        King    -> 'k'
+        _       -> 'z'
 
 svgTag : String -> String
 svgTag s =
