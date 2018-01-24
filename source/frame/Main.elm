@@ -42,7 +42,7 @@ update msg ({ game, select, player } as model) =
                                 -- prevents select from persisting after dragging piece
                                 if p == pc && position /= (toGamePosition ps)
                                 then Nothing
-                                else select
+                                else Just (Square position piece True)
                             Nothing -> Nothing
                     Nothing -> Nothing            
 
@@ -59,19 +59,30 @@ update msg ({ game, select, player } as model) =
                      -- case for moving piece clicking squares
                      Nothing -> 
                         case select of
-                            Just {position, piece} -> 
-                                case piece of
-                                    Just pc -> Chess ((liftPiece2 pc position) <| (addPiece pc ps) <| game.board) game.history
-                                    Nothing -> game
+                            Just ({position,piece} as sel) -> 
+                                let validBoard = validate sel game.board
+                                    nextSquare = findSquare (toGamePosition ps) validBoard
+                                in case piece of
+                                        Just p -> 
+                                            if nextSquare.valid
+                                            then Chess (clearBoardHilite <| (liftPiece2 p position) <| (addPiece p ps) <| validBoard) game.history
+                                            else Chess (clearBoardHilite <| (addPiece2 p position) <| (allValid game.board)) game.history
+                                        Nothing -> game
                             Nothing -> game
             Drop pc ps -> 
                 case select of
-                    Just {piece} -> 
-                        case piece of
-                            Just p -> Chess (addPiece pc ps (clearBoardHilite game.board)) game.history
-                            Nothing -> Chess (addPiece pc ps (clearBoardHilite game.board)) game.history     
-                    Nothing -> Chess (addPiece pc ps (clearBoardHilite game.board)) game.history     
-            Drag _ _ -> game 
+                    Just ({position,piece} as sel) -> 
+                        let validBoard = validate sel game.board
+                            nextSquare = findSquare (toGamePosition ps) validBoard
+                        in case piece of
+                                Just p -> 
+                                    if nextSquare.valid 
+                                    then Chess (clearBoardHilite <| addPiece pc ps validBoard) game.history
+                                    else Chess (clearBoardHilite <| addPiece2 p position (allValid game.board)) game.history
+                                Nothing -> game
+                    Nothing -> game    
+            Drag _ _ -> game
+            
     in (Model nextGame nextSelect nextMovement, Cmd.none)
 
 startDrag : Mouse.Position -> Maybe Moving -> Board -> Maybe Moving
@@ -118,6 +129,10 @@ clearBoardHilite : Board -> Board
 clearBoardHilite board = 
         List.map (\rk -> List.map (\{position,piece,valid} -> Square position piece False) rk) board
 
+allValid : Board -> Board
+allValid board = 
+        List.map (\rk -> List.map (\{position,piece,valid} -> Square position piece True) rk) board
+
 liftPiece : Piece -> Mouse.Position -> Board -> Board
 liftPiece pc ps bd = updateBoard remPieceFromSquare pc ps bd
 
@@ -156,11 +171,11 @@ addPieceToSquare : Piece -> Mouse.Position -> Square -> Square
 addPieceToSquare pc mp sq =
         case sq.piece of 
             Just pec ->
-                if sq.position == (toGamePosition mp)
+                if sq.position == (toGamePosition mp) && sq.valid
                 then Square sq.position (Just pc) True 
                 else sq
             Nothing -> 
-                if sq.position == (toGamePosition mp)
+                if sq.position == (toGamePosition mp) && sq.valid
                 then Square sq.position (Just pc) True 
                 else sq 
 
@@ -168,12 +183,12 @@ addPieceToSquare2 : Piece -> Game.Position -> Square -> Square
 addPieceToSquare2 pc mp sq =
         case sq.piece of 
             Just pec ->
-                if sq.position == mp
+                if sq.position == mp && sq.valid
                 then Square sq.position (Just pc) True 
                 else sq
             Nothing -> 
-                if sq.position == mp
-                then Square sq.position (Just pc) False 
+                if sq.position == mp && sq.valid
+                then Square sq.position (Just pc) True 
                 else sq 
 
 -----

@@ -91,9 +91,18 @@ cardinals board position =
             , left
             ]
         stepRange = List.map ((+) 1) boardside
-        step = List.concatMap 
-            (\d -> List.map (\i -> d i) stepRange)
-    in step directions    
+        step = List.foldl 
+            (\d (m, c) -> 
+                List.foldl (\i (memo, cont) -> 
+                        if cont
+                        then 
+                            let blocking = findSquare (d i position) board
+                            in case blocking.piece of
+                                Just p -> (memo, False)
+                                Nothing -> ((d i)::memo, True)                            
+                        else (memo, False)
+                        ) (m, c) stepRange) ([],True)
+    in fst <| step directions    
 
 up : Int -> Position -> Position
 up n p = {x=p.x, y=p.y-n}
