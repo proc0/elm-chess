@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "description": "elm chess",
   "main": "index.js",
+  "scripts": {
+    "build": "elm make source/Main.elm --output elm.js",
+    "serve": "elm reactor",
+    "start": "yarn build && yarn serve"
+  },
   "repository": "https://github.com/proc0/elmskak",
   "author": "proc0 <alanvx@gmail.com>",
   "license": "MIT",
