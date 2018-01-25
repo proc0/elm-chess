@@ -15,18 +15,25 @@ getPossible square board =
         Nothing -> [square]
 
 moveSquare : (Position -> Position) -> Square -> Square
-moveSquare move sq = Square (move sq.position) sq.piece sq.valid
+moveSquare move sq = Square (move sq.position) sq.piece True
 
 pieceMoves : Piece -> Position -> Board -> List (Position -> Position)
 pieceMoves piece position board = 
     let moves p =
         case p of
             Pawn -> 
-                case piece of
-                    White pc ->
-                        [ up 1 ]
-                    Black pc ->
-                        [ down 1 ]
+                let isFirstMove = pawnFirstMove piece position
+                    pawnEats = pawnCanEat piece position board
+                    firstMove = case piece of
+                        White pc ->
+                            case isFirstMove of
+                                Just mv -> mv::[ up 1 ]
+                                Nothing -> [ up 1 ]
+                        Black pc ->
+                            case isFirstMove of
+                                Just mv -> mv::[ down 1 ]
+                                Nothing -> [ down 1 ]
+                in firstMove ++ pawnEats
             Knight -> 
                 [ up 2 >> right 1
                 , up 2 >> left 1
@@ -79,7 +86,7 @@ diagonals board position =
                                     Just p -> (memo, False)
                                     Nothing -> (nextStep::memo, True)
                             else (memo, False)
-                        ) (m, c) stepRange) ([],True)
+                        ) (m, True) stepRange) ([],True)
     in fst <| step directions
 
 cardinals : Board -> Position -> List (Position -> Position)
@@ -101,7 +108,7 @@ cardinals board position =
                                 Just p -> (memo, False)
                                 Nothing -> ((d i)::memo, True)                            
                         else (memo, False)
-                        ) (m, c) stepRange) ([],True)
+                        ) (m, True) stepRange) ([],True)
     in fst <| step directions    
 
 up : Int -> Position -> Position
@@ -131,3 +138,53 @@ findSquare pos board =
     in case getSquare board of
             Just match -> match
             Nothing -> emptySquare
+
+pawnFirstMove : Piece -> Position -> Maybe (Position -> Position)
+pawnFirstMove pc ps =
+    case pc of
+        White _ -> 
+            if ps.y == 6
+            then Just (up 2)
+            else Nothing
+        Black _ ->
+            if ps.y == 1
+            then Just (down 2)
+            else Nothing 
+
+pawnCanEat : Piece -> Position -> Board -> List (Position -> Position)
+pawnCanEat pc ps bd =
+        let topLeft = {x=ps.x-1,y=ps.y-1} 
+            topRight = {x=ps.x+1,y=ps.y-1} 
+            bottomLeft = {x=ps.x-1,y=ps.y+1} 
+            bottomRight = {x=ps.x+1,y=ps.y+1} 
+        in case pc of
+            White _ -> 
+                let rank = bd |> Array.fromList |> Array.get (ps.y-1)
+                in case rank of
+                    Just r -> List.filterMap (\sq -> 
+                                    if sq.position == topLeft
+                                    then case sq.piece of
+                                        Just p -> Just (up 1 >> left 1)
+                                        Nothing -> Nothing
+                                    else if sq.position == topRight
+                                    then case sq.piece of
+                                        Just p -> Just (up 1 >> right 1)
+                                        Nothing -> Nothing                                    
+                                    else Nothing
+                    ) r
+                    Nothing -> []
+            Black _ ->
+                let rank = bd |> Array.fromList |> Array.get (ps.y+1)
+                in case rank of
+                    Just r -> List.filterMap (\sq -> 
+                                    if sq.position == bottomLeft
+                                    then case sq.piece of
+                                        Just p -> Just (down 1 >> left 1)
+                                        Nothing -> Nothing
+                                    else if sq.position == bottomRight
+                                    then case sq.piece of
+                                        Just p -> Just (down 1 >> right 1)
+                                        Nothing -> Nothing                                    
+                                    else Nothing
+                    ) r
+                    Nothing -> []

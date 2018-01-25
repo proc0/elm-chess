@@ -56,7 +56,7 @@ update msg ({ game, select, player } as model) =
                                 let movingSquare = findSquare (toGamePosition mv.start) game.board
                                 in Chess (validate movingSquare <| liftPiece pc mv.start (clearBoardHilite game.board)) game.history
                             Nothing -> game
-                     -- case for moving piece clicking squares
+                     -- case for moving by clicking squares
                      Nothing -> 
                         case select of
                             Just ({position,piece} as sel) -> 
