@@ -9,6 +9,11 @@ type alias Model =
     , player : Maybe Moving
     }
 
+type alias Moving2 =
+    { start   : Maybe Square
+    , current : Maybe Square
+    }
+
 type alias Moving =
     { piece   : Maybe Piece
     , start   : Mouse.Position

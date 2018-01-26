@@ -2,6 +2,7 @@ module View.Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Matrix exposing (..)
 import SvgParser exposing (parse)
 import Debug exposing (..)
 
@@ -38,11 +39,12 @@ r_player mv =
 ----------------
 r_pieces : Board -> Html Msg
 r_pieces board = 
-    let pieces = map_board r_piece board
+    let pieces = map_board r_piece (Matrix.toList board)
     in node "pieces" [] pieces
 
-map_board : (Square -> Maybe (Html Msg)) -> Board -> List (Html Msg)
-map_board f b = List.map (\r -> filter_rank f r) b |> List.concat
+map_board : (Square -> Maybe (Html Msg)) -> List Rank -> List (Html Msg)
+map_board f b = 
+    List.map (\r -> filter_rank f r) b |> List.concat
 
 -- empty squares will be filtered
 filter_rank : (Square -> Maybe (Html Msg)) -> Rank -> List (Html Msg)
@@ -91,7 +93,7 @@ getPieceSvgPrefix piece =
 ---------------
 r_board : Maybe Square -> Board -> Html Msg 
 r_board selected board =
-    let checker = List.map (r_rank (r_square selected)) board
+    let checker = List.map (r_rank (r_square selected)) (Matrix.toList board)
     in node "board" [] checker
 
 r_rank : (Square -> Html Msg) -> Rank -> Html Msg

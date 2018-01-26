@@ -27,25 +27,27 @@ update msg ({ game, select, player } as model) =
 
         nextMovement : Maybe Moving
         nextMovement = case msg of
-            Click ps -> startDrag ps player game.board
-            Drag pc ps -> Maybe.map (updateMoving ps pc) player
+            Click ps   -> startDrag ps player game.board
+            Drag pc ps -> Maybe.map (\{start} -> Moving (Just pc) start ps) player
             Drop pc ps -> Nothing
 
         nextSelect : Maybe Square
         nextSelect = case msg of
-            Click ps -> Just (findSquare (toGamePosition ps) game.board)
+            Click ps   -> Just (findSquare (toGamePosition ps) game.board)
             Drag pc ps -> select            
-            Drop pc ps -> 
-                case select of
-                    Just {position, piece} ->
-                        case piece of
-                            Just p -> 
-                                -- prevents select from persisting after dragging piece
-                                if p == pc && position /= (toGamePosition ps)
-                                then Nothing
-                                else Just (Square position piece True)
-                            Nothing -> Nothing
-                    Nothing -> Nothing            
+            Drop pc ps -> select |> 
+                -- prevents last piece from persisting
+                Maybe.map (\{position, piece} ->
+                    case piece of
+                        Just p -> 
+                            let movingAway = 
+                                p == pc && position /= (toGamePosition ps)
+                            in 
+                            if movingAway
+                            then Nothing -- clear select
+                            else Just (Square position piece True)
+                        Nothing -> Nothing) 
+                |> Maybe.withDefault Nothing
 
         nextGame : Chess
         nextGame = case msg of
@@ -55,7 +57,7 @@ update msg ({ game, select, player } as model) =
                         case mv.piece of
                             Just pc -> 
                                 let movingSquare = findSquare (toGamePosition mv.start) game.board
-                                in Chess (validate movingSquare <| liftPiece pc mv.start (clearBoardHilite game.board)) game.history
+                                in Chess (validate movingSquare <| liftPiece pc mv.start (toggleValid False game.board)) game.history
                             Nothing -> game
                      -- case for moving by clicking squares
                      Nothing -> 
@@ -66,8 +68,8 @@ update msg ({ game, select, player } as model) =
                                 in case piece of
                                         Just p -> 
                                             if nextSquare.valid
-                                            then Chess (clearBoardHilite <| (liftPiece2 p position) <| (addPiece p ps) <| validBoard) game.history
-                                            else Chess (clearBoardHilite <| (addPiece2 p position) <| (allValid game.board)) game.history
+                                            then Chess (toggleValid False <| (liftPiece2 p position) <| (addPiece p ps) <| validBoard) game.history
+                                            else Chess (toggleValid False <| (addPiece2 p position) <| (toggleValid True game.board)) game.history
                                         Nothing -> game
                             Nothing -> game
             Drop pc ps -> 
@@ -78,8 +80,8 @@ update msg ({ game, select, player } as model) =
                         in case piece of
                                 Just p -> 
                                     if nextSquare.valid 
-                                    then Chess (clearBoardHilite <| addPiece pc ps validBoard) game.history
-                                    else Chess (clearBoardHilite <| addPiece2 p position (allValid game.board)) game.history
+                                    then Chess (toggleValid False <| addPiece pc ps validBoard) game.history
+                                    else Chess (toggleValid False <| addPiece2 p position (toggleValid True game.board)) game.history
                                 Nothing -> game
                     Nothing -> game    
             Drag _ _ -> game
@@ -93,46 +95,30 @@ startDrag ps pl board =
             Just p -> Just (Moving (Just p) ps ps)
             Nothing -> Nothing
 
-updateDrag : Mouse.Position -> Moving -> Moving
-updateDrag ps {start} = Moving Nothing start ps
-
-updateMoving : Mouse.Position -> Piece -> Moving -> Moving
-updateMoving ps pc {start} = Moving (Just pc) start ps 
-
-stopMoving : Mouse.Position -> Piece -> Moving -> Maybe Moving
-stopMoving ps pc {start} = Just (Moving Nothing start ps)
-
---findPiece : Mouse.Position -> Board -> Maybe Piece
---findPiece ps board = 
---    let sq = (flip findSquare board) <| toGamePosition ps
---    in sq.piece
-
 findSquare : Game.Position -> Game.Board -> Square
 findSquare pos board = 
-    let emptySquare = Square pos Nothing False
-        retrieve : Int -> List a -> Maybe a
-        retrieve index items = 
-                items 
-                |> Array.fromList 
-                |> Array.get index
-        getSquare b = 
-            retrieve pos.y b 
-            |> Maybe.andThen (retrieve pos.x)
-
-    in case getSquare board of
-            Just match -> match
+    let sq = Matrix.get (fromPos pos) board
+        emptySquare = Square pos Nothing False
+    in case sq of
+            Just s -> s
             Nothing -> emptySquare
 
 -- board manipulations
 ----------------------
 
-clearBoardHilite : Board -> Board
-clearBoardHilite board = 
-        List.map (\rk -> List.map (\{position,piece,valid} -> Square position piece False) rk) board
+toggleValid : Bool -> Board -> Board
+toggleValid isValid board=
+        Matrix.map (\{position,piece} -> Square position piece isValid) board
 
-allValid : Board -> Board
-allValid board = 
-        List.map (\rk -> List.map (\{position,piece,valid} -> Square position piece True) rk) board
+--clearBoardHilite : Board -> Board
+--clearBoardHilite board = 
+--        Matrix.map (\{position,piece,valid} -> Square position piece False) board
+--        --List.map (\rk -> List.map (\{position,piece,valid} -> Square position piece False) rk) board
+
+--allValid : Board -> Board
+--allValid board = 
+--        Matrix.map (\{position,piece,valid} -> Square position piece True) board
+        --List.map (\rk -> List.map (\{position,piece,valid} -> Square position piece True) rk) board
 
 liftPiece : Piece -> Mouse.Position -> Board -> Board
 liftPiece pc ps bd = updateBoard remPieceFromSquare pc ps bd
@@ -148,7 +134,8 @@ addPiece2 pc ps bd = updateBoard addPieceToSquare2 pc ps bd
 
 updateBoard : (Piece -> Game.Position -> Square -> Square) -> Piece -> Game.Position -> Board -> Board
 updateBoard trans piece pos board =
-    List.map ((\pc ps rk -> List.map (trans pc ps) rk) piece pos) board
+    Matrix.map (\sq -> trans piece pos sq) board
+    --List.map ((\pc ps rk -> List.map (trans pc ps) rk) piece pos) board
 
 remPieceFromSquare : Piece -> Game.Position -> Square -> Square
 remPieceFromSquare pc pos sq = 
@@ -196,19 +183,15 @@ addPieceToSquare2 pc mp sq =
 
 validate : Square -> Board -> Board
 validate sq bd =
-    let possibleSquares = getPossibleSquares sq bd
-        -- using foldl for hack to check memo square
-        -- todo: process possible squares as matrix
-        checkMoves sq_ = List.foldl 
-            (\s {position,piece,valid} -> 
-                if s.position == position
-                then Square position piece True
-                else Square position piece valid 
-            ) sq_ possibleSquares
-    in List.map (\rk -> List.map checkMoves rk) (Matrix.toList bd) |> Matrix.fromList
+    let validSquares = getValidSquares sq bd
+        checkMoves sq_ b = 
+            Matrix.update (fromPos sq_.position) 
+                (\{ position, piece, valid } ->
+                    Square position piece True) b 
+    in List.foldl checkMoves bd validSquares
 
-getPossibleSquares : Square -> Board -> List Square
-getPossibleSquares sq bd = (flip filterSameSquares) bd <| getPossible sq bd
+getValidSquares : Square -> Board -> List Square
+getValidSquares sq bd = (flip filterSameSquares) bd <| getPossible sq bd
 
 filterSameSquares : List Square -> Board -> List Square
 filterSameSquares squares bd =

@@ -11,9 +11,6 @@ type alias Chess =
 type alias Board =
     Matrix Square
 
-type alias Boarde 
-    = List Rank
-
 type alias Rank 
     = List Square
 

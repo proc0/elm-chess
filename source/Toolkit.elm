@@ -1,5 +1,7 @@
 module Toolkit exposing (..)
 
+import Array exposing (..)
+import Matrix exposing (..)
 import Mouse exposing (..)
 
 import Data.Game as Game exposing (..)
@@ -9,6 +11,9 @@ import Settings exposing (..)
 
 fst = Tuple.first
 snd = Tuple.second
+
+fromPos : Game.Position -> Matrix.Location
+fromPos p = loc p.x p.y
 
 toPosition : (Int, Int) -> Game.Position
 toPosition (x_, y_) = {x=x_, y=y_}

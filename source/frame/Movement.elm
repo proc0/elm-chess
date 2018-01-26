@@ -34,11 +34,8 @@ left n p =
 right : Int -> Position -> Position
 right n p = 
     { x = p.x + n
-    , y = p.y 
+    , y = p.y
     }
-
-fromPos : Position -> Location
-fromPos p = loc p.x p.y
 
 diagonals : Board -> Position -> List (Position -> Position)
 diagonals board position = 
