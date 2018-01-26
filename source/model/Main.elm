@@ -3,6 +3,7 @@ module Model.Main exposing (fromFEN, initialBoard)
 -- Forsythe Edwards Notation (FEN) -> Chess model
 
 import Array exposing (..)
+import Matrix exposing (..)
 import Debug exposing (..)
 
 import Data.Main exposing (..)
@@ -51,7 +52,7 @@ fromFEN fen =
 
 parsePieces : String -> Board
 parsePieces s =
-    String.split "/" s |> List.map2 mapRank boardside
+    String.split "/" s |> List.map2 mapRank boardside |> Matrix.fromList
 
 mapRank : Int -> String -> Rank
 mapRank y row =

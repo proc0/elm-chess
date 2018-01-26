@@ -1,6 +1,7 @@
 module Frame.Main exposing (..)
 
 import Array exposing (..)
+import Matrix exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Mouse exposing (..)
@@ -9,7 +10,7 @@ import Debug exposing (..)
 
 import Data.Main exposing (..)
 import Data.Game as Game exposing (..)
-import Frame.Movement exposing (..)
+import Frame.Moves exposing (..)
 import Settings exposing (..)
 import Toolkit exposing (..)
 
@@ -196,13 +197,15 @@ addPieceToSquare2 pc mp sq =
 validate : Square -> Board -> Board
 validate sq bd =
     let possibleSquares = getPossibleSquares sq bd
+        -- using foldl for hack to check memo square
+        -- todo: process possible squares as matrix
         checkMoves sq_ = List.foldl 
             (\s {position,piece,valid} -> 
                 if s.position == position
                 then Square position piece True
                 else Square position piece valid 
             ) sq_ possibleSquares
-    in List.map (\rk -> List.map checkMoves rk) bd
+    in List.map (\rk -> List.map checkMoves rk) (Matrix.toList bd) |> Matrix.fromList
 
 getPossibleSquares : Square -> Board -> List Square
 getPossibleSquares sq bd = (flip filterSameSquares) bd <| getPossible sq bd
@@ -213,7 +216,7 @@ filterSameSquares squares bd =
             sq_.position == s.position
         checkRank s_ rk = List.head <| List.filter (checkSquare s_) rk
         filterSquare square =
-            let s1 = List.filterMap (checkRank square) bd
+            let s1 = List.filterMap (checkRank square) (Matrix.toList bd)
             in case (List.head s1) of
                  Just s -> filterSame square s
                  Nothing -> False
