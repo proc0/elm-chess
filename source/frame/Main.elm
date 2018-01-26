@@ -68,8 +68,8 @@ update msg ({ game, select, player } as model) =
                                 in case piece of
                                         Just p -> 
                                             if nextSquare.valid
-                                            then Chess (toggleValid False <| (liftPiece2 p position) <| (addPiece p ps) <| validBoard) game.history
-                                            else Chess (toggleValid False <| (addPiece2 p position) <| (toggleValid True game.board)) game.history
+                                            then Chess (toggleValid False <| (liftPiece p (toGamePosition position)) <| (addPiece p ps) <| validBoard) game.history
+                                            else Chess (toggleValid False <| (addPiece p (toGamePosition position)) <| (toggleValid True game.board)) game.history
                                         Nothing -> game
                             Nothing -> game
             Drop pc ps -> 
@@ -81,7 +81,7 @@ update msg ({ game, select, player } as model) =
                                 Just p -> 
                                     if nextSquare.valid 
                                     then Chess (toggleValid False <| addPiece pc ps validBoard) game.history
-                                    else Chess (toggleValid False <| addPiece2 p position (toggleValid True game.board)) game.history
+                                    else Chess (toggleValid False <| addPiece p (toGamePosition position) (toggleValid True game.board)) game.history
                                 Nothing -> game
                     Nothing -> game    
             Drag _ _ -> game
@@ -110,32 +110,15 @@ toggleValid : Bool -> Board -> Board
 toggleValid isValid board=
         Matrix.map (\{position,piece} -> Square position piece isValid) board
 
---clearBoardHilite : Board -> Board
---clearBoardHilite board = 
---        Matrix.map (\{position,piece,valid} -> Square position piece False) board
---        --List.map (\rk -> List.map (\{position,piece,valid} -> Square position piece False) rk) board
-
---allValid : Board -> Board
---allValid board = 
---        Matrix.map (\{position,piece,valid} -> Square position piece True) board
-        --List.map (\rk -> List.map (\{position,piece,valid} -> Square position piece True) rk) board
-
 liftPiece : Piece -> Mouse.Position -> Board -> Board
 liftPiece pc ps bd = updateBoard remPieceFromSquare pc ps bd
-
-liftPiece2 : Piece -> Game.Position -> Board -> Board
-liftPiece2 pc ps bd = updateBoard remPieceFromSquare2 pc ps bd
 
 addPiece : Piece -> Mouse.Position -> Board -> Board
 addPiece pc ps bd = updateBoard addPieceToSquare pc ps bd
 
-addPiece2 : Piece -> Game.Position -> Board -> Board
-addPiece2 pc ps bd = updateBoard addPieceToSquare2 pc ps bd
-
 updateBoard : (Piece -> Game.Position -> Square -> Square) -> Piece -> Game.Position -> Board -> Board
 updateBoard trans piece pos board =
     Matrix.map (\sq -> trans piece pos sq) board
-    --List.map ((\pc ps rk -> List.map (trans pc ps) rk) piece pos) board
 
 remPieceFromSquare : Piece -> Game.Position -> Square -> Square
 remPieceFromSquare pc pos sq = 
@@ -146,29 +129,8 @@ remPieceFromSquare pc pos sq =
                 else sq
             Nothing -> sq
 
-remPieceFromSquare2 : Piece -> Game.Position -> Square -> Square
-remPieceFromSquare2 pc pos sq = 
-        case sq.piece of 
-            Just pec -> 
-                if sq.position == pos && pec == pc 
-                then Square sq.position Nothing True
-                else sq
-            Nothing -> sq
-
-addPieceToSquare : Piece -> Mouse.Position -> Square -> Square
+addPieceToSquare : Piece -> Game.Position -> Square -> Square
 addPieceToSquare pc mp sq =
-        case sq.piece of 
-            Just pec ->
-                if sq.position == (toGamePosition mp) && sq.valid
-                then Square sq.position (Just pc) True 
-                else sq
-            Nothing -> 
-                if sq.position == (toGamePosition mp) && sq.valid
-                then Square sq.position (Just pc) True 
-                else sq 
-
-addPieceToSquare2 : Piece -> Game.Position -> Square -> Square
-addPieceToSquare2 pc mp sq =
         case sq.piece of 
             Just pec ->
                 if sq.position == mp && sq.valid
