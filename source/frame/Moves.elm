@@ -13,7 +13,7 @@ getPossible : Square -> Board -> List Square
 getPossible square board = 
     case square.piece of
         Just pc -> List.map (flip moveSquare square) (pieceMoves pc square.position board)
-        Nothing -> [square]
+        Nothing -> []
 
 moveSquare : (Position -> Position) -> Square -> Square
 moveSquare move sq = Square (move sq.position) sq.piece True

@@ -48,18 +48,18 @@ diagonals board position =
             ]
         stepRange = List.map ((+) 1) boardside
         step = List.foldl 
-                (\(d1,d2) (m, c) -> 
-                    List.foldl (\i (memo, cont) -> 
-                        let nextStep = (d1 i) >> (d2 i)
-                        -- stop processing if piece found
-                        in if cont
-                            then 
-                                let blocking = findSquare (nextStep position) board
-                                in case blocking.piece of
-                                    Just p -> (memo, False)
-                                    Nothing -> (nextStep::memo, True)
-                            else (memo, False)
-                        ) (m, True) stepRange) ([],True)
+            (\(d1,d2) (m, c) -> 
+                List.foldl (\i (memo, cont) -> 
+                    let nextStep = (d1 i) >> (d2 i)
+                    -- stop processing if piece found
+                    in if cont
+                        then 
+                            let blocking = findSquare (nextStep position) board
+                            in case blocking.piece of
+                                Just p -> (memo, False)
+                                Nothing -> (nextStep::memo, True)
+                        else (memo, False)
+                    ) (m, True) stepRange) ([],True)
     in fst <| step directions
 
 cardinals : Board -> Position -> List (Position -> Position)
@@ -87,7 +87,7 @@ cardinals board position =
 
 findSquare : Game.Position -> Game.Board -> Square
 findSquare pos board = 
-    let sq = Matrix.get (loc pos.x pos.y) board
+    let sq = Matrix.get (toLocation pos) board
         emptySquare = Square pos Nothing False
     in case sq of
             Just s -> s
@@ -108,7 +108,7 @@ findSquare pos board =
 
 pawnMoves : Piece -> Position -> Board -> List (Position -> Position)
 pawnMoves piece position board = 
-    let location = (loc position.x position.y)
+    let location = (toLocation position)
         pawnSquare = Matrix.get location board
         pawnMove = case piece of
             White _ -> [ up 1 ]
@@ -159,7 +159,7 @@ pawnCaptures sq bd =
                 , down 1 >> right 1
                 ]
             checkSquare mv =
-                let target = Matrix.get (fromPos <| mv ps) bd
+                let target = Matrix.get (toLocation <| mv ps) bd
                     posons = Maybe.map (\t -> Maybe.map (\_ -> mv) t.piece) target
                 in Maybe.withDefault (Just idle) posons
         in case sq.piece of

@@ -20,17 +20,23 @@ main = Html.program
 
 init : ( Model, Cmd Msg )
 init = let initBoard = fromFEN initialBoard
-       in Model initBoard Nothing Nothing ! []
+       in Model initBoard Nothing ! []
 
 subscriptions : Model -> Sub Msg
 subscriptions {player} = 
     case player of
         Nothing -> Sub.none
-        Just {piece} ->
-            case piece of 
-                Just p ->
+        Just {select, drag} ->
+        --    Maybe.map2 (\s d ->
+        --            Sub.batch 
+        --                [ Mouse.moves (Drag d)
+        --                , Mouse.ups (Drop d) 
+        --                ]  
+        --        ) select drag |> Maybe.withDefault Sub.none
+            case drag of 
+                Just sq ->
                     Sub.batch 
-                        [ Mouse.moves (Drag p)
-                        , Mouse.ups (Drop p) 
-                        ]                    
+                        [ Mouse.moves (Drag sq)
+                        , Mouse.ups (Drop sq) 
+                        ]                   
                 Nothing -> Sub.none
