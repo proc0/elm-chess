@@ -3,11 +3,6 @@ module Data.Game exposing (..)
 import Matrix exposing (..)
 import Array exposing (..)
 
-type alias Chess =
-    { board : Board
-    , history : History
-    }
-
 type alias Board =
     Matrix Square
 

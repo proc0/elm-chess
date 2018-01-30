@@ -14,29 +14,24 @@ import Toolkit exposing (..)
 import Frame.Main exposing (..)
 import View.Assets.Pieces exposing (..)
 
-render : Model -> Html Msg
-render { game, player } =
+render : Chess -> Html Msg
+render { board, player } =
     node "main" 
         [ onMouseDown 
         ]
         [ r_player player
-        , r_pieces game.board
-        , r_board game.board 
+        , r_pieces board
+        , r_board board 
         ]
 
 -- render player layer
 ----------------------
-r_player : Maybe Moving -> Html Msg
-r_player mv =
-    let mv_piece = case mv of
-        Nothing -> ([], [])
-        Just {select, drag} -> 
-            Maybe.map2 
-                (\s d ->
-                    if s == d -- use select if drag not started
-                    then ([class "visible"], [r_dragSvg s])
-                    else ([class "visible"], [r_dragSvg d])
-                ) select drag |> Maybe.withDefault ([], [])
+r_player : Player -> Html Msg
+r_player {select, drag} =
+    let mv_piece =
+        case drag of
+            Just d -> ([class "visible"], [r_dragSvg d])
+            Nothing -> ([], [])        
     in (uncurry (node "player")) mv_piece
 
 -- render pieces

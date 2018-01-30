@@ -17,138 +17,85 @@ import Toolkit exposing (..)
 onMouseDown : Attribute Msg
 onMouseDown = on "mousedown" (Json.map Click Mouse.position)
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ({ game, player } as model) =
-    let 
-        nextMovement : Maybe Moving
-        nextMovement = case msg of
-            Click xy   -> startDrag xy game.board
-            Drag sq xy -> updateDrag xy sq player
-            Drop _ _   -> Maybe.map (\pl -> { pl | drag = Nothing }) player
+update : Msg -> Chess -> ( Chess, Cmd Msg )
+update msg ({ board, player, history } as model) =
+   let 
+        selected : Maybe Square
+        selected = 
+            let target p = Matrix.get (toLocation <| getPosition p) board
+            in case msg of
+                Click xy -> target xy
+                Drag xy  -> target xy
+                Drop xy  -> target xy
 
-            --Drop sq xy -> player.drag |> 
-            --    -- prevents sticky piece when lifted
-            --    Maybe.map (\{position, piece} ->
-            --        case piece of
-            --            Just p -> 
-            --                let movingAway = 
-            --                    p == piece && position /= (getPosition xy)
-            --                in 
-            --                if movingAway
-            --                then Nothing -- drop drag
-            --                else Just (Square position piece True)
-            --            Nothing -> Nothing) 
-            --    |> Maybe.withDefault Nothing
+        playerMove : Player
+        playerMove = 
+            case msg of 
+                Click xy ->
+                    case selected of
+                        Just s  -> { player | select = selected, drag = Just (startDrag xy s) }
+                        Nothing -> { player | select = Nothing, drag = Nothing }
+                Drag xy -> 
+                    case player.drag of
+                        Just d -> { player | drag = Just { d | position = xy }}
+                        Nothing -> player
+                Drop xy -> { player | drag = Nothing }
 
-        --nextSelect : Maybe Square
-        --nextSelect = case msg of
-        --    Click xy   -> Matrix.get (toLocation xy) game.board
-        --    Drag _ _   -> player.drag            
-        --    Drop sq xy -> player.drag |> 
-        --        -- prevents sticky piece when lifted
-        --        Maybe.map (\{position, piece} ->
-        --            case piece of
-        --                Just p -> 
-        --                    let movingAway = 
-        --                        p == pc && position /= (getPosition ps)
-        --                    in 
-        --                    if movingAway
-        --                    then Nothing -- drop drag
-        --                    else Just (Square position piece True)
-        --                Nothing -> Nothing) 
-        --        |> Maybe.withDefault Nothing
-        logSquare = case nextMovement of
-            Just m -> case msg of
-                Click ps -> log "Click" Nothing
-                Drag pc ps -> log "Drag" (Just pc)
-                Drop pc ps -> log "Drop" (Just pc)
-            Nothing -> log "nothing" Nothing
-        logMovement = case nextMovement of
-            Just m -> case msg of
-                Click ps -> log "Click" ps
-                Drag pc ps -> log "Drag" ps
-                Drop pc ps -> log "Drop" ps
-            Nothing -> log "nothing" (toPosition (0,0))
 
-        nextGame : Maybe Chess
-        nextGame = case msg of
-            Click xy -> 
-                nextMovement |> Maybe.map (\mv ->
-                    --Maybe.map (\sq -> 
-                    --    Maybe.map (\pc -> 
-                    --            Chess (validate sq <| liftPiece sq (toggleValid False game.board)) game.history
-                    --        ) sq.piece
-                    --    ) mv.drag)
-                    --|> Maybe.map (\)
-                    case mv.drag of
+        nextBoard : Board
+        nextBoard = 
+            let clear = toggleValid False
+                defaults = clear board
+                toValid = flip validate defaults
+            in case msg of
+                Drag _  -> board
+                Click xy -> 
+                    case selected of
                         Just sq -> 
-                            case sq.piece of
-                                Just pc -> 
-                                    case mv.select of
-                                        Just sel -> Chess (validate sel <| liftPiece sel (toggleValid False game.board)) game.history
-                                        Nothing -> game
-                                    --let movingSquare = findSquare (getPosition mv.start) game.board
-                                    --in Chess (validate movingSquare <| liftPiece pc mv.start (toggleValid False game.board)) game.history
-                                Nothing -> game
-                        -- case for moving by clicking squares
-                        Nothing -> 
-                            case mv.select of
-                                Just ({position,piece} as sel) -> 
-                                    let validBoard = validate sel game.board
-                                        nextSquare = findSquare (getPosition xy) validBoard
-                                    in case piece of
-                                            Just p -> 
-                                                if nextSquare.valid
-                                                then Chess (toggleValid False <| (liftPiece sel) <| (addPiece ({ sel | position = getPosition xy })) <| validBoard) game.history
-                                                else Chess (toggleValid False <| (addPiece ({ sel | position = getPosition xy })) <| (toggleValid True game.board)) game.history
-                                            Nothing -> game
-                                Nothing -> game
-                    )
-            Drop sq xy -> 
-                nextMovement |> Maybe.map (\mv -> 
-                    case mv.select of
-                        Just ({position,piece} as sel) -> 
-                            let validBoard = validate sel game.board
-                                --nextSquare = findSquare (getPosition xy) validBoard
-                            in case piece of
-                                    Just _ -> 
-                                        if sq.valid 
-                                        then Chess (toggleValid False <| addPiece ({ sel | position = getPosition xy }) validBoard) game.history
-                                        else Chess (toggleValid False <| addPiece ({ sel | position = getPosition xy }) (toggleValid True game.board)) game.history
-                                    Nothing -> game
-                        Nothing -> game
-                    ) 
-            Drag _ _ -> Nothing
-            
-    in (Model (Maybe.withDefault game nextGame) nextMovement, Cmd.none)
+                            case sq.piece of 
+                                Just pc -> defaults |> validate sq |> liftPiece sq 
+                                Nothing -> 
+                                    case player.select of
+                                        Just sq -> 
+                                            let position = getPosition xy
+                                                target = Matrix.get (toLocation position) (toValid sq) 
+                                            in case target of
+                                                Just tg ->
+                                                    if tg.valid && tg.position /= sq.position
+                                                    then toValid sq |> liftPiece sq |> addPiece position sq.piece |> clear
+                                                    else defaults
+                                                Nothing -> defaults
+                                        Nothing -> defaults 
+                        Nothing -> defaults
 
-startDrag : Mouse.Position -> Board -> Maybe Moving
-startDrag ({x,y} as xy) board = 
-    let currentSquare = Matrix.get (toLocation << getPosition <| xy) board
-        _ = log "currentSquare" currentSquare
-    in Just <| Moving currentSquare (Maybe.map (\sq -> { sq | position = xy }) currentSquare)
+                Drop xy ->
+                    case player.select of
+                        Just sq -> 
+                            let position = getPosition xy
+                                target = Matrix.get (toLocation position) (toValid sq) 
+                            in case target of
+                                Just tg ->
+                                    if tg.valid && tg.position /= sq.position
+                                    then addPiece position sq.piece (toValid sq) |> clear
+                                    else addPiece sq.position sq.piece board
+                                Nothing -> defaults
+                        Nothing -> defaults 
 
-updateDrag : Mouse.Position -> Square -> Maybe Moving -> Maybe Moving
+    in Chess nextBoard playerMove history ! []
+                                           
+
+startDrag : Mouse.Position -> Square -> Square
+startDrag ps sq = 
+    case sq.piece of
+            Just p -> { sq | position = ps }
+            Nothing -> sq
+
+updateDrag : Mouse.Position -> Square -> Maybe Player -> Maybe Player
 updateDrag xy sq player = 
-    --let pos = {x=xy.x,y=xy.y}
-    Maybe.map (\p -> { p | 
-            drag = Just ({ sq | position = xy })
+    Maybe.map (\p -> 
+        { p | drag = Just ({ sq | position = xy })
         }) player
-    --let currentSquare = Matrix.get (toLocation xy) board
-    --in Maybe.map (\sq -> Moving sq sq) currentSquare
 
-    --let sq = findSquare (getPosition xy) board
-    --in case sq.piece of
-    --        Just p -> Just (Moving (Just p) xy xy)
-    --        Nothing -> Nothing
-
-findSquare : Game.Position -> Game.Board -> Square
-findSquare pos board = 
-    let sq = Matrix.get (toLocation pos) board
-        emptySquare = Square pos Nothing False
-    in case sq of
-            Just s -> s
-            Nothing -> emptySquare
 
 -- board manipulations
 ----------------------
@@ -161,37 +108,12 @@ liftPiece : Square -> Board -> Board
 liftPiece sq bd = 
     Matrix.update (toLocation sq.position) (\s -> { s | piece = Nothing }) bd
 
---updateBoard : (Square -> Square -> Square) -> Square -> Board -> Board
---updateBoard trans piece pos board =
---    Matrix.map (\sq -> trans piece pos sq) board
-
---liftPiece : Square -> Board -> Board
---liftPiece sq bd = updateBoard clearSquare sq bd
-
-addPiece : Square -> Board -> Board
-addPiece sq bd = 
-    Matrix.update (toLocation sq.position) (\s -> { s | piece = sq.piece }) bd
-
-
-
---liftPiece : Piece -> Mouse.Position -> Board -> Board
---liftPiece pc xy bd = updateBoard remPieceFromSquare pc ps bd
-
---addPiece : Piece -> Game.Position -> Board -> Board
---addPiece pc ps bd = updateBoard addPieceToSquare pc ps bd
-
---updateBoard : (Piece -> Game.Position -> Square -> Square) -> Piece -> Game.Position -> Board -> Board
---updateBoard trans piece pos board =
---    Matrix.map (\sq -> trans piece pos sq) board
-
---clearSquare : Square -> Square -> Square
---clearSquare current target = 
---        case target.piece of 
---            Just pc -> 
---                if target.position == current.position && pc == current.piece 
---                then Square target.position Nothing True
---                else target
---            Nothing -> target
+addPiece : Mouse.Position -> Maybe Piece -> Board -> Board
+addPiece ps pc bd = 
+    Matrix.update (toLocation ps) (\s -> 
+        if s.valid 
+        then { s | piece = pc, valid = True } 
+        else s) bd
 
 moveSquare : Square -> Square -> Square
 moveSquare current target = 
@@ -199,23 +121,12 @@ moveSquare current target =
         then { current | valid = True }
         else target
 
-        --case sq.piece of 
-        --    Just pec ->
-        --        if sq.position == mp && sq.valid
-        --        then Square sq.position (Just pc) True 
-        --        else sq
-        --    Nothing -> 
-        --        if sq.position == mp && sq.valid
-        --        then Square sq.position (Just pc) True 
-        --        else sq 
-
 -----
 
 validate : Square -> Board -> Board
 validate sq bd =
-    let validSquares = getValidSquares sq bd
-    --let validSquares = [sq]
-        _ = log "valid" validSquares
+    -- append input square as valid
+    let validSquares = sq::(getValidSquares sq bd)
         checkMoves sq_ b = 
             Matrix.update (toLocation sq_.position) 
                 (\{ position, piece, valid } ->
@@ -232,10 +143,6 @@ filterSameSquares squares bd =
             in case square of
                 Just sq -> isSameColor sq target
                 Nothing -> False
-            --let s1 = List.filterMap (checkRank square) (Matrix.toList bd)
-            --in case (List.head s1) of
-            --     Just s -> isSameColor square s
-            --     Nothing -> False
     in List.filter filterSquare squares
 
 isSameColor : Square -> Square -> Bool

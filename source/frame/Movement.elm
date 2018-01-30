@@ -92,27 +92,15 @@ findSquare pos board =
     in case sq of
             Just s -> s
             Nothing -> emptySquare
-    --let emptySquare = Square pos Nothing False
-    --    retrieve : Int -> List a -> Maybe a
-    --    retrieve index items = 
-    --            items 
-    --            |> Array.fromList 
-    --            |> Array.get index
-    --    getSquare b = 
-    --        retrieve pos.y b 
-    --        |> Maybe.andThen (retrieve pos.x)
 
-    --in case getSquare board of
-    --        Just match -> match
-    --        Nothing -> emptySquare
-
-pawnMoves : Piece -> Position -> Board -> List (Position -> Position)
-pawnMoves piece position board = 
-    let location = (toLocation position)
-        pawnSquare = Matrix.get location board
-        pawnMove = case piece of
-            White _ -> [ up 1 ]
-            Black _ -> [ down 1 ] 
+pawnMoves : Square -> Board -> List (Position -> Position)
+pawnMoves square board = 
+    let pawnMove = case square.piece of
+            Just pc ->
+                case pc of
+                    White _ -> [ up 1 ]
+                    Black _ -> [ down 1 ]
+            Nothing -> []
         -- pawn potential moves:
         -- forward square (two if first move),
         -- capture squares if a piece is there              
@@ -121,7 +109,7 @@ pawnMoves piece position board =
                 (pawnFirstMove sq) 
                 ++ (pawnCaptures sq board) 
                 ++ pawnMove
-            ) pawnSquare
+            ) (Just square)
     in Maybe.withDefault [] totalMoves
 
 pawnFirstMove : Square -> List (Position -> Position)

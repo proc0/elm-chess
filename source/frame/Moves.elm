@@ -12,20 +12,20 @@ import Toolkit exposing (..)
 getPossible : Square -> Board -> List Square
 getPossible square board = 
     case square.piece of
-        Just pc -> List.map (flip moveSquare square) (pieceMoves pc square.position board)
+        Just pc -> List.map (flip moveSquare square) (pieceMoves square board)
         Nothing -> []
 
 moveSquare : (Position -> Position) -> Square -> Square
 moveSquare move sq = Square (move sq.position) sq.piece True
 
-pieceMoves : Piece -> Position -> Board -> List (Position -> Position)
-pieceMoves piece position board = 
-    let ps = position
+pieceMoves : Square -> Board -> List (Position -> Position)
+pieceMoves square board = 
+    let ps = square.position
         getCardinals p = cardinals board p
         getDiagonals p = diagonals board p
         moves p =
             case p of
-                Pawn    -> pawnMoves piece ps board
+                Pawn    -> pawnMoves square board
                 Bishop  -> getDiagonals ps
                 Rook    -> getCardinals ps 
                 Queen   -> List.append (getDiagonals ps) (getCardinals ps)                
@@ -50,6 +50,9 @@ pieceMoves piece position board =
                     , down 1 >> right 1
                     ]
                 _ -> []
-    in case piece of
-        White pc -> moves pc
-        Black pc -> moves pc
+    in case square.piece of
+        Just pc ->
+            case pc of 
+                White p -> moves p
+                Black p -> moves p
+        Nothing -> []

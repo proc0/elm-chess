@@ -1,7 +1,5 @@
 module Model.Main exposing (fromFEN, initialBoard)
 
--- Forsythe Edwards Notation (FEN) -> Chess model
-
 import Array exposing (..)
 import Matrix exposing (..)
 import Debug exposing (..)
@@ -19,7 +17,7 @@ initialPieces =
 initialBoard =
     initialPieces ++ " w KQkq - 0 1"
 
--- Some useful boards for debugging
+-- examples
 
 --testingEngine =
 --    "K6k/3n2pp/8/1P6/B7/8/6PP/8 w - - 0 1"
@@ -36,11 +34,12 @@ initialBoard =
 --castlingAvailable =
 --    "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/R3K2R w KQkq - 0 1"
 
-fromFEN : String -> Chess
+-- Forsythe Edwards Notation (FEN) -> Board
+fromFEN : String -> Board
 fromFEN fen =
     let parts =
         String.split " " fen |> Array.fromList
-    in Chess (parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))) []
+    in parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))
             --(maybeContains (Array.get 1 parts) "w")
             --(maybeContains (Array.get 2 parts) "Q")
             --(maybeContains (Array.get 2 parts) "K")
@@ -49,6 +48,13 @@ fromFEN fen =
             --(Maybe.withDefault "-" (Array.get 3 parts))
             --(Result.withDefault 0 (String.toInt (Maybe.withDefault "0" (Array.get 4 parts))))
             --(Result.withDefault 1 (String.toInt (Maybe.withDefault "0" (Array.get 5 parts))))
+
+--maybeContains str value =
+--    case str of
+--        Just s ->
+--            String.contains value s
+--        Nothing ->
+--            False
 
 parsePieces : String -> Board
 parsePieces s =
@@ -61,13 +67,6 @@ mapRank y row =
         posons = List.map2 (,) boardside (List.repeat 8 y)
                  |> List.map toPosition
     in List.map2 toPiece posons pieces
-
---maybeContains str value =
---    case str of
---        Just s ->
---            String.contains value s
---        Nothing ->
---            False
 
 expand : String -> String
 expand s =
