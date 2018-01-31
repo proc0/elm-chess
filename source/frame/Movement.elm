@@ -31,7 +31,7 @@ left n p =
     , y = p.y 
     }
 
-right : Int -> Position -> Position
+right   : Int -> Position -> Position
 right n p = 
     { x = p.x + n
     , y = p.y
@@ -39,7 +39,6 @@ right n p =
 
 diagonals : Board -> Position -> List (Position -> Position)
 diagonals board position = 
-    --[up 1 >> left 1, up 2 >> left 2, up 3 >> left 3, up 4 >> left 4]
     let directions = 
             [ (up, left)
             , (down, left)

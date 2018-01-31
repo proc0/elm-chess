@@ -4,7 +4,7 @@ boardside : List Int
 boardside = List.range 0 7
 
 squareSize : Int
-squareSize = 64
+squareSize = 54
 
 --squareColors : 
 --    ( String

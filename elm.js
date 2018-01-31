@@ -8863,7 +8863,7 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _darrensiegel$elm_chess_client$Settings$squareSize = 64;
+var _darrensiegel$elm_chess_client$Settings$squareSize = 54;
 var _darrensiegel$elm_chess_client$Settings$boardside = A2(_elm_lang$core$List$range, 0, 7);
 
 var _darrensiegel$elm_chess_client$Toolkit$px = function (value) {
