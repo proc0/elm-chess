@@ -1,12 +1,10 @@
 module Data.Game exposing (..)
 
-type alias Chess =
-    { board : Board
-    , history : History
-    }
+import Matrix exposing (..)
+import Array exposing (..)
 
-type alias Board 
-    = List Rank
+type alias Board =
+    Matrix Square
 
 type alias Rank 
     = List Square

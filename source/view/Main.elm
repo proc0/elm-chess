@@ -2,6 +2,8 @@ module View.Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Mouse exposing (..)
+import Matrix exposing (..)
 import SvgParser exposing (parse)
 import Debug exposing (..)
 
@@ -12,37 +14,36 @@ import Toolkit exposing (..)
 import Frame.Main exposing (..)
 import View.Assets.Pieces exposing (..)
 
-render : Model -> Html Msg
-render { game, select, player } =
+render : Chess -> Html Msg
+render { board, player } =
     node "main" 
         [ onMouseDown 
         ]
         [ r_player player
-        , r_pieces game.board
-        , r_board select game.board 
+        , r_pieces board
+        , r_board board 
         ]
 
 -- render player layer
 ----------------------
-r_player : Maybe Moving -> Html Msg
-r_player mv =
-    let mv_piece = case mv of
-                        Just {current, piece} -> 
-                            case piece of
-                                Just pc -> ([class "visible"], [r_dragSvg (toPosition (current.y,current.x)) pc])
-                                Nothing -> ([], [])
-                        Nothing -> ([], [])
+r_player : Player -> Html Msg
+r_player {select, drag} =
+    let mv_piece =
+        case drag of
+            Just d -> ([class "visible"], [r_dragSvg d])
+            Nothing -> ([], [])        
     in (uncurry (node "player")) mv_piece
 
 -- render pieces
 ----------------
 r_pieces : Board -> Html Msg
 r_pieces board = 
-    let pieces = map_board r_piece board
+    let pieces = map_board r_piece (Matrix.toList board)
     in node "pieces" [] pieces
 
-map_board : (Square -> Maybe (Html Msg)) -> Board -> List (Html Msg)
-map_board f b = List.map (\r -> filter_rank f r) b |> List.concat
+map_board : (Square -> Maybe (Html Msg)) -> List Rank -> List (Html Msg)
+map_board f b = 
+    List.map (\r -> filter_rank f r) b |> List.concat
 
 -- empty squares will be filtered
 filter_rank : (Square -> Maybe (Html Msg)) -> Rank -> List (Html Msg)
@@ -62,24 +63,29 @@ r_svg {x,y} piece =
         Err e -> text e
         Ok svg -> node "piece" 
                     [ style 
-                        [ "left" => px (x * squareSize)
-                        , "top" => px (y * squareSize)
+                        [ "top" => px (y * squareSize)
+                        , "left" => px (x * squareSize)
                         ]
                     ] [svg]
 
 -- dragable svg markup
-r_dragSvg : G.Position -> Piece -> Html Msg
-r_dragSvg {x,y} piece = 
-    -- parse SVG from String
-    case parse (getPieceSvgPrefix piece) of
-        Err e -> text e
-        Ok svg -> node "piece" 
-                    [ style 
-                        [ "position" => "absolute"
-                        , "top" => px (x - 32)
-                        , "left" => px (y - 32)
-                        ]
-                    ] [svg]
+r_dragSvg : Square -> Html Msg
+r_dragSvg {position,piece} = 
+    let x = position.x
+        y = position.y
+    in case piece of
+        Just pc ->
+            -- parse SVG from String
+            case parse (getPieceSvgPrefix pc) of
+                Err e -> text e
+                Ok svg -> node "piece" 
+                            [ style 
+                                [ "position" => "absolute"
+                                , "top" => px (y - 32)
+                                , "left" => px (x - 32)
+                                ]
+                            ] [svg]
+        Nothing -> text "" --neutral
 
 getPieceSvgPrefix : Piece -> String
 getPieceSvgPrefix piece = 
@@ -89,16 +95,16 @@ getPieceSvgPrefix piece =
 
 -- render board
 ---------------
-r_board : Maybe Square -> Board -> Html Msg 
-r_board selected board =
-    let checker = List.map (r_rank (r_square selected)) board
+r_board : Board -> Html Msg 
+r_board board =
+    let checker = List.map (r_rank r_square) (Matrix.toList board)
     in node "board" [] checker
 
 r_rank : (Square -> Html Msg) -> Rank -> Html Msg
 r_rank f r = node "rank" [] (List.map f r)
 
-r_square : Maybe Square -> Square -> Html Msg
-r_square sel sq = 
+r_square : Square -> Html Msg
+r_square sq = 
     let attrs = 
         if sq.valid 
         then [class "selected"] 

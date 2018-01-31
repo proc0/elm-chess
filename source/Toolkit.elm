@@ -1,5 +1,7 @@
 module Toolkit exposing (..)
 
+import Array exposing (..)
+import Matrix exposing (..)
 import Mouse exposing (..)
 
 import Data.Game as Game exposing (..)
@@ -10,39 +12,21 @@ import Settings exposing (..)
 fst = Tuple.first
 snd = Tuple.second
 
+pos : Int -> Int -> Game.Position
+pos x_ y_ = {x=x_, y=y_}
+
+toLocation : Game.Position -> Matrix.Location
+toLocation p = loc p.y p.x
+
 toPosition : (Int, Int) -> Game.Position
 toPosition (x_, y_) = {x=x_, y=y_}
-          --{ x = (x_ * squareSize)
-          --, y = (y_ * squareSize)
-          --}
---squareColor : Int -> Int -> String
---squareColor x y =
---    let black = isBlack x y
---    in if black 
---       then fst squareColors
---       else snd squareColors
 
-toGamePosition : Mouse.Position -> Game.Position
-toGamePosition position = 
-    Game.Position 
-        (position.x // squareSize) 
-        (position.y // squareSize)
+getPosition : Mouse.Position -> Game.Position
+getPosition position = 
+    Game.Position (position.x // squareSize) (position.y // squareSize)
 
 px : Int -> String
 px value = (toString value) ++ "px"
 
 --isBlack : Int -> Int -> Bool
 --isBlack x y = (rem (x + y) 2) == 0
-
---tile : G.Position -> List (Html Msg) -> Html Msg
---tile {x,y} = div []
-            --[ style
-            --[ 
-            ----"position"        => "absolute"
-            ----, "top"             => px (x * squareSize)
-            ----, "left"            => px (y * squareSize)
-            -- "width"           => px squareSize
-            --, "height"          => px squareSize
-            --, "backgroundColor" => squareColor x y
-            --]
-            --]
