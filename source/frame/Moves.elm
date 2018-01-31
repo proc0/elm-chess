@@ -9,6 +9,52 @@ import Frame.Movement exposing (..)
 import Settings exposing (..)
 import Toolkit exposing (..)
 
+validate : Square -> Board -> Board
+validate sq bd =
+    -- append input square as valid
+    let validSquares = sq::(getValidSquares sq bd)
+        checkMoves sq_ b = 
+            Matrix.update (toLocation sq_.position) 
+                (\{ position, piece, valid } ->
+                    Square position piece True) b 
+    in List.foldl checkMoves bd validSquares
+
+getValidSquares : Square -> Board -> List Square
+getValidSquares sq bd = (flip filterSameSquares) bd <| getPossible sq bd
+
+filterSameSquares : List Square -> Board -> List Square
+filterSameSquares squares bd =
+    let filterSquare target =
+            let square = Matrix.get (toLocation target.position) bd
+            in case square of
+                Just sq -> isSameColor sq target
+                Nothing -> False
+    in List.filter filterSquare squares
+
+isSameColor : Square -> Square -> Bool
+isSameColor s1 s2 = 
+    let isWhite p =
+            case p of
+                White _ -> True
+                Black _ -> False
+        avoidWhite p =
+            case p of
+                White _ -> False
+                Black _ -> True
+        avoidBlack p =
+            case p of
+                White _ -> True
+                Black _ -> False
+        checkRule p1 p2 =
+            if isWhite p1
+            then avoidWhite p2
+            else avoidBlack p2
+        valid = Maybe.map2 checkRule s1.piece s2.piece 
+    in case valid of
+        Just v -> v
+        Nothing -> True
+
+
 getPossible : Square -> Board -> List Square
 getPossible square board = 
     case square.piece of

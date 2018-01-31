@@ -75,32 +75,33 @@ update msg ({ board, player, history } as model) =
                 Drag _  -> Nothing
                 -- perform move by click
                 Click xy -> 
-                    case selected of
+                    selected |> Maybe.map
                         -- check selected square
-                        Just sq -> 
+                        (\sel ->
                             -- if occupied by piece
-                            case sq.piece of
+                            case sel.piece of
                                 -- player starts move
-                                Just pc -> halfMove sq 
+                                Just _ -> halfMove sel 
                                 Nothing -> 
                                     -- check if existing selection
-                                    case player.select of
+                                    player.select |> Maybe.map 
                                         -- if player has selection
-                                        -- then square click is a move
-                                        Just sq -> 
+                                        -- then square click is a move                                            
+                                        (\sq ->
                                             let pos = getPosition xy
                                             -- check clicked target square
-                                            in case (findTarget pos sq) of
-                                                Just tg ->
+                                            in (findTarget pos sq) |> Maybe.map
+                                                (\tg ->
                                                     -- prevent same square click
                                                     if tg.valid && tg.position /= sq.position
                                                     -- complete move by click (from, to)
                                                     then fullMove (sq => Square pos sq.piece True)
                                                     else Nothing
-                                                -- invalid target
-                                                Nothing -> Nothing
-                                        Nothing -> Nothing 
-                        Nothing -> Nothing
+                                                ) |> Maybe.withDefault Nothing
+                                        -- or invalid move
+                                        ) |> Maybe.withDefault Nothing 
+                        ) |> Maybe.withDefault Nothing
+
                 -- move by drag
                 Drop xy ->
                     -- if existing selection
@@ -117,7 +118,8 @@ update msg ({ board, player, history } as model) =
                                     else Nothing
                                 Nothing -> Nothing
                         -- dead branch
-                        Nothing -> Nothing 
+                        Nothing -> Nothing
+
         -- calculate next board 
         -- based on player move
         nextBoard : Board
@@ -167,8 +169,8 @@ update msg ({ board, player, history } as model) =
                                 Just sq -> addPiece sq.position sq.piece board
                                 Nothing -> defaults
         -- update history based on next move
-        newHistory : History
-        newHistory = 
+        nextHistory : History
+        nextHistory = 
             case nextMove of
                 Just ((sq1, sq2) as move) ->
                     case sq2 of
@@ -176,7 +178,7 @@ update msg ({ board, player, history } as model) =
                         Nothing -> history
                 Nothing -> history
 
-    in Chess nextBoard playerMove newHistory ! []
+    in Chess nextBoard playerMove nextHistory ! []
                                            
 
 startDrag : Mouse.Position -> Square -> Square
@@ -209,51 +211,4 @@ addPiece ps pc bd =
         if s.valid 
         then { s | piece = pc, valid = True } 
         else s) bd
-
------
-
-validate : Square -> Board -> Board
-validate sq bd =
-    -- append input square as valid
-    let validSquares = sq::(getValidSquares sq bd)
-        checkMoves sq_ b = 
-            Matrix.update (toLocation sq_.position) 
-                (\{ position, piece, valid } ->
-                    Square position piece True) b 
-    in List.foldl checkMoves bd validSquares
-
-getValidSquares : Square -> Board -> List Square
-getValidSquares sq bd = (flip filterSameSquares) bd <| getPossible sq bd
-
-filterSameSquares : List Square -> Board -> List Square
-filterSameSquares squares bd =
-    let filterSquare target =
-            let square = Matrix.get (toLocation target.position) bd
-            in case square of
-                Just sq -> isSameColor sq target
-                Nothing -> False
-    in List.filter filterSquare squares
-
-isSameColor : Square -> Square -> Bool
-isSameColor s1 s2 = 
-    let isWhite p =
-            case p of
-                White _ -> True
-                Black _ -> False
-        avoidWhite p =
-            case p of
-                White _ -> False
-                Black _ -> True
-        avoidBlack p =
-            case p of
-                White _ -> True
-                Black _ -> False
-        checkRule p1 p2 =
-            if isWhite p1
-            then avoidWhite p2
-            else avoidBlack p2
-        valid = Maybe.map2 checkRule s1.piece s2.piece 
-    in case valid of
-        Just v -> v
-        Nothing -> True
 
