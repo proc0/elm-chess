@@ -40,6 +40,6 @@ type alias History
 
 type alias Move =
     ( Square
-    , Square 
+    , Maybe Square 
     )
 

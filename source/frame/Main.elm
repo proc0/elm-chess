@@ -19,7 +19,7 @@ onMouseDown = on "mousedown" (Json.map Click Mouse.position)
 
 update : Msg -> Chess -> ( Chess, Cmd Msg )
 update msg ({ board, player, history } as model) =
-   let 
+    let -- get selected square
         selected : Maybe Square
         selected = 
             let target p = Matrix.get (toLocation <| getPosition p) board
@@ -27,61 +27,156 @@ update msg ({ board, player, history } as model) =
                 Click xy -> target xy
                 Drag xy  -> target xy
                 Drop xy  -> target xy
-
+        -- update player action
+        -- persist piece select + drag
         playerMove : Player
         playerMove = 
             case msg of 
                 Click xy ->
                     case selected of
-                        Just s  -> { player | select = selected, drag = Just (startDrag xy s) }
-                        Nothing -> { player | select = Nothing, drag = Nothing }
+                        -- select/drag piece
+                        Just sel -> 
+                            { player 
+                            | select = selected
+                            , drag   = Just (startDrag xy sel) 
+                            }
+                        -- clear selection
+                        Nothing -> 
+                            { player 
+                            | select = Nothing
+                            , drag   = Nothing 
+                            }
+
                 Drag xy -> 
                     case player.drag of
-                        Just d -> { player | drag = Just { d | position = xy }}
+                        Just d -> 
+                            { player 
+                            | drag = Just { d | position = xy }
+                            }
                         Nothing -> player
-                Drop xy -> { player | drag = Nothing }
 
+                Drop _  -> { player 
+                           | drag = Nothing 
+                           }
 
+        -- calculate possible next move
+        nextMove : Maybe Move
+        nextMove = 
+            let clear = toggleValid False
+                defaults = clear board
+                halfMove s = Just (s, Nothing)
+                fullMove (s1,s2) = Just (s1, Just s2)
+                findTarget ps sq = 
+                    Matrix.get 
+                        (toLocation ps) 
+                        (validate sq defaults)
+            in case msg of
+                -- no move update when dragging
+                Drag _  -> Nothing
+                -- perform move by click
+                Click xy -> 
+                    case selected of
+                        -- check selected square
+                        Just sq -> 
+                            -- if occupied by piece
+                            case sq.piece of
+                                -- player starts move
+                                Just pc -> halfMove sq 
+                                Nothing -> 
+                                    -- check if existing selection
+                                    case player.select of
+                                        -- if player has selection
+                                        -- then square click is a move
+                                        Just sq -> 
+                                            let pos = getPosition xy
+                                            -- check clicked target square
+                                            in case (findTarget pos sq) of
+                                                Just tg ->
+                                                    -- prevent same square click
+                                                    if tg.valid && tg.position /= sq.position
+                                                    -- complete move by click (from, to)
+                                                    then fullMove (sq => Square pos sq.piece True)
+                                                    else Nothing
+                                                -- invalid target
+                                                Nothing -> Nothing
+                                        Nothing -> Nothing 
+                        Nothing -> Nothing
+                -- move by drag
+                Drop xy ->
+                    -- if existing selection
+                    case player.select of
+                        Just sq -> 
+                            let pos = getPosition xy
+                            -- check target square 
+                            in case (findTarget pos sq) of
+                                Just tg ->
+                                    -- prevent same square drop
+                                    if tg.valid && tg.position /= sq.position
+                                    -- complete move by drag
+                                    then fullMove (sq => Square pos sq.piece True)
+                                    else Nothing
+                                Nothing -> Nothing
+                        -- dead branch
+                        Nothing -> Nothing 
+        -- calculate next board 
+        -- based on player move
         nextBoard : Board
         nextBoard = 
             let clear = toggleValid False
                 defaults = clear board
-                toValid = flip validate defaults
             in case msg of
+                -- no update
                 Drag _  -> board
+                -- move by click
                 Click xy -> 
-                    case selected of
-                        Just sq -> 
-                            case sq.piece of 
-                                Just pc -> defaults |> validate sq |> liftPiece sq 
+                    case nextMove of
+                        Just (sq1, sq2) -> 
+                            -- if full move, translate piece 
+                            -- and clear board highilight
+                            case sq2 of
+                                Just s2 -> 
+                                    defaults
+                                    |> validate s2 
+                                    |> liftPiece sq1 
+                                    |> addPiece s2.position s2.piece 
+                                    |> clear
+                                -- if half move
+                                -- highlight board and lift piece
                                 Nothing -> 
-                                    case player.select of
-                                        Just sq -> 
-                                            let position = getPosition xy
-                                                target = Matrix.get (toLocation position) (toValid sq) 
-                                            in case target of
-                                                Just tg ->
-                                                    if tg.valid && tg.position /= sq.position
-                                                    then toValid sq |> liftPiece sq |> addPiece position sq.piece |> clear
-                                                    else defaults
-                                                Nothing -> defaults
-                                        Nothing -> defaults 
+                                    defaults 
+                                    |> validate sq1 
+                                    |> liftPiece sq1
                         Nothing -> defaults
-
+                -- move by drag
                 Drop xy ->
-                    case player.select of
-                        Just sq -> 
-                            let position = getPosition xy
-                                target = Matrix.get (toLocation position) (toValid sq) 
-                            in case target of
-                                Just tg ->
-                                    if tg.valid && tg.position /= sq.position
-                                    then addPiece position sq.piece (toValid sq) |> clear
-                                    else addPiece sq.position sq.piece board
+                    case nextMove of
+                        Just (sq1, sq2) ->
+                            case sq2 of
+                                -- if full move 
+                                -- add piece to board
+                                Just s2 -> 
+                                    defaults
+                                    |> validate s2
+                                    |> addPiece s2.position s2.piece
+                                    |> clear
                                 Nothing -> defaults
-                        Nothing -> defaults 
+                        Nothing -> 
+                            -- invalid move, return piece back
+                            -- using selection square
+                            case player.select of
+                                Just sq -> addPiece sq.position sq.piece board
+                                Nothing -> defaults
+        -- update history based on next move
+        newHistory : History
+        newHistory = 
+            case nextMove of
+                Just ((sq1, sq2) as move) ->
+                    case sq2 of
+                        Just s2 -> history ++ [move]
+                        Nothing -> history
+                Nothing -> history
 
-    in Chess nextBoard playerMove history ! []
+    in Chess nextBoard playerMove newHistory ! []
                                            
 
 startDrag : Mouse.Position -> Square -> Square
@@ -114,12 +209,6 @@ addPiece ps pc bd =
         if s.valid 
         then { s | piece = pc, valid = True } 
         else s) bd
-
-moveSquare : Square -> Square -> Square
-moveSquare current target = 
-        if target.position == current.position && target.valid 
-        then { current | valid = True }
-        else target
 
 -----
 
