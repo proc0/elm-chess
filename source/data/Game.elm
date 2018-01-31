@@ -9,6 +9,12 @@ type alias Board =
 type alias Rank 
     = List Square
 
+type alias History 
+    = List Move
+
+type alias Move =
+    (Square, Maybe Square)
+
 type alias Square = 
     { position : Position
     , piece : Maybe Piece
@@ -20,11 +26,16 @@ type alias Position =
     , y : Int 
     }
 
-type Piece
-    = White Figure
-    | Black Figure
+type alias Piece =
+    { color  : Color
+    , role   : Role
+    , active : Bool
+    }
 
-type Figure
+type Color = 
+    White | Black
+
+type Role
     = Pawn
     | Rook
     | Bishop
@@ -32,14 +43,4 @@ type Figure
     | Queen
     | King
     | Zebra
-
---
-
-type alias History 
-    = List Move
-
-type alias Move =
-    ( Square
-    , Maybe Square 
-    )
 

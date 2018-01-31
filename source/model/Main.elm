@@ -79,16 +79,16 @@ toPiece : Position -> Char -> Square
 toPiece pos ch = 
         let sq piece = Square pos (Just piece) False
         in case ch of 
-                'p' -> sq <| Black Pawn
-                'n' -> sq <| Black Knight
-                'b' -> sq <| Black Bishop
-                'r' -> sq <| Black Rook
-                'q' -> sq <| Black Queen
-                'k' -> sq <| Black King
-                'P' -> sq <| White Pawn
-                'N' -> sq <| White Knight
-                'B' -> sq <| White Bishop
-                'R' -> sq <| White Rook
-                'Q' -> sq <| White Queen
-                'K' -> sq <| White King
+                'p' -> sq <| Piece Black Pawn False
+                'n' -> sq <| Piece Black Knight False
+                'b' -> sq <| Piece Black Bishop False
+                'r' -> sq <| Piece Black Rook False
+                'q' -> sq <| Piece Black Queen False
+                'k' -> sq <| Piece Black King False
+                'P' -> sq <| Piece White Pawn False
+                'N' -> sq <| Piece White Knight False
+                'B' -> sq <| Piece White Bishop False
+                'R' -> sq <| Piece White Rook False
+                'Q' -> sq <| Piece White Queen False
+                'K' -> sq <| Piece White King False
                 _   -> Square pos Nothing False

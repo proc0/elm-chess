@@ -88,10 +88,10 @@ r_dragSvg {position,piece} =
         Nothing -> text "" --neutral
 
 getPieceSvgPrefix : Piece -> String
-getPieceSvgPrefix piece = 
-    case piece of
-        Black figure -> getSvgTag "b_" figure
-        White figure -> getSvgTag "w_" figure
+getPieceSvgPrefix  {color, role} = 
+    case color of
+        Black -> getSvgTag "b_" role
+        White -> getSvgTag "w_" role
 
 -- render board
 ---------------

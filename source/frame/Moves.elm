@@ -33,18 +33,18 @@ filterSameSquares squares bd =
 
 isSameColor : Square -> Square -> Bool
 isSameColor s1 s2 = 
-    let isWhite p =
-            case p of
-                White _ -> True
-                Black _ -> False
-        avoidWhite p =
-            case p of
-                White _ -> False
-                Black _ -> True
-        avoidBlack p =
-            case p of
-                White _ -> True
-                Black _ -> False
+    let isWhite {color} =
+            case color of
+                White -> True
+                Black -> False
+        avoidWhite {color} =
+            case color of
+                White -> False
+                Black -> True
+        avoidBlack {color} =
+            case color of
+                White -> True
+                Black -> False
         checkRule p1 p2 =
             if isWhite p1
             then avoidWhite p2
@@ -69,8 +69,8 @@ pieceMoves square board =
     let ps = square.position
         getCardinals p = cardinals board p
         getDiagonals p = diagonals board p
-        moves p =
-            case p of
+        moves role =
+            case role of
                 Pawn    -> pawnMoves square board
                 Bishop  -> getDiagonals ps
                 Rook    -> getCardinals ps 
@@ -97,8 +97,8 @@ pieceMoves square board =
                     ]
                 _ -> []
     in case square.piece of
-        Just pc ->
-            case pc of 
-                White p -> moves p
-                Black p -> moves p
+        Just ({color, role} as p) ->
+            case color of 
+                White -> moves role
+                Black -> moves role
         Nothing -> []

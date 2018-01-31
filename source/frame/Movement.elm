@@ -95,10 +95,10 @@ findSquare pos board =
 pawnMoves : Square -> Board -> List (Position -> Position)
 pawnMoves square board = 
     let pawnMove = case square.piece of
-            Just pc ->
-                case pc of
-                    White _ -> [ up 1 ]
-                    Black _ -> [ down 1 ]
+            Just {color} ->
+                case color of
+                    White -> [ up 1 ]
+                    Black -> [ down 1 ]
             Nothing -> []
         -- pawn potential moves:
         -- forward square (two if first move),
@@ -127,31 +127,30 @@ pawnFirstMove sq =
             let pawnWrap = case pc of
                 Just pn -> [pn]
                 Nothing -> []
-            in List.filterMap (\p -> 
-                case p of
-                    White _ -> whiteMove sq
-                    Black _ -> blackMove sq
+            in List.filterMap (\{color} -> 
+                case color of
+                    White -> whiteMove sq
+                    Black -> blackMove sq
                 ) pawnWrap
         ) [sq.piece]
 
 pawnCaptures : Square -> Board -> List (Position -> Position)
 pawnCaptures sq bd =
         let ps = sq.position
-            whiteEats = 
-                [ up 1 >> left 1
-                , up 1 >> right 1
-                ]
-            blackEats = 
-                [ down 1 >> left 1
-                , down 1 >> right 1
-                ]
+            eats color = 
+                case color of
+                    White ->
+                        [ up 1 >> left 1
+                        , up 1 >> right 1
+                        ]
+                    Black ->
+                        [ down 1 >> left 1
+                        , down 1 >> right 1
+                        ]
             checkSquare mv =
                 let target = Matrix.get (toLocation <| mv ps) bd
                     posons = Maybe.map (\t -> Maybe.map (\_ -> mv) t.piece) target
                 in Maybe.withDefault (Just idle) posons
         in case sq.piece of
-            Just pc ->
-                case pc of
-                    White _ -> List.filterMap checkSquare whiteEats
-                    Black _ -> List.filterMap checkSquare blackEats
+            Just {color} -> List.filterMap checkSquare (eats color)
             Nothing -> []

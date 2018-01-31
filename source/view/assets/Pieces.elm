@@ -2,10 +2,10 @@ module View.Assets.Pieces exposing (..)
 
 import Data.Game as G exposing (..)
 
-getSvgTag : String -> G.Figure -> String
+getSvgTag : String -> G.Role -> String
 getSvgTag prefix f = svgTag (prefix ++ String.fromChar (figCharMap f))
 
-figCharMap : G.Figure -> Char
+figCharMap : G.Role -> Char
 figCharMap fig = 
     case fig of
         Pawn    -> 'p'
