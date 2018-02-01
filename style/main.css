@@ -14,6 +14,22 @@ player piece {
     cursor: -webkit-grabbing;
 }
 
+pieces piece {
+    display: flex;
+    position: absolute;
+    /* padding: 9px */
+    padding: 4px;
+    cursor: -webkit-grab;
+}
+
+/* piece.active {
+     border: 3px solid red;
+} */
+
+square.active {
+    background: #e6f14c !important;
+}
+
 rank {
     display: flex;
     /* width: 512px; */
@@ -29,7 +45,9 @@ rank square {
 }
 
 rank square.selected {
- background: #e6f14c;
+    width: 46px;
+    height: 46px;
+    border: 4px solid #e6f14c;
 }
 
 /* dark squares */
@@ -38,16 +56,3 @@ rank:nth-of-type(even) > square:nth-of-type(odd) {
     background: #D8A367;
 }
 
-/* dark squares */
-rank:nth-of-type(odd) > square:nth-of-type(even).selected,
-rank:nth-of-type(even) > square:nth-of-type(odd).selected {
-    background: #d0da46;
-}
-
-pieces piece {
-    display: flex;
-    position: absolute;
-    /* padding: 9px */
-    padding: 4px;
-    cursor: -webkit-grab;
-}

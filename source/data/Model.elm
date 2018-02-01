@@ -1,11 +1,10 @@
-module Model.Main exposing (fromFEN, initialBoard)
+module Data.Model exposing (fromFEN, initialBoard)
 
 import Array exposing (..)
 import Matrix exposing (..)
 import Debug exposing (..)
 
-import Data.Main exposing (..)
-import Data.Game exposing (..)
+import Data.Chess exposing (..)
 import Toolkit exposing (..)
 import Settings exposing (..)
 import String

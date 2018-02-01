@@ -4,11 +4,10 @@ import Html exposing (..)
 import Debug exposing (..)
 import Mouse exposing (..)
 
-import Data.Main exposing (..)
-import Data.Game exposing (..)
+import Data.Chess exposing (..)
+import Data.Model exposing (..)
 import Frame.Main as Frame exposing (..)
 import Frame.Moves exposing (..)
-import Model.Main exposing (..)
 import View.Main as View exposing (..)
 
 main : Program Never Chess Msg

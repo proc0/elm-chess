@@ -1,10 +1,27 @@
-module Data.Game exposing (..)
+module Data.Chess exposing (..)
 
 import Matrix exposing (..)
 import Array exposing (..)
+import Mouse exposing (..)
+
+type Msg = 
+      Click Mouse.Position
+    | Drag Mouse.Position
+    | Drop Mouse.Position
+
+type alias Chess =
+    { board   : Board
+    , player  : Player
+    , history : History
+    }
 
 type alias Board =
     Matrix Square
+
+type alias Player =
+    { select : Maybe Square
+    , drag   : Maybe Square 
+    }
 
 type alias Rank 
     = List Square

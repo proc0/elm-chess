@@ -1,18 +1,21 @@
 module View.Main exposing (..)
 
+import Matrix exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Mouse exposing (..)
-import Matrix exposing (..)
 import SvgParser exposing (parse)
+import Json.Decode as Json exposing (..)
 import Debug exposing (..)
 
-import Data.Main exposing (..)
-import Data.Game as G exposing (..)
+import Data.Chess as Game exposing (..)
 import Settings exposing (..)
 import Toolkit exposing (..)
-import Frame.Main exposing (..)
 import View.Assets.Pieces exposing (..)
+
+onMouseDown : Attribute Msg
+onMouseDown = on "mousedown" (Json.map Click Mouse.position)
 
 render : Chess -> Html Msg
 render { board, player } =
@@ -56,17 +59,23 @@ r_piece s = case s.piece of
                  Nothing -> Nothing
 
 -- render svg piece
-r_svg : G.Position -> Piece -> Html Msg
-r_svg {x,y} piece = 
+r_svg : Game.Position -> Piece -> Html Msg
+r_svg {x,y} ({active} as piece) = 
+    let classes = 
+            if active
+            then [class "active"]
+            else []
+        styles = 
+            [style 
+                [ "top" => px (y * squareSize)
+                , "left" => px (x * squareSize)
+                ]
+            ]
     -- parse SVG from String
-    case parse (getPieceSvgPrefix piece) of
+    in case parse (getPieceSvgPrefix piece) of
         Err e -> text e
         Ok svg -> node "piece" 
-                    [ style 
-                        [ "top" => px (y * squareSize)
-                        , "left" => px (x * squareSize)
-                        ]
-                    ] [svg]
+                    (classes ++ styles) [svg]
 
 -- dragable svg markup
 r_dragSvg : Square -> Html Msg
@@ -105,8 +114,15 @@ r_rank f r = node "rank" [] (List.map f r)
 
 r_square : Square -> Html Msg
 r_square sq = 
-    let attrs = 
-        if sq.valid 
-        then [class "selected"] 
-        else []
+    let activeClass = 
+            case sq.piece of
+                Just {active} -> 
+                    if active
+                    then "active"
+                    else "selected"
+                Nothing -> "selected"
+        attrs = 
+            if sq.valid 
+            then [class activeClass] 
+            else []
     in node "square" attrs []

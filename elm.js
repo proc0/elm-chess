@@ -5647,28 +5647,6 @@ var _elm_lang$core$Time$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
 
-var _darrensiegel$elm_chess_client$Data_Game$Square = F3(
-	function (a, b, c) {
-		return {position: a, piece: b, valid: c};
-	});
-var _darrensiegel$elm_chess_client$Data_Game$Position = F2(
-	function (a, b) {
-		return {x: a, y: b};
-	});
-var _darrensiegel$elm_chess_client$Data_Game$Piece = F3(
-	function (a, b, c) {
-		return {color: a, role: b, active: c};
-	});
-var _darrensiegel$elm_chess_client$Data_Game$Black = {ctor: 'Black'};
-var _darrensiegel$elm_chess_client$Data_Game$White = {ctor: 'White'};
-var _darrensiegel$elm_chess_client$Data_Game$Zebra = {ctor: 'Zebra'};
-var _darrensiegel$elm_chess_client$Data_Game$King = {ctor: 'King'};
-var _darrensiegel$elm_chess_client$Data_Game$Queen = {ctor: 'Queen'};
-var _darrensiegel$elm_chess_client$Data_Game$Knight = {ctor: 'Knight'};
-var _darrensiegel$elm_chess_client$Data_Game$Bishop = {ctor: 'Bishop'};
-var _darrensiegel$elm_chess_client$Data_Game$Rook = {ctor: 'Rook'};
-var _darrensiegel$elm_chess_client$Data_Game$Pawn = {ctor: 'Pawn'};
-
 //import Maybe, Native.Array, Native.List, Native.Utils, Result //
 
 var _elm_lang$core$Native_Json = function() {
@@ -6692,22 +6670,317 @@ var _elm_lang$mouse$Mouse$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Mouse'] = {pkg: 'elm-lang/mouse', init: _elm_lang$mouse$Mouse$init, onEffects: _elm_lang$mouse$Mouse$onEffects, onSelfMsg: _elm_lang$mouse$Mouse$onSelfMsg, tag: 'sub', subMap: _elm_lang$mouse$Mouse$subMap};
 
-var _darrensiegel$elm_chess_client$Data_Main$Chess = F3(
+var _darrensiegel$elm_chess_client$Data_Chess$Chess = F3(
 	function (a, b, c) {
 		return {board: a, player: b, history: c};
 	});
-var _darrensiegel$elm_chess_client$Data_Main$Player = F2(
+var _darrensiegel$elm_chess_client$Data_Chess$Player = F2(
 	function (a, b) {
 		return {select: a, drag: b};
 	});
-var _darrensiegel$elm_chess_client$Data_Main$Drop = function (a) {
+var _darrensiegel$elm_chess_client$Data_Chess$Square = F3(
+	function (a, b, c) {
+		return {position: a, piece: b, valid: c};
+	});
+var _darrensiegel$elm_chess_client$Data_Chess$Position = F2(
+	function (a, b) {
+		return {x: a, y: b};
+	});
+var _darrensiegel$elm_chess_client$Data_Chess$Piece = F3(
+	function (a, b, c) {
+		return {color: a, role: b, active: c};
+	});
+var _darrensiegel$elm_chess_client$Data_Chess$Drop = function (a) {
 	return {ctor: 'Drop', _0: a};
 };
-var _darrensiegel$elm_chess_client$Data_Main$Drag = function (a) {
+var _darrensiegel$elm_chess_client$Data_Chess$Drag = function (a) {
 	return {ctor: 'Drag', _0: a};
 };
-var _darrensiegel$elm_chess_client$Data_Main$Click = function (a) {
+var _darrensiegel$elm_chess_client$Data_Chess$Click = function (a) {
 	return {ctor: 'Click', _0: a};
+};
+var _darrensiegel$elm_chess_client$Data_Chess$Black = {ctor: 'Black'};
+var _darrensiegel$elm_chess_client$Data_Chess$White = {ctor: 'White'};
+var _darrensiegel$elm_chess_client$Data_Chess$Zebra = {ctor: 'Zebra'};
+var _darrensiegel$elm_chess_client$Data_Chess$King = {ctor: 'King'};
+var _darrensiegel$elm_chess_client$Data_Chess$Queen = {ctor: 'Queen'};
+var _darrensiegel$elm_chess_client$Data_Chess$Knight = {ctor: 'Knight'};
+var _darrensiegel$elm_chess_client$Data_Chess$Bishop = {ctor: 'Bishop'};
+var _darrensiegel$elm_chess_client$Data_Chess$Rook = {ctor: 'Rook'};
+var _darrensiegel$elm_chess_client$Data_Chess$Pawn = {ctor: 'Pawn'};
+
+var _darrensiegel$elm_chess_client$Settings$squareSize = 54;
+var _darrensiegel$elm_chess_client$Settings$boardside = A2(_elm_lang$core$List$range, 0, 7);
+
+var _darrensiegel$elm_chess_client$Toolkit$px = function (value) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString(value),
+		'px');
+};
+var _darrensiegel$elm_chess_client$Toolkit$getPosition = function (position) {
+	return A2(_darrensiegel$elm_chess_client$Data_Chess$Position, (position.x / _darrensiegel$elm_chess_client$Settings$squareSize) | 0, (position.y / _darrensiegel$elm_chess_client$Settings$squareSize) | 0);
+};
+var _darrensiegel$elm_chess_client$Toolkit$toPosition = function (_p0) {
+	var _p1 = _p0;
+	return {x: _p1._0, y: _p1._1};
+};
+var _darrensiegel$elm_chess_client$Toolkit$toLocation = function (p) {
+	return A2(_chendrix$elm_matrix$Matrix$loc, p.y, p.x);
+};
+var _darrensiegel$elm_chess_client$Toolkit$pos = F2(
+	function (x_, y_) {
+		return {x: x_, y: y_};
+	});
+var _darrensiegel$elm_chess_client$Toolkit$snd = _elm_lang$core$Tuple$second;
+var _darrensiegel$elm_chess_client$Toolkit$fst = _elm_lang$core$Tuple$first;
+var _darrensiegel$elm_chess_client$Toolkit_ops = _darrensiegel$elm_chess_client$Toolkit_ops || {};
+_darrensiegel$elm_chess_client$Toolkit_ops['=>'] = F2(
+	function (v0, v1) {
+		return {ctor: '_Tuple2', _0: v0, _1: v1};
+	});
+
+//import Maybe, Native.List //
+
+var _elm_lang$core$Native_Regex = function() {
+
+function escape(str)
+{
+	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+function caseInsensitive(re)
+{
+	return new RegExp(re.source, 'gi');
+}
+function regex(raw)
+{
+	return new RegExp(raw, 'g');
+}
+
+function contains(re, string)
+{
+	return string.match(re) !== null;
+}
+
+function find(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
+	{
+		if (prevLastIndex === re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
+		{
+			var submatch = result[i];
+			subs[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		out.push({
+			match: result[0],
+			submatches: _elm_lang$core$Native_List.fromArray(subs),
+			index: result.index,
+			number: number
+		});
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+function replace(n, re, replacer, string)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
+		{
+			return match;
+		}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		return replacer({
+			match: match,
+			submatches: _elm_lang$core$Native_List.fromArray(submatches),
+			index: arguments[arguments.length - 2],
+			number: count
+		});
+	}
+	return string.replace(re, jsReplacer);
+}
+
+function split(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	if (n === Infinity)
+	{
+		return _elm_lang$core$Native_List.fromArray(str.split(re));
+	}
+	var string = str;
+	var result;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		if (!(result = re.exec(string))) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+return {
+	regex: regex,
+	caseInsensitive: caseInsensitive,
+	escape: escape,
+
+	contains: F2(contains),
+	find: F3(find),
+	replace: F4(replace),
+	split: F3(split)
+};
+
+}();
+
+var _elm_lang$core$Regex$split = _elm_lang$core$Native_Regex.split;
+var _elm_lang$core$Regex$replace = _elm_lang$core$Native_Regex.replace;
+var _elm_lang$core$Regex$find = _elm_lang$core$Native_Regex.find;
+var _elm_lang$core$Regex$contains = _elm_lang$core$Native_Regex.contains;
+var _elm_lang$core$Regex$caseInsensitive = _elm_lang$core$Native_Regex.caseInsensitive;
+var _elm_lang$core$Regex$regex = _elm_lang$core$Native_Regex.regex;
+var _elm_lang$core$Regex$escape = _elm_lang$core$Native_Regex.escape;
+var _elm_lang$core$Regex$Match = F4(
+	function (a, b, c, d) {
+		return {match: a, submatches: b, index: c, number: d};
+	});
+var _elm_lang$core$Regex$Regex = {ctor: 'Regex'};
+var _elm_lang$core$Regex$AtMost = function (a) {
+	return {ctor: 'AtMost', _0: a};
+};
+var _elm_lang$core$Regex$All = {ctor: 'All'};
+
+var _darrensiegel$elm_chess_client$Data_Model$toPiece = F2(
+	function (pos, ch) {
+		var sq = function (piece) {
+			return A3(
+				_darrensiegel$elm_chess_client$Data_Chess$Square,
+				pos,
+				_elm_lang$core$Maybe$Just(piece),
+				false);
+		};
+		var _p0 = ch;
+		switch (_p0.valueOf()) {
+			case 'p':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$Black, _darrensiegel$elm_chess_client$Data_Chess$Pawn, false));
+			case 'n':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$Black, _darrensiegel$elm_chess_client$Data_Chess$Knight, false));
+			case 'b':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$Black, _darrensiegel$elm_chess_client$Data_Chess$Bishop, false));
+			case 'r':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$Black, _darrensiegel$elm_chess_client$Data_Chess$Rook, false));
+			case 'q':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$Black, _darrensiegel$elm_chess_client$Data_Chess$Queen, false));
+			case 'k':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$Black, _darrensiegel$elm_chess_client$Data_Chess$King, false));
+			case 'P':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$White, _darrensiegel$elm_chess_client$Data_Chess$Pawn, false));
+			case 'N':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$White, _darrensiegel$elm_chess_client$Data_Chess$Knight, false));
+			case 'B':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$White, _darrensiegel$elm_chess_client$Data_Chess$Bishop, false));
+			case 'R':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$White, _darrensiegel$elm_chess_client$Data_Chess$Rook, false));
+			case 'Q':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$White, _darrensiegel$elm_chess_client$Data_Chess$Queen, false));
+			case 'K':
+				return sq(
+					A3(_darrensiegel$elm_chess_client$Data_Chess$Piece, _darrensiegel$elm_chess_client$Data_Chess$White, _darrensiegel$elm_chess_client$Data_Chess$King, false));
+			default:
+				return A3(_darrensiegel$elm_chess_client$Data_Chess$Square, pos, _elm_lang$core$Maybe$Nothing, false);
+		}
+	});
+var _darrensiegel$elm_chess_client$Data_Model$expandMatch = function (_p1) {
+	var _p2 = _p1;
+	return A2(
+		_elm_lang$core$String$repeat,
+		A2(
+			_elm_lang$core$Result$withDefault,
+			0,
+			_elm_lang$core$String$toInt(_p2.match)),
+		' ');
+};
+var _darrensiegel$elm_chess_client$Data_Model$expand = function (s) {
+	return A4(
+		_elm_lang$core$Regex$replace,
+		_elm_lang$core$Regex$All,
+		_elm_lang$core$Regex$regex('[12345678]'),
+		_darrensiegel$elm_chess_client$Data_Model$expandMatch,
+		s);
+};
+var _darrensiegel$elm_chess_client$Data_Model$mapRank = F2(
+	function (y, row) {
+		var posons = A2(
+			_elm_lang$core$List$map,
+			_darrensiegel$elm_chess_client$Toolkit$toPosition,
+			A3(
+				_elm_lang$core$List$map2,
+				F2(
+					function (v0, v1) {
+						return {ctor: '_Tuple2', _0: v0, _1: v1};
+					}),
+				_darrensiegel$elm_chess_client$Settings$boardside,
+				A2(_elm_lang$core$List$repeat, 8, y)));
+		var pieces = _elm_lang$core$String$toList(
+			_darrensiegel$elm_chess_client$Data_Model$expand(row));
+		return A3(_elm_lang$core$List$map2, _darrensiegel$elm_chess_client$Data_Model$toPiece, posons, pieces);
+	});
+var _darrensiegel$elm_chess_client$Data_Model$parsePieces = function (s) {
+	return _chendrix$elm_matrix$Matrix$fromList(
+		A3(
+			_elm_lang$core$List$map2,
+			_darrensiegel$elm_chess_client$Data_Model$mapRank,
+			_darrensiegel$elm_chess_client$Settings$boardside,
+			A2(_elm_lang$core$String$split, '/', s)));
+};
+var _darrensiegel$elm_chess_client$Data_Model$initialPieces = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+var _darrensiegel$elm_chess_client$Data_Model$initialBoard = A2(_elm_lang$core$Basics_ops['++'], _darrensiegel$elm_chess_client$Data_Model$initialPieces, ' w KQkq - 0 1');
+var _darrensiegel$elm_chess_client$Data_Model$fromFEN = function (fen) {
+	var parts = _elm_lang$core$Array$fromList(
+		A2(_elm_lang$core$String$split, ' ', fen));
+	return _darrensiegel$elm_chess_client$Data_Model$parsePieces(
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			_darrensiegel$elm_chess_client$Data_Model$initialPieces,
+			A2(_elm_lang$core$Array$get, 0, parts)));
 };
 
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
@@ -8748,155 +9021,9 @@ var _elm_lang$html$Html$summary = _elm_lang$html$Html$node('summary');
 var _elm_lang$html$Html$menuitem = _elm_lang$html$Html$node('menuitem');
 var _elm_lang$html$Html$menu = _elm_lang$html$Html$node('menu');
 
-var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
-var _elm_lang$html$Html_Events$targetChecked = A2(
-	_elm_lang$core$Json_Decode$at,
-	{
-		ctor: '::',
-		_0: 'target',
-		_1: {
-			ctor: '::',
-			_0: 'checked',
-			_1: {ctor: '[]'}
-		}
-	},
-	_elm_lang$core$Json_Decode$bool);
-var _elm_lang$html$Html_Events$targetValue = A2(
-	_elm_lang$core$Json_Decode$at,
-	{
-		ctor: '::',
-		_0: 'target',
-		_1: {
-			ctor: '::',
-			_0: 'value',
-			_1: {ctor: '[]'}
-		}
-	},
-	_elm_lang$core$Json_Decode$string);
-var _elm_lang$html$Html_Events$defaultOptions = _elm_lang$virtual_dom$VirtualDom$defaultOptions;
-var _elm_lang$html$Html_Events$onWithOptions = _elm_lang$virtual_dom$VirtualDom$onWithOptions;
-var _elm_lang$html$Html_Events$on = _elm_lang$virtual_dom$VirtualDom$on;
-var _elm_lang$html$Html_Events$onFocus = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'focus',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onBlur = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'blur',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onSubmitOptions = _elm_lang$core$Native_Utils.update(
-	_elm_lang$html$Html_Events$defaultOptions,
-	{preventDefault: true});
-var _elm_lang$html$Html_Events$onSubmit = function (msg) {
-	return A3(
-		_elm_lang$html$Html_Events$onWithOptions,
-		'submit',
-		_elm_lang$html$Html_Events$onSubmitOptions,
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onCheck = function (tagger) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'change',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetChecked));
-};
-var _elm_lang$html$Html_Events$onInput = function (tagger) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'input',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
-};
-var _elm_lang$html$Html_Events$onMouseOut = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseout',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseOver = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseover',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseLeave = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseleave',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseEnter = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseenter',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseUp = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseup',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseDown = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mousedown',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onDoubleClick = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'dblclick',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onClick = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'click',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$Options = F2(
-	function (a, b) {
-		return {stopPropagation: a, preventDefault: b};
-	});
-
-var _darrensiegel$elm_chess_client$Settings$squareSize = 54;
-var _darrensiegel$elm_chess_client$Settings$boardside = A2(_elm_lang$core$List$range, 0, 7);
-
-var _darrensiegel$elm_chess_client$Toolkit$px = function (value) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_elm_lang$core$Basics$toString(value),
-		'px');
-};
-var _darrensiegel$elm_chess_client$Toolkit$getPosition = function (position) {
-	return A2(_darrensiegel$elm_chess_client$Data_Game$Position, (position.x / _darrensiegel$elm_chess_client$Settings$squareSize) | 0, (position.y / _darrensiegel$elm_chess_client$Settings$squareSize) | 0);
-};
-var _darrensiegel$elm_chess_client$Toolkit$toPosition = function (_p0) {
-	var _p1 = _p0;
-	return {x: _p1._0, y: _p1._1};
-};
-var _darrensiegel$elm_chess_client$Toolkit$toLocation = function (p) {
-	return A2(_chendrix$elm_matrix$Matrix$loc, p.y, p.x);
-};
-var _darrensiegel$elm_chess_client$Toolkit$pos = F2(
-	function (x_, y_) {
-		return {x: x_, y: y_};
-	});
-var _darrensiegel$elm_chess_client$Toolkit$snd = _elm_lang$core$Tuple$second;
-var _darrensiegel$elm_chess_client$Toolkit$fst = _elm_lang$core$Tuple$first;
-var _darrensiegel$elm_chess_client$Toolkit_ops = _darrensiegel$elm_chess_client$Toolkit_ops || {};
-_darrensiegel$elm_chess_client$Toolkit_ops['=>'] = F2(
-	function (v0, v1) {
-		return {ctor: '_Tuple2', _0: v0, _1: v1};
-	});
-
 var _darrensiegel$elm_chess_client$Frame_Movement$findSquare = F2(
 	function (pos, board) {
-		var emptySquare = A3(_darrensiegel$elm_chess_client$Data_Game$Square, pos, _elm_lang$core$Maybe$Nothing, false);
+		var emptySquare = A3(_darrensiegel$elm_chess_client$Data_Chess$Square, pos, _elm_lang$core$Maybe$Nothing, false);
 		var sq = A2(
 			_chendrix$elm_matrix$Matrix$get,
 			_darrensiegel$elm_chess_client$Toolkit$toLocation(pos),
@@ -9406,7 +9533,7 @@ var _darrensiegel$elm_chess_client$Frame_Moves$pieceMoves = F2(
 var _darrensiegel$elm_chess_client$Frame_Moves$moveSquare = F2(
 	function (move, sq) {
 		return A3(
-			_darrensiegel$elm_chess_client$Data_Game$Square,
+			_darrensiegel$elm_chess_client$Data_Chess$Square,
 			move(sq.position),
 			sq.piece,
 			true);
@@ -9497,13 +9624,29 @@ var _darrensiegel$elm_chess_client$Frame_Moves$validate = F2(
 					_darrensiegel$elm_chess_client$Toolkit$toLocation(sq_.position),
 					function (_p28) {
 						var _p29 = _p28;
-						return A3(_darrensiegel$elm_chess_client$Data_Game$Square, _p29.position, _p29.piece, true);
+						return A3(_darrensiegel$elm_chess_client$Data_Chess$Square, _p29.position, _p29.piece, true);
 					},
 					b);
 			});
+		var newSquare = A2(
+			_elm_lang$core$Maybe$withDefault,
+			sq,
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (pc) {
+					return _elm_lang$core$Native_Utils.update(
+						sq,
+						{
+							piece: _elm_lang$core$Maybe$Just(
+								_elm_lang$core$Native_Utils.update(
+									pc,
+									{active: true}))
+						});
+				},
+				sq.piece));
 		var validSquares = {
 			ctor: '::',
-			_0: sq,
+			_0: newSquare,
 			_1: A2(_darrensiegel$elm_chess_client$Frame_Moves$getValidSquares, sq, bd)
 		};
 		return A3(_elm_lang$core$List$foldl, checkMoves, bd, validSquares);
@@ -9539,7 +9682,7 @@ var _darrensiegel$elm_chess_client$Frame_Main$toggleValid = F2(
 			_chendrix$elm_matrix$Matrix$map,
 			function (_p0) {
 				var _p1 = _p0;
-				return A3(_darrensiegel$elm_chess_client$Data_Game$Square, _p1.position, _p1.piece, isValid);
+				return A3(_darrensiegel$elm_chess_client$Data_Chess$Square, _p1.position, _p1.piece, isValid);
 			},
 			board);
 	});
@@ -9565,7 +9708,13 @@ var _darrensiegel$elm_chess_client$Frame_Main$startDrag = F2(
 		if (_p2.ctor === 'Just') {
 			return _elm_lang$core$Native_Utils.update(
 				sq,
-				{position: ps});
+				{
+					position: ps,
+					piece: _elm_lang$core$Maybe$Just(
+						_elm_lang$core$Native_Utils.update(
+							_p2._0,
+							{active: true}))
+				});
 		} else {
 			return sq;
 		}
@@ -9573,16 +9722,16 @@ var _darrensiegel$elm_chess_client$Frame_Main$startDrag = F2(
 var _darrensiegel$elm_chess_client$Frame_Main$update = F2(
 	function (msg, _p3) {
 		var _p4 = _p3;
-		var _p31 = _p4.player;
-		var _p30 = _p4.history;
-		var _p29 = _p4.board;
+		var _p32 = _p4.player;
+		var _p31 = _p4.history;
+		var _p30 = _p4.board;
 		var selected = function () {
 			var target = function (p) {
 				return A2(
 					_chendrix$elm_matrix$Matrix$get,
 					_darrensiegel$elm_chess_client$Toolkit$toLocation(
 						_darrensiegel$elm_chess_client$Toolkit$getPosition(p)),
-					_p29);
+					_p30);
 			};
 			var _p5 = msg;
 			switch (_p5.ctor) {
@@ -9601,7 +9750,7 @@ var _darrensiegel$elm_chess_client$Frame_Main$update = F2(
 					var _p7 = selected;
 					if (_p7.ctor === 'Just') {
 						return _elm_lang$core$Native_Utils.update(
-							_p31,
+							_p32,
 							{
 								select: selected,
 								drag: _elm_lang$core$Maybe$Just(
@@ -9609,14 +9758,14 @@ var _darrensiegel$elm_chess_client$Frame_Main$update = F2(
 							});
 					} else {
 						return _elm_lang$core$Native_Utils.update(
-							_p31,
+							_p32,
 							{select: _elm_lang$core$Maybe$Nothing, drag: _elm_lang$core$Maybe$Nothing});
 					}
 				case 'Drag':
-					var _p8 = _p31.drag;
+					var _p8 = _p32.drag;
 					if (_p8.ctor === 'Just') {
 						return _elm_lang$core$Native_Utils.update(
-							_p31,
+							_p32,
 							{
 								drag: _elm_lang$core$Maybe$Just(
 									_elm_lang$core$Native_Utils.update(
@@ -9624,11 +9773,11 @@ var _darrensiegel$elm_chess_client$Frame_Main$update = F2(
 										{position: _p6._0}))
 							});
 					} else {
-						return _p31;
+						return _p32;
 					}
 				default:
 					return _elm_lang$core$Native_Utils.update(
-						_p31,
+						_p32,
 						{drag: _elm_lang$core$Maybe$Nothing});
 			}
 		}();
@@ -9647,7 +9796,7 @@ var _darrensiegel$elm_chess_client$Frame_Main$update = F2(
 					{ctor: '_Tuple2', _0: s, _1: _elm_lang$core$Maybe$Nothing});
 			};
 			var clear = _darrensiegel$elm_chess_client$Frame_Main$toggleValid(false);
-			var defaults = clear(_p29);
+			var defaults = clear(_p30);
 			var findTarget = F2(
 				function (ps, sq) {
 					return A2(
@@ -9659,15 +9808,32 @@ var _darrensiegel$elm_chess_client$Frame_Main$update = F2(
 			switch (_p11.ctor) {
 				case 'Drag':
 					return _elm_lang$core$Maybe$Nothing;
-				case 'Click':
+				case 'Drop':
+					var _p12 = _p32.select;
+					if (_p12.ctor === 'Just') {
+						var _p15 = _p12._0;
+						var pos = _darrensiegel$elm_chess_client$Toolkit$getPosition(_p11._0);
+						var _p13 = A2(findTarget, pos, _p15);
+						if (_p13.ctor === 'Just') {
+							var _p14 = _p13._0;
+							var dest = A3(_darrensiegel$elm_chess_client$Data_Chess$Square, pos, _p15.piece, true);
+							return (_p14.valid && (!_elm_lang$core$Native_Utils.eq(_p14.position, _p15.position))) ? fullMove(
+								A2(_darrensiegel$elm_chess_client$Toolkit_ops['=>'], _p15, dest)) : _elm_lang$core$Maybe$Nothing;
+						} else {
+							return _elm_lang$core$Maybe$Nothing;
+						}
+					} else {
+						return _elm_lang$core$Maybe$Nothing;
+					}
+				default:
 					return A2(
 						_elm_lang$core$Maybe$withDefault,
 						_elm_lang$core$Maybe$Nothing,
 						A2(
 							_elm_lang$core$Maybe$map,
 							function (sel) {
-								var _p12 = sel.piece;
-								if (_p12.ctor === 'Just') {
+								var _p16 = sel.piece;
+								if (_p16.ctor === 'Just') {
 									return halfMove(sel);
 								} else {
 									return A2(
@@ -9683,46 +9849,25 @@ var _darrensiegel$elm_chess_client$Frame_Main$update = F2(
 													A2(
 														_elm_lang$core$Maybe$map,
 														function (tg) {
+															var dest = A3(_darrensiegel$elm_chess_client$Data_Chess$Square, pos, sq.piece, true);
 															return (tg.valid && (!_elm_lang$core$Native_Utils.eq(tg.position, sq.position))) ? fullMove(
-																A2(
-																	_darrensiegel$elm_chess_client$Toolkit_ops['=>'],
-																	sq,
-																	A3(_darrensiegel$elm_chess_client$Data_Game$Square, pos, sq.piece, true))) : _elm_lang$core$Maybe$Nothing;
+																A2(_darrensiegel$elm_chess_client$Toolkit_ops['=>'], sq, dest)) : _elm_lang$core$Maybe$Nothing;
 														},
 														A2(findTarget, pos, sq)));
 											},
-											_p31.select));
+											_p32.select));
 								}
 							},
 							selected));
-				default:
-					var _p13 = _p31.select;
-					if (_p13.ctor === 'Just') {
-						var _p16 = _p13._0;
-						var pos = _darrensiegel$elm_chess_client$Toolkit$getPosition(_p11._0);
-						var _p14 = A2(findTarget, pos, _p16);
-						if (_p14.ctor === 'Just') {
-							var _p15 = _p14._0;
-							return (_p15.valid && (!_elm_lang$core$Native_Utils.eq(_p15.position, _p16.position))) ? fullMove(
-								A2(
-									_darrensiegel$elm_chess_client$Toolkit_ops['=>'],
-									_p16,
-									A3(_darrensiegel$elm_chess_client$Data_Game$Square, pos, _p16.piece, true))) : _elm_lang$core$Maybe$Nothing;
-						} else {
-							return _elm_lang$core$Maybe$Nothing;
-						}
-					} else {
-						return _elm_lang$core$Maybe$Nothing;
-					}
 			}
 		}();
 		var nextBoard = function () {
 			var clear = _darrensiegel$elm_chess_client$Frame_Main$toggleValid(false);
-			var defaults = clear(_p29);
+			var defaults = clear(_p30);
 			var _p17 = msg;
 			switch (_p17.ctor) {
 				case 'Drag':
-					return _p29;
+					return _p30;
 				case 'Click':
 					var _p18 = nextMove;
 					if (_p18.ctor === 'Just') {
@@ -9754,20 +9899,36 @@ var _darrensiegel$elm_chess_client$Frame_Main$update = F2(
 						var _p23 = _p22._0._1;
 						if (_p23.ctor === 'Just') {
 							var _p24 = _p23._0;
+							var pc = A2(
+								_elm_lang$core$Maybe$map,
+								function (p) {
+									return _elm_lang$core$Native_Utils.update(
+										p,
+										{active: false});
+								},
+								_p24.piece);
 							return clear(
 								A3(
 									_darrensiegel$elm_chess_client$Frame_Main$addPiece,
 									_p24.position,
-									_p24.piece,
+									pc,
 									A2(_darrensiegel$elm_chess_client$Frame_Moves$validate, _p24, defaults)));
 						} else {
 							return defaults;
 						}
 					} else {
-						var _p25 = _p31.select;
+						var _p25 = _p32.select;
 						if (_p25.ctor === 'Just') {
 							var _p26 = _p25._0;
-							return A3(_darrensiegel$elm_chess_client$Frame_Main$addPiece, _p26.position, _p26.piece, _p29);
+							var pc = A2(
+								_elm_lang$core$Maybe$map,
+								function (p) {
+									return _elm_lang$core$Native_Utils.update(
+										p,
+										{active: true});
+								},
+								_p26.piece);
+							return A3(_darrensiegel$elm_chess_client$Frame_Main$addPiece, _p26.position, pc, _p30);
 						} else {
 							return defaults;
 						}
@@ -9781,271 +9942,25 @@ var _darrensiegel$elm_chess_client$Frame_Main$update = F2(
 				if (_p28.ctor === 'Just') {
 					return A2(
 						_elm_lang$core$Basics_ops['++'],
-						_p30,
+						_p31,
 						{
 							ctor: '::',
 							_0: _p27._0,
 							_1: {ctor: '[]'}
 						});
 				} else {
-					return _p30;
+					return _p31;
 				}
 			} else {
-				return _p30;
+				return _p31;
 			}
 		}();
+		var _p29 = A2(_elm_lang$core$Debug$log, 'move', nextMove);
 		return A2(
 			_elm_lang$core$Platform_Cmd_ops['!'],
-			A3(_darrensiegel$elm_chess_client$Data_Main$Chess, nextBoard, playerMove, nextHistory),
+			A3(_darrensiegel$elm_chess_client$Data_Chess$Chess, nextBoard, playerMove, nextHistory),
 			{ctor: '[]'});
 	});
-var _darrensiegel$elm_chess_client$Frame_Main$onMouseDown = A2(
-	_elm_lang$html$Html_Events$on,
-	'mousedown',
-	A2(_elm_lang$core$Json_Decode$map, _darrensiegel$elm_chess_client$Data_Main$Click, _elm_lang$mouse$Mouse$position));
-
-//import Maybe, Native.List //
-
-var _elm_lang$core$Native_Regex = function() {
-
-function escape(str)
-{
-	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-}
-function caseInsensitive(re)
-{
-	return new RegExp(re.source, 'gi');
-}
-function regex(raw)
-{
-	return new RegExp(raw, 'g');
-}
-
-function contains(re, string)
-{
-	return string.match(re) !== null;
-}
-
-function find(n, re, str)
-{
-	n = n.ctor === 'All' ? Infinity : n._0;
-	var out = [];
-	var number = 0;
-	var string = str;
-	var lastIndex = re.lastIndex;
-	var prevLastIndex = -1;
-	var result;
-	while (number++ < n && (result = re.exec(string)))
-	{
-		if (prevLastIndex === re.lastIndex) break;
-		var i = result.length - 1;
-		var subs = new Array(i);
-		while (i > 0)
-		{
-			var submatch = result[i];
-			subs[--i] = submatch === undefined
-				? _elm_lang$core$Maybe$Nothing
-				: _elm_lang$core$Maybe$Just(submatch);
-		}
-		out.push({
-			match: result[0],
-			submatches: _elm_lang$core$Native_List.fromArray(subs),
-			index: result.index,
-			number: number
-		});
-		prevLastIndex = re.lastIndex;
-	}
-	re.lastIndex = lastIndex;
-	return _elm_lang$core$Native_List.fromArray(out);
-}
-
-function replace(n, re, replacer, string)
-{
-	n = n.ctor === 'All' ? Infinity : n._0;
-	var count = 0;
-	function jsReplacer(match)
-	{
-		if (count++ >= n)
-		{
-			return match;
-		}
-		var i = arguments.length - 3;
-		var submatches = new Array(i);
-		while (i > 0)
-		{
-			var submatch = arguments[i];
-			submatches[--i] = submatch === undefined
-				? _elm_lang$core$Maybe$Nothing
-				: _elm_lang$core$Maybe$Just(submatch);
-		}
-		return replacer({
-			match: match,
-			submatches: _elm_lang$core$Native_List.fromArray(submatches),
-			index: arguments[arguments.length - 2],
-			number: count
-		});
-	}
-	return string.replace(re, jsReplacer);
-}
-
-function split(n, re, str)
-{
-	n = n.ctor === 'All' ? Infinity : n._0;
-	if (n === Infinity)
-	{
-		return _elm_lang$core$Native_List.fromArray(str.split(re));
-	}
-	var string = str;
-	var result;
-	var out = [];
-	var start = re.lastIndex;
-	var restoreLastIndex = re.lastIndex;
-	while (n--)
-	{
-		if (!(result = re.exec(string))) break;
-		out.push(string.slice(start, result.index));
-		start = re.lastIndex;
-	}
-	out.push(string.slice(start));
-	re.lastIndex = restoreLastIndex;
-	return _elm_lang$core$Native_List.fromArray(out);
-}
-
-return {
-	regex: regex,
-	caseInsensitive: caseInsensitive,
-	escape: escape,
-
-	contains: F2(contains),
-	find: F3(find),
-	replace: F4(replace),
-	split: F3(split)
-};
-
-}();
-
-var _elm_lang$core$Regex$split = _elm_lang$core$Native_Regex.split;
-var _elm_lang$core$Regex$replace = _elm_lang$core$Native_Regex.replace;
-var _elm_lang$core$Regex$find = _elm_lang$core$Native_Regex.find;
-var _elm_lang$core$Regex$contains = _elm_lang$core$Native_Regex.contains;
-var _elm_lang$core$Regex$caseInsensitive = _elm_lang$core$Native_Regex.caseInsensitive;
-var _elm_lang$core$Regex$regex = _elm_lang$core$Native_Regex.regex;
-var _elm_lang$core$Regex$escape = _elm_lang$core$Native_Regex.escape;
-var _elm_lang$core$Regex$Match = F4(
-	function (a, b, c, d) {
-		return {match: a, submatches: b, index: c, number: d};
-	});
-var _elm_lang$core$Regex$Regex = {ctor: 'Regex'};
-var _elm_lang$core$Regex$AtMost = function (a) {
-	return {ctor: 'AtMost', _0: a};
-};
-var _elm_lang$core$Regex$All = {ctor: 'All'};
-
-var _darrensiegel$elm_chess_client$Model_Main$toPiece = F2(
-	function (pos, ch) {
-		var sq = function (piece) {
-			return A3(
-				_darrensiegel$elm_chess_client$Data_Game$Square,
-				pos,
-				_elm_lang$core$Maybe$Just(piece),
-				false);
-		};
-		var _p0 = ch;
-		switch (_p0.valueOf()) {
-			case 'p':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$Black, _darrensiegel$elm_chess_client$Data_Game$Pawn, false));
-			case 'n':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$Black, _darrensiegel$elm_chess_client$Data_Game$Knight, false));
-			case 'b':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$Black, _darrensiegel$elm_chess_client$Data_Game$Bishop, false));
-			case 'r':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$Black, _darrensiegel$elm_chess_client$Data_Game$Rook, false));
-			case 'q':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$Black, _darrensiegel$elm_chess_client$Data_Game$Queen, false));
-			case 'k':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$Black, _darrensiegel$elm_chess_client$Data_Game$King, false));
-			case 'P':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$White, _darrensiegel$elm_chess_client$Data_Game$Pawn, false));
-			case 'N':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$White, _darrensiegel$elm_chess_client$Data_Game$Knight, false));
-			case 'B':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$White, _darrensiegel$elm_chess_client$Data_Game$Bishop, false));
-			case 'R':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$White, _darrensiegel$elm_chess_client$Data_Game$Rook, false));
-			case 'Q':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$White, _darrensiegel$elm_chess_client$Data_Game$Queen, false));
-			case 'K':
-				return sq(
-					A3(_darrensiegel$elm_chess_client$Data_Game$Piece, _darrensiegel$elm_chess_client$Data_Game$White, _darrensiegel$elm_chess_client$Data_Game$King, false));
-			default:
-				return A3(_darrensiegel$elm_chess_client$Data_Game$Square, pos, _elm_lang$core$Maybe$Nothing, false);
-		}
-	});
-var _darrensiegel$elm_chess_client$Model_Main$expandMatch = function (_p1) {
-	var _p2 = _p1;
-	return A2(
-		_elm_lang$core$String$repeat,
-		A2(
-			_elm_lang$core$Result$withDefault,
-			0,
-			_elm_lang$core$String$toInt(_p2.match)),
-		' ');
-};
-var _darrensiegel$elm_chess_client$Model_Main$expand = function (s) {
-	return A4(
-		_elm_lang$core$Regex$replace,
-		_elm_lang$core$Regex$All,
-		_elm_lang$core$Regex$regex('[12345678]'),
-		_darrensiegel$elm_chess_client$Model_Main$expandMatch,
-		s);
-};
-var _darrensiegel$elm_chess_client$Model_Main$mapRank = F2(
-	function (y, row) {
-		var posons = A2(
-			_elm_lang$core$List$map,
-			_darrensiegel$elm_chess_client$Toolkit$toPosition,
-			A3(
-				_elm_lang$core$List$map2,
-				F2(
-					function (v0, v1) {
-						return {ctor: '_Tuple2', _0: v0, _1: v1};
-					}),
-				_darrensiegel$elm_chess_client$Settings$boardside,
-				A2(_elm_lang$core$List$repeat, 8, y)));
-		var pieces = _elm_lang$core$String$toList(
-			_darrensiegel$elm_chess_client$Model_Main$expand(row));
-		return A3(_elm_lang$core$List$map2, _darrensiegel$elm_chess_client$Model_Main$toPiece, posons, pieces);
-	});
-var _darrensiegel$elm_chess_client$Model_Main$parsePieces = function (s) {
-	return _chendrix$elm_matrix$Matrix$fromList(
-		A3(
-			_elm_lang$core$List$map2,
-			_darrensiegel$elm_chess_client$Model_Main$mapRank,
-			_darrensiegel$elm_chess_client$Settings$boardside,
-			A2(_elm_lang$core$String$split, '/', s)));
-};
-var _darrensiegel$elm_chess_client$Model_Main$initialPieces = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
-var _darrensiegel$elm_chess_client$Model_Main$initialBoard = A2(_elm_lang$core$Basics_ops['++'], _darrensiegel$elm_chess_client$Model_Main$initialPieces, ' w KQkq - 0 1');
-var _darrensiegel$elm_chess_client$Model_Main$fromFEN = function (fen) {
-	var parts = _elm_lang$core$Array$fromList(
-		A2(_elm_lang$core$String$split, ' ', fen));
-	return _darrensiegel$elm_chess_client$Model_Main$parsePieces(
-		A2(
-			_elm_lang$core$Maybe$withDefault,
-			_darrensiegel$elm_chess_client$Model_Main$initialPieces,
-			A2(_elm_lang$core$Array$get, 0, parts)));
-};
 
 var _elm_lang$html$Html_Attributes$map = _elm_lang$virtual_dom$VirtualDom$mapProperty;
 var _elm_lang$html$Html_Attributes$attribute = _elm_lang$virtual_dom$VirtualDom$attribute;
@@ -10396,6 +10311,121 @@ var _elm_lang$html$Html_Attributes$classList = function (list) {
 				A2(_elm_lang$core$List$filter, _elm_lang$core$Tuple$second, list))));
 };
 var _elm_lang$html$Html_Attributes$style = _elm_lang$virtual_dom$VirtualDom$style;
+
+var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$html$Html_Events$targetChecked = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'checked',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$bool);
+var _elm_lang$html$Html_Events$targetValue = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'value',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$string);
+var _elm_lang$html$Html_Events$defaultOptions = _elm_lang$virtual_dom$VirtualDom$defaultOptions;
+var _elm_lang$html$Html_Events$onWithOptions = _elm_lang$virtual_dom$VirtualDom$onWithOptions;
+var _elm_lang$html$Html_Events$on = _elm_lang$virtual_dom$VirtualDom$on;
+var _elm_lang$html$Html_Events$onFocus = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'focus',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onBlur = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'blur',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onSubmitOptions = _elm_lang$core$Native_Utils.update(
+	_elm_lang$html$Html_Events$defaultOptions,
+	{preventDefault: true});
+var _elm_lang$html$Html_Events$onSubmit = function (msg) {
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'submit',
+		_elm_lang$html$Html_Events$onSubmitOptions,
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onCheck = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'change',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetChecked));
+};
+var _elm_lang$html$Html_Events$onInput = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'input',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
+};
+var _elm_lang$html$Html_Events$onMouseOut = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseout',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseOver = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseover',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseLeave = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseleave',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseEnter = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseenter',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseUp = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseup',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseDown = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mousedown',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onDoubleClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'dblclick',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'click',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$Options = F2(
+	function (a, b) {
+		return {stopPropagation: a, preventDefault: b};
+	});
 
 var _elm_lang$lazy$Native_Lazy = function() {
 
@@ -11820,12 +11850,24 @@ var _darrensiegel$elm_chess_client$View_Assets_Pieces$svgTag = function (s) {
 			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\"><g style=\"opacity:1; fill:#ffffff; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\"><path d=\"M 9,39 L 36,39 L 36,36 L 9,36 L 9,39 z \" style=\"stroke-linecap:butt;\"/><path d=\"M 12,36 L 12,32 L 33,32 L 33,36 L 12,36 z \" style=\"stroke-linecap:butt;\"/><path d=\"M 11,14 L 11,9 L 15,9 L 15,11 L 20,11 L 20,9 L 25,9 L 25,11 L 30,11 L 30,9 L 34,9 L 34,14\" style=\"stroke-linecap:butt;\"/><path d=\"M 34,14 L 31,17 L 14,17 L 11,14\"/><path d=\"M 31,17 L 31,29.5 L 14,29.5 L 14,17\" style=\"stroke-linecap:butt; stroke-linejoin:miter;\"/><path d=\"M 31,29.5 L 32.5,32 L 12.5,32 L 14,29.5\"/><path d=\"M 11,14 L 34,14\" style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\"/></g></svg>';
 		case 'w_k':
 			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\"><g style=\"fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\"><path d=\"M 22.5,11.63 L 22.5,6\" style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\"/><path d=\"M 20,8 L 25,8\" style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\"/><path d=\"M 22.5,25 C 22.5,25 27,17.5 25.5,14.5 C 25.5,14.5 24.5,12 22.5,12 C 20.5,12 19.5,14.5 19.5,14.5 C 18,17.5 22.5,25 22.5,25\" style=\"fill:#ffffff; stroke:#000000; stroke-linecap:butt; stroke-linejoin:miter;\"/><path d=\"M 11.5,37 C 17,40.5 27,40.5 32.5,37 L 32.5,30 C 32.5,30 41.5,25.5 38.5,19.5 C 34.5,13 25,16 22.5,23.5 L 22.5,27 L 22.5,23.5 C 19,16 9.5,13 6.5,19.5 C 3.5,25.5 11.5,29.5 11.5,29.5 L 11.5,37 z \" style=\"fill:#ffffff; stroke:#000000;\"/><path d=\"M 11.5,30 C 17,27 27,27 32.5,30\" style=\"fill:none; stroke:#000000;\"/><path d=\"M 11.5,33.5 C 17,30.5 27,30.5 32.5,33.5\" style=\"fill:none; stroke:#000000;\"/><path d=\"M 11.5,37 C 17,34 27,34 32.5,37\" style=\"fill:none; stroke:#000000;\"/></g></svg>';
+		case 'w_b':
+			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\">  <g style=\"opacity:1; fill:none; fill-rule:evenodd; fill-opacity:1; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\">    <g style=\"fill:#ffffff; stroke:#000000; stroke-linecap:butt;\">       <path d=\"M 9,36 C 12.39,35.03 19.11,36.43 22.5,34 C 25.89,36.43 32.61,35.03 36,36 C 36,36 37.65,36.54 39,38 C 38.32,38.97 37.35,38.99 36,38.5 C 32.61,37.53 25.89,38.96 22.5,37.5 C 19.11,38.96 12.39,37.53 9,38.5 C 7.646,38.99 6.677,38.97 6,38 C 7.354,36.06 9,36 9,36 z\"/>      <path d=\"M 15,32 C 17.5,34.5 27.5,34.5 30,32 C 30.5,30.5 30,30 30,30 C 30,27.5 27.5,26 27.5,26 C 33,24.5 33.5,14.5 22.5,10.5 C 11.5,14.5 12,24.5 17.5,26 C 17.5,26 15,27.5 15,30 C 15,30 14.5,30.5 15,32 z\"/>      <path d=\"M 25 8 A 2.5 2.5 0 1 1  20,8 A 2.5 2.5 0 1 1  25 8 z\"/>    </g>    <path d=\"M 17.5,26 L 27.5,26 M 15,30 L 30,30 M 22.5,15.5 L 22.5,20.5 M 20,18 L 25,18\" style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\"/>  </g></svg>';
+		case 'w_n':
+			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\">  <g style=\"opacity:1; fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\">    <path d=\"M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18\" style=\"fill:#ffffff; stroke:#000000;\"/>    <path d=\"M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10\" style=\"fill:#ffffff; stroke:#000000;\"/>    <path d=\"M 9.5 25.5 A 0.5 0.5 0 1 1 8.5,25.5 A 0.5 0.5 0 1 1 9.5 25.5 z\" style=\"fill:#000000; stroke:#000000;\"/>    <path d=\"M 15 15.5 A 0.5 1.5 0 1 1  14,15.5 A 0.5 1.5 0 1 1  15 15.5 z\" transform=\"matrix(0.866,0.5,-0.5,0.866,9.693,-5.173)\" style=\"fill:#000000; stroke:#000000;\"/>  </g></svg>';
+		case 'w_q':
+			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\">  <g style=\"opacity:1; fill:#ffffff; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\">    <path d=\"M 9 13 A 2 2 0 1 1  5,13 A 2 2 0 1 1  9 13 z\" transform=\"translate(-1,-1)\"/>    <path d=\"M 9 13 A 2 2 0 1 1  5,13 A 2 2 0 1 1  9 13 z\" transform=\"translate(15.5,-5.5)\"/>    <path d=\"M 9 13 A 2 2 0 1 1  5,13 A 2 2 0 1 1  9 13 z\" transform=\"translate(32,-1)\"/>    <path d=\"M 9 13 A 2 2 0 1 1  5,13 A 2 2 0 1 1  9 13 z\" transform=\"translate(7,-4.5)\"/>    <path d=\"M 9 13 A 2 2 0 1 1  5,13 A 2 2 0 1 1  9 13 z\" transform=\"translate(24,-4)\"/>    <path d=\"M 9,26 C 17.5,24.5 30,24.5 36,26 L 38,14 L 31,25 L 31,11 L 25.5,24.5 L 22.5,9.5 L 19.5,24.5 L 14,10.5 L 14,25 L 7,14 L 9,26 z \" style=\"stroke-linecap:butt;\"/>    <path d=\"M 9,26 C 9,28 10.5,28 11.5,30 C 12.5,31.5 12.5,31 12,33.5 C 10.5,34.5 10.5,36 10.5,36 C 9,37.5 11,38.5 11,38.5 C 17.5,39.5 27.5,39.5 34,38.5 C 34,38.5 35.5,37.5 34,36 C 34,36 34.5,34.5 33,33.5 C 32.5,31 32.5,31.5 33.5,30 C 34.5,28 36,28 36,26 C 27.5,24.5 17.5,24.5 9,26 z \" style=\"stroke-linecap:butt;\"/>    <path d=\"M 11.5,30 C 15,29 30,29 33.5,30\" style=\"fill:none;\"/>    <path d=\"M 12,33.5 C 18,32.5 27,32.5 33,33.5\" style=\"fill:none;\"/>  </g></svg>';
 		case 'b_p':
 			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\">  <path d=\"M 22,9 C 19.79,9 18,10.79 18,13 C 18,13.89 18.29,14.71 18.78,15.38 C 16.83,16.5 15.5,18.59 15.5,21 C 15.5,23.03 16.44,24.84 17.91,26.03 C 14.91,27.09 10.5,31.58 10.5,39.5 L 33.5,39.5 C 33.5,31.58 29.09,27.09 26.09,26.03 C 27.56,24.84 28.5,23.03 28.5,21 C 28.5,18.59 27.17,16.5 25.22,15.38 C 25.71,14.71 26,13.89 26,13 C 26,10.79 24.21,9 22,9 z \" style=\"opacity:1; fill:#000000; fill-opacity:1; fill-rule:nonzero; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:miter; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\"/></svg>';
 		case 'b_r':
 			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\"><g style=\"opacity:1; fill:000000; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\">    <path d=\"M 9,39 L 36,39 L 36,36 L 9,36 L 9,39 z \" style=\"stroke-linecap:butt;\"/>    <path d=\"M 12.5,32 L 14,29.5 L 31,29.5 L 32.5,32 L 12.5,32 z \" style=\"stroke-linecap:butt;\"/>    <path d=\"M 12,36 L 12,32 L 33,32 L 33,36 L 12,36 z \" style=\"stroke-linecap:butt;\"/>    <path d=\"M 14,29.5 L 14,16.5 L 31,16.5 L 31,29.5 L 14,29.5 z \" style=\"stroke-linecap:butt;stroke-linejoin:miter;\"/>    <path d=\"M 14,16.5 L 11,14 L 34,14 L 31,16.5 L 14,16.5 z \" style=\"stroke-linecap:butt;\"/>    <path d=\"M 11,14 L 11,9 L 15,9 L 15,11 L 20,11 L 20,9 L 25,9 L 25,11 L 30,11 L 30,9 L 34,9 L 34,14 L 11,14 z \" style=\"stroke-linecap:butt;\"/>    <path d=\"M 12,35.5 L 33,35.5 L 33,35.5\" style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\"/>    <path d=\"M 13,31.5 L 32,31.5\" style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\"/>    <path d=\"M 14,29.5 L 31,29.5\" style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\"/>    <path d=\"M 14,16.5 L 31,16.5\" style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\"/>    <path d=\"M 11,14 L 34,14\" style=\"fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;\"/>  </g></svg>';
 		case 'b_k':
 			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\"><g style=\"fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\"><path d=\"M 22.5,11.63 L 22.5,6\" style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\" id=\"path6570\"/><path d=\"M 22.5,25 C 22.5,25 27,17.5 25.5,14.5 C 25.5,14.5 24.5,12 22.5,12 C 20.5,12 19.5,14.5 19.5,14.5 C 18,17.5 22.5,25 22.5,25\" style=\"fill:#000000;fill-opacity:1; stroke-linecap:butt; stroke-linejoin:miter;\"/><path d=\"M 11.5,37 C 17,40.5 27,40.5 32.5,37 L 32.5,30 C 32.5,30 41.5,25.5 38.5,19.5 C 34.5,13 25,16 22.5,23.5 L 22.5,27 L 22.5,23.5 C 19,16 9.5,13 6.5,19.5 C 3.5,25.5 11.5,29.5 11.5,29.5 L 11.5,37 z \" style=\"fill:#000000; stroke:#000000;\"/><path d=\"M 20,8 L 25,8\" style=\"fill:none; stroke:#000000; stroke-linejoin:miter;\"/><path d=\"M 32,29.5 C 32,29.5 40.5,25.5 38.03,19.85 C 34.15,14 25,18 22.5,24.5 L 22.51,26.6 L 22.5,24.5 C 20,18 9.906,14 6.997,19.85 C 4.5,25.5 11.85,28.85 11.85,28.85\" style=\"fill:none; stroke:#ffffff;\"/><path d=\"M 11.5,30 C 17,27 27,27 32.5,30 M 11.5,33.5 C 17,30.5 27,30.5 32.5,33.5 M 11.5,37 C 17,34 27,34 32.5,37\" style=\"fill:none; stroke:#ffffff;\"/></g></svg>';
+		case 'b_b':
+			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\">  <g style=\"opacity:1; fill:none; fill-rule:evenodd; fill-opacity:1; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\">    <g style=\"fill:#000000; stroke:#000000; stroke-linecap:butt;\">       <path d=\"M 9,36 C 12.39,35.03 19.11,36.43 22.5,34 C 25.89,36.43 32.61,35.03 36,36 C 36,36 37.65,36.54 39,38 C 38.32,38.97 37.35,38.99 36,38.5 C 32.61,37.53 25.89,38.96 22.5,37.5 C 19.11,38.96 12.39,37.53 9,38.5 C 7.646,38.99 6.677,38.97 6,38 C 7.354,36.06 9,36 9,36 z\"/>      <path d=\"M 15,32 C 17.5,34.5 27.5,34.5 30,32 C 30.5,30.5 30,30 30,30 C 30,27.5 27.5,26 27.5,26 C 33,24.5 33.5,14.5 22.5,10.5 C 11.5,14.5 12,24.5 17.5,26 C 17.5,26 15,27.5 15,30 C 15,30 14.5,30.5 15,32 z\"/>      <path d=\"M 25 8 A 2.5 2.5 0 1 1  20,8 A 2.5 2.5 0 1 1  25 8 z\"/>    </g>    <path d=\"M 17.5,26 L 27.5,26 M 15,30 L 30,30 M 22.5,15.5 L 22.5,20.5 M 20,18 L 25,18\" style=\"fill:none; stroke:#ffffff; stroke-linejoin:miter;\"/>  </g></svg>';
+		case 'b_n':
+			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\">  <g style=\"opacity:1; fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\">    <path d=\"M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18\" style=\"fill:#000000; stroke:#000000;\"/>    <path d=\"M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10\" style=\"fill:#000000; stroke:#000000;\"/>    <path d=\"M 9.5 25.5 A 0.5 0.5 0 1 1 8.5,25.5 A 0.5 0.5 0 1 1 9.5 25.5 z\" style=\"fill:#ffffff; stroke:#ffffff;\"/>    <path d=\"M 15 15.5 A 0.5 1.5 0 1 1  14,15.5 A 0.5 1.5 0 1 1  15 15.5 z\" transform=\"matrix(0.866,0.5,-0.5,0.866,9.693,-5.173)\" style=\"fill:#ffffff; stroke:#ffffff;\"/>    <path d=\"M 24.55,10.4 L 24.1,11.85 L 24.6,12 C 27.75,13 30.25,14.49 32.5,18.75 C 34.75,23.01 35.75,29.06 35.25,39 L 35.2,39.5 L 37.45,39.5 L 37.5,39 C 38,28.94 36.62,22.15 34.25,17.66 C 31.88,13.17 28.46,11.02 25.06,10.5 L 24.55,10.4 z \" style=\"fill:#ffffff; stroke:none;\"/>  </g></svg>';
+		case 'b_q':
+			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\">  <g style=\"opacity:1; fill:000000; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;\">    <g style=\"fill:#000000; stroke:none;\">      <circle cx=\"6\" cy=\"12\" r=\"2.75\"/>      <circle cx=\"14\" cy=\"9\" r=\"2.75\"/>      <circle cx=\"22.5\" cy=\"8\" r=\"2.75\"/>      <circle cx=\"31\" cy=\"9\" r=\"2.75\"/>      <circle cx=\"39\" cy=\"12\" r=\"2.75\"/>    </g>    <path d=\"M 9,26 C 17.5,24.5 30,24.5 36,26 L 38.5,13.5 L 31,25 L 30.7,10.9 L 25.5,24.5 L 22.5,10 L 19.5,24.5 L 14.3,10.9 L 14,25 L 6.5,13.5 L 9,26 z\" style=\"stroke-linecap:butt; stroke:#000000;\"/>    <path d=\"M 9,26 C 9,28 10.5,28 11.5,30 C 12.5,31.5 12.5,31 12,33.5 C 10.5,34.5 10.5,36 10.5,36 C 9,37.5 11,38.5 11,38.5 C 17.5,39.5 27.5,39.5 34,38.5 C 34,38.5 35.5,37.5 34,36 C 34,36 34.5,34.5 33,33.5 C 32.5,31 32.5,31.5 33.5,30 C 34.5,28 36,28 36,26 C 27.5,24.5 17.5,24.5 9,26 z\" style=\"stroke-linecap:butt;\"/>    <path d=\"M 11,38.5 A 35,35 1 0 0 34,38.5\" style=\"fill:none; stroke:#000000; stroke-linecap:butt;\"/>    <path d=\"M 11,29 A 35,35 1 0 1 34,29\" style=\"fill:none; stroke:#ffffff;\"/>    <path d=\"M 12.5,31.5 L 32.5,31.5\" style=\"fill:none; stroke:#ffffff;\"/>    <path d=\"M 11.5,34.5 A 35,35 1 0 0 33.5,34.5\" style=\"fill:none; stroke:#ffffff;\"/>    <path d=\"M 10.5,37.5 A 35,35 1 0 0 34.5,37.5\" style=\"fill:none; stroke:#ffffff;\"/>  </g></svg>';
 		default:
 			return '<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"45\" height=\"45\" viewBox=\"0 0 11.90625 11.90625\" id=\"svg3976\"><defs id=\"defs3970\"/><sodipodi:namedview id=\"base\" pagecolor=\"#ffffff\" bordercolor=\"#666666\" borderopacity=\"1.0\" inkscape:pageopacity=\"0.0\" inkscape:pageshadow=\"2\" inkscape:zoom=\"7.9195959\" inkscape:cx=\"10.158656\" inkscape:cy=\"26.100682\" inkscape:document-units=\"mm\" inkscape:current-layer=\"layer1\" showgrid=\"false\" units=\"px\" inkscape:window-width=\"1600\" inkscape:window-height=\"837\" inkscape:window-x=\"-8\" inkscape:window-y=\"-8\" inkscape:window-maximized=\"1\"/><metadata id=\"metadata3973\"><rdf:RDF><cc:Work rdf:about=\"\"><dc:format>image/svg+xml</dc:format><dc:type rdf:resource=\"http://purl.org/dc/dcmitype/StillImage\"/><dc:title/></cc:Work></rdf:RDF></metadata><g inkscape:label=\"Layer 1\" inkscape:groupmode=\"layer\" id=\"layer1\" transform=\"translate(0,-285.09373)\"><g id=\"g4108\" transform=\"matrix(0.3043473,0,0,0.3043473,-0.74786792,284.04687)\"><path sodipodi:nodetypes=\"cccc\" id=\"path3491\" d=\"m 22,10 c 10.5,1 16.5,8 16,29 H 15 c 0,-9 10,-6.5 8,-21\" style=\"fill:#2b2b3c;fill-opacity:1;fill-rule:evenodd;stroke:#303042;stroke-width:1px;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/><path sodipodi:nodetypes=\"csccccccccccc\" id=\"path3495\" d=\"m 24,18 c 0.384461,2.911278 -5.552936,7.368624 -8,9 -3,2 -2.819198,4.342892 -5,4 -1.04172,-0.944016 1.413429,-3.037549 0,-3 -1,0 0.187332,1.231727 -1,2 -1,0 -4.0031608,0.999999 -4,-4 0,-2 6,-12 6,-12 0,0 1.885866,-1.902129 2,-3.5 -0.726047,-0.994369 -0.5,-2 -0.5,-3 1,-1 3,2.5 3,2.5 h 2 c 0,0 0.781781,-1.9919255 2.5,-3 1,0 1,3 1,3\" style=\"fill:#2b2b3c;fill-opacity:1;fill-rule:evenodd;stroke:#303042;stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/><circle transform=\"translate(0.5,2)\" id=\"path3499\" style=\"opacity:1;fill:#2b2b3c;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1\" cx=\"8.5\" cy=\"23.5\" r=\"0.5\"/><ellipse transform=\"rotate(30.000012,14.500009,15.499986)\" id=\"path3501\" style=\"opacity:1;fill:#2b2b3c;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1\" cx=\"14.5\" cy=\"15.5\" rx=\"0.5\" ry=\"1.5\"/><path sodipodi:nodetypes=\"cccsccccscc\" id=\"path8049\" d=\"m 24.55,10.4 -0.3,1.1 0.55,0.1 c 3.101459,0.477147 6.323526,2.234204 8.575,6.49375 C 35.626474,22.353296 36.297157,29.05687 35.8,39 l -0.05,0.5 H 37.5 V 39 C 38.002843,28.94313 36.623526,22.146704 34.25,17.65625 31.876474,13.165796 28.461041,11.022853 25.0625,10.5 Z\" style=\"fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/><path id=\"path2818\" d=\"m 14.567771,38.459879 c 0.13635,-1.796208 0.558844,-3.152428 1.384569,-4.444516 0.233128,-0.364797 1.312337,-1.579372 2.398243,-2.699058 1.994197,-2.056232 2.893864,-3.226759 3.454584,-4.494646 0.446573,-1.009784 0.799401,-2.508009 0.890245,-3.78028 l 0.07945,-1.11275 -1.108514,1.075131 c -1.509002,1.46356 -2.57691,2.350841 -4.421012,3.673239 -1.700047,1.219096 -2.544384,2.006507 -3.665008,3.417912 -0.775227,0.976384 -1.421866,1.388405 -2.18696,1.393473 -0.575285,0.0038 -0.855457,-0.176834 -1.012077,-0.652545 l -0.134066,-0.40721 -1.0319639,0.04174 C 7.9615845,30.521081 7.3792222,30.361435 6.7525106,29.795239 6.1336101,29.236099 5.7610606,28.34997 5.6181745,27.09716 5.478446,25.872035 5.5914562,25.271009 6.2522413,23.724978 7.4052529,21.02729 11.111158,14.365763 12.223638,12.991129 c 0.361652,-0.446875 0.803261,-1.12024 0.981352,-1.496367 0.321358,-0.678706 0.322164,-0.68814 0.106827,-1.25 -0.119336,-0.3113731 -0.24652,-1.0767335 -0.28263,-1.7008009 -0.06502,-1.1237006 -0.06232,-1.137293 0.279605,-1.40625 0.189893,-0.1493702 0.502052,-0.2715821 0.693686,-0.2715821 0.498896,0 1.319417,0.6731881 2.100897,1.7236592 l 0.670536,0.9013408 h 0.733173 0.733173 l 0.270503,-0.53125 c 0.148777,-0.2921875 0.677944,-0.9390625 1.175928,-1.4375 0.781557,-0.7822703 0.965687,-0.90625 1.345925,-0.90625 0.33503,0 0.515317,0.088914 0.752972,0.3713508 0.304723,0.3621418 0.58282,1.3000334 0.586667,1.9785518 0.0029,0.5080395 0.12709,0.6173638 0.810586,0.7134464 6.88235,0.967487 11.352047,4.976401 13.517699,12.124151 1.123152,3.706976 1.627873,7.687946 1.755158,13.84375 l 0.07948,3.84375 h -0.500364 -0.500362 l 0.06018,-3.126764 C 37.71967,29.867039 37.027323,24.699753 35.44664,20.333049 33.737003,15.6101 30.713269,12.258466 26.998148,10.968382 c -0.532334,-0.184853 -2.215573,-0.602253 -2.428696,-0.602253 -0.08352,0 -0.32899,1.015984 -0.268939,1.113148 0.03671,0.0594 0.33074,0.147593 0.653394,0.195978 2.43577,0.365266 5.129133,1.935823 6.703427,3.90891 3.061731,3.837315 4.212184,8.694398 4.211846,17.781964 -7.5e-5,2.028125 -0.03645,4.235937 -0.08084,4.90625 l -0.08071,1.21875 H 25.098558 14.489486 l 0.07828,-1.03125 z M 9.6885199,26.18431 c 0.6200241,-0.620024 0.1806775,-1.693181 -0.6931819,-1.693181 -0.5138873,0 -1,0.486112 -1,1 0,0.513887 0.4861127,1 1,1 0.2435466,0 0.4997771,-0.113414 0.6931819,-0.306819 z m 4.6625311,-9.016105 c 0.720688,-0.42992 1.519287,-1.842801 1.519287,-2.687922 0,-0.482012 -0.458393,-0.901188 -0.873776,-0.799022 -0.470815,0.115799 -1.090962,0.77835 -1.506066,1.609047 -0.434872,0.870256 -0.474443,1.471536 -0.120158,1.825821 0.301661,0.301661 0.54102,0.314371 0.980713,0.05208 z\" style=\"fill:#000000\" inkscape:connector-curvature=\"0\"/><path sodipodi:nodetypes=\"ccccc\" id=\"path3787\" d=\"m 20,38 c 5,-5 11.375,-5.625 16.375,-6.625 l 0.125,0.75 C 31.5,33.125 25.75,34 21.75,38 Z\" style=\"fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/><path sodipodi:nodetypes=\"ccccc\" id=\"path4301\" d=\"m 36.25,28.5 c -5.54684,0.614372 -12.711319,1.059578 -18.25,5.25 2.125,-2.625 2.823017,-2.541667 3.625,-3.875 4,-1 9.188096,-2.067905 14.375,-2.875 z\" style=\"fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/><path sodipodi:nodetypes=\"ccccc\" id=\"path4303\" d=\"M 23.75,25.75 C 29.759822,24.806647 31.895381,23.766153 35,23 v -1 c -3.365763,0.834839 -6.665102,2.155386 -11,2.5 z\" style=\"fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/><path sodipodi:nodetypes=\"ccccc\" id=\"path4311\" d=\"M 36.5,35.625 C 32.65337,35.962561 30.888877,36.495727 28.625,38 l 3.125,-0.125 c 2.22881,-1.603573 3.356592,-1.372098 4.625,-1.375 z\" style=\"fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/><path sodipodi:nodetypes=\"ccccc\" id=\"path4313\" d=\"m 33.125,17.75 c -1.651212,1.497849 -5.120762,2.268362 -8.375,3.125 l 0.125,-0.75 c 2.192276,-0.757978 2.842349,0.156524 7.5,-3.375 z\" style=\"fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/><path sodipodi:nodetypes=\"cccc\" id=\"path4317\" d=\"m 25.125,11.25 -1.75,2.25 0.375,-2.625 z\" style=\"fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/><path sodipodi:nodetypes=\"cccc\" id=\"path4319\" d=\"m 30,13.375 c -2.647892,2.504117 -2.719417,2.4805 -5.25,3.375 1.857607,-1.621366 2.685484,-2.344089 3.875,-4.75 z\" style=\"fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\" inkscape:connector-curvature=\"0\"/></g></g></svg>';
 	}
@@ -11860,9 +11902,17 @@ var _darrensiegel$elm_chess_client$View_Assets_Pieces$getSvgTag = F2(
 	});
 
 var _darrensiegel$elm_chess_client$View_Main$r_square = function (sq) {
+	var activeClass = function () {
+		var _p0 = sq.piece;
+		if (_p0.ctor === 'Just') {
+			return _p0._0.active ? 'active' : 'selected';
+		} else {
+			return 'selected';
+		}
+	}();
 	var attrs = sq.valid ? {
 		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$class('selected'),
+		_0: _elm_lang$html$Html_Attributes$class(activeClass),
 		_1: {ctor: '[]'}
 	} : {ctor: '[]'};
 	return A3(
@@ -11890,27 +11940,27 @@ var _darrensiegel$elm_chess_client$View_Main$r_board = function (board) {
 		{ctor: '[]'},
 		checker);
 };
-var _darrensiegel$elm_chess_client$View_Main$getPieceSvgPrefix = function (_p0) {
-	var _p1 = _p0;
-	var _p3 = _p1.role;
-	var _p2 = _p1.color;
-	if (_p2.ctor === 'Black') {
-		return A2(_darrensiegel$elm_chess_client$View_Assets_Pieces$getSvgTag, 'b_', _p3);
+var _darrensiegel$elm_chess_client$View_Main$getPieceSvgPrefix = function (_p1) {
+	var _p2 = _p1;
+	var _p4 = _p2.role;
+	var _p3 = _p2.color;
+	if (_p3.ctor === 'Black') {
+		return A2(_darrensiegel$elm_chess_client$View_Assets_Pieces$getSvgTag, 'b_', _p4);
 	} else {
-		return A2(_darrensiegel$elm_chess_client$View_Assets_Pieces$getSvgTag, 'w_', _p3);
+		return A2(_darrensiegel$elm_chess_client$View_Assets_Pieces$getSvgTag, 'w_', _p4);
 	}
 };
-var _darrensiegel$elm_chess_client$View_Main$r_dragSvg = function (_p4) {
-	var _p5 = _p4;
-	var _p8 = _p5.position;
-	var y = _p8.y;
-	var x = _p8.x;
-	var _p6 = _p5.piece;
-	if (_p6.ctor === 'Just') {
-		var _p7 = _rnons$elm_svg_parser$SvgParser$parse(
-			_darrensiegel$elm_chess_client$View_Main$getPieceSvgPrefix(_p6._0));
-		if (_p7.ctor === 'Err') {
-			return _elm_lang$html$Html$text(_p7._0);
+var _darrensiegel$elm_chess_client$View_Main$r_dragSvg = function (_p5) {
+	var _p6 = _p5;
+	var _p9 = _p6.position;
+	var y = _p9.y;
+	var x = _p9.x;
+	var _p7 = _p6.piece;
+	if (_p7.ctor === 'Just') {
+		var _p8 = _rnons$elm_svg_parser$SvgParser$parse(
+			_darrensiegel$elm_chess_client$View_Main$getPieceSvgPrefix(_p7._0));
+		if (_p8.ctor === 'Err') {
+			return _elm_lang$html$Html$text(_p8._0);
 		} else {
 			return A3(
 				_elm_lang$html$Html$node,
@@ -11941,7 +11991,7 @@ var _darrensiegel$elm_chess_client$View_Main$r_dragSvg = function (_p4) {
 				},
 				{
 					ctor: '::',
-					_0: _p7._0,
+					_0: _p8._0,
 					_1: {ctor: '[]'}
 				});
 		}
@@ -11950,48 +12000,55 @@ var _darrensiegel$elm_chess_client$View_Main$r_dragSvg = function (_p4) {
 	}
 };
 var _darrensiegel$elm_chess_client$View_Main$r_svg = F2(
-	function (_p9, piece) {
-		var _p10 = _p9;
-		var _p11 = _rnons$elm_svg_parser$SvgParser$parse(
-			_darrensiegel$elm_chess_client$View_Main$getPieceSvgPrefix(piece));
-		if (_p11.ctor === 'Err') {
-			return _elm_lang$html$Html$text(_p11._0);
+	function (_p11, _p10) {
+		var _p12 = _p11;
+		var _p13 = _p10;
+		var styles = {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: A2(
+						_darrensiegel$elm_chess_client$Toolkit_ops['=>'],
+						'top',
+						_darrensiegel$elm_chess_client$Toolkit$px(_p12.y * _darrensiegel$elm_chess_client$Settings$squareSize)),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_darrensiegel$elm_chess_client$Toolkit_ops['=>'],
+							'left',
+							_darrensiegel$elm_chess_client$Toolkit$px(_p12.x * _darrensiegel$elm_chess_client$Settings$squareSize)),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		};
+		var classes = _p13.active ? {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('active'),
+			_1: {ctor: '[]'}
+		} : {ctor: '[]'};
+		var _p14 = _rnons$elm_svg_parser$SvgParser$parse(
+			_darrensiegel$elm_chess_client$View_Main$getPieceSvgPrefix(_p13));
+		if (_p14.ctor === 'Err') {
+			return _elm_lang$html$Html$text(_p14._0);
 		} else {
 			return A3(
 				_elm_lang$html$Html$node,
 				'piece',
+				A2(_elm_lang$core$Basics_ops['++'], classes, styles),
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$style(
-						{
-							ctor: '::',
-							_0: A2(
-								_darrensiegel$elm_chess_client$Toolkit_ops['=>'],
-								'top',
-								_darrensiegel$elm_chess_client$Toolkit$px(_p10.y * _darrensiegel$elm_chess_client$Settings$squareSize)),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_darrensiegel$elm_chess_client$Toolkit_ops['=>'],
-									'left',
-									_darrensiegel$elm_chess_client$Toolkit$px(_p10.x * _darrensiegel$elm_chess_client$Settings$squareSize)),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _p11._0,
+					_0: _p14._0,
 					_1: {ctor: '[]'}
 				});
 		}
 	});
 var _darrensiegel$elm_chess_client$View_Main$r_piece = function (s) {
-	var _p12 = s.piece;
-	if (_p12.ctor === 'Just') {
+	var _p15 = s.piece;
+	if (_p15.ctor === 'Just') {
 		return _elm_lang$core$Maybe$Just(
-			A2(_darrensiegel$elm_chess_client$View_Main$r_svg, s.position, _p12._0));
+			A2(_darrensiegel$elm_chess_client$View_Main$r_svg, s.position, _p15._0));
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
@@ -12026,11 +12083,11 @@ var _darrensiegel$elm_chess_client$View_Main$r_pieces = function (board) {
 		{ctor: '[]'},
 		pieces);
 };
-var _darrensiegel$elm_chess_client$View_Main$r_player = function (_p13) {
-	var _p14 = _p13;
+var _darrensiegel$elm_chess_client$View_Main$r_player = function (_p16) {
+	var _p17 = _p16;
 	var mv_piece = function () {
-		var _p15 = _p14.drag;
-		if (_p15.ctor === 'Just') {
+		var _p18 = _p17.drag;
+		if (_p18.ctor === 'Just') {
 			return {
 				ctor: '_Tuple2',
 				_0: {
@@ -12040,7 +12097,7 @@ var _darrensiegel$elm_chess_client$View_Main$r_player = function (_p13) {
 				},
 				_1: {
 					ctor: '::',
-					_0: _darrensiegel$elm_chess_client$View_Main$r_dragSvg(_p15._0),
+					_0: _darrensiegel$elm_chess_client$View_Main$r_dragSvg(_p18._0),
 					_1: {ctor: '[]'}
 				}
 			};
@@ -12057,26 +12114,30 @@ var _darrensiegel$elm_chess_client$View_Main$r_player = function (_p13) {
 		_elm_lang$html$Html$node('player'),
 		mv_piece);
 };
-var _darrensiegel$elm_chess_client$View_Main$render = function (_p16) {
-	var _p17 = _p16;
-	var _p18 = _p17.board;
+var _darrensiegel$elm_chess_client$View_Main$onMouseDown = A2(
+	_elm_lang$html$Html_Events$on,
+	'mousedown',
+	A2(_elm_lang$core$Json_Decode$map, _darrensiegel$elm_chess_client$Data_Chess$Click, _elm_lang$mouse$Mouse$position));
+var _darrensiegel$elm_chess_client$View_Main$render = function (_p19) {
+	var _p20 = _p19;
+	var _p21 = _p20.board;
 	return A3(
 		_elm_lang$html$Html$node,
 		'main',
 		{
 			ctor: '::',
-			_0: _darrensiegel$elm_chess_client$Frame_Main$onMouseDown,
+			_0: _darrensiegel$elm_chess_client$View_Main$onMouseDown,
 			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
-			_0: _darrensiegel$elm_chess_client$View_Main$r_player(_p17.player),
+			_0: _darrensiegel$elm_chess_client$View_Main$r_player(_p20.player),
 			_1: {
 				ctor: '::',
-				_0: _darrensiegel$elm_chess_client$View_Main$r_pieces(_p18),
+				_0: _darrensiegel$elm_chess_client$View_Main$r_pieces(_p21),
 				_1: {
 					ctor: '::',
-					_0: _darrensiegel$elm_chess_client$View_Main$r_board(_p18),
+					_0: _darrensiegel$elm_chess_client$View_Main$r_board(_p21),
 					_1: {ctor: '[]'}
 				}
 			}
@@ -12090,10 +12151,10 @@ var _darrensiegel$elm_chess_client$Main$subscriptions = function (_p0) {
 		return _elm_lang$core$Platform_Sub$batch(
 			{
 				ctor: '::',
-				_0: _elm_lang$mouse$Mouse$moves(_darrensiegel$elm_chess_client$Data_Main$Drag),
+				_0: _elm_lang$mouse$Mouse$moves(_darrensiegel$elm_chess_client$Data_Chess$Drag),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$mouse$Mouse$ups(_darrensiegel$elm_chess_client$Data_Main$Drop),
+					_0: _elm_lang$mouse$Mouse$ups(_darrensiegel$elm_chess_client$Data_Chess$Drop),
 					_1: {ctor: '[]'}
 				}
 			});
@@ -12102,12 +12163,12 @@ var _darrensiegel$elm_chess_client$Main$subscriptions = function (_p0) {
 	}
 };
 var _darrensiegel$elm_chess_client$Main$init = function () {
-	var initPlayer = A2(_darrensiegel$elm_chess_client$Data_Main$Player, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
-	var initBoard = _darrensiegel$elm_chess_client$Model_Main$fromFEN(_darrensiegel$elm_chess_client$Model_Main$initialBoard);
+	var initPlayer = A2(_darrensiegel$elm_chess_client$Data_Chess$Player, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+	var initBoard = _darrensiegel$elm_chess_client$Data_Model$fromFEN(_darrensiegel$elm_chess_client$Data_Model$initialBoard);
 	return A2(
 		_elm_lang$core$Platform_Cmd_ops['!'],
 		A3(
-			_darrensiegel$elm_chess_client$Data_Main$Chess,
+			_darrensiegel$elm_chess_client$Data_Chess$Chess,
 			initBoard,
 			initPlayer,
 			{ctor: '[]'}),

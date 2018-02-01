@@ -3,8 +3,7 @@ module Frame.Moves exposing (..)
 import Matrix exposing (..)
 import Debug exposing (..)
 
-import Data.Main exposing (..)
-import Data.Game as Game exposing (..)
+import Data.Chess exposing (..)
 import Frame.Movement exposing (..)
 import Settings exposing (..)
 import Toolkit exposing (..)
@@ -12,7 +11,10 @@ import Toolkit exposing (..)
 validate : Square -> Board -> Board
 validate sq bd =
     -- append input square as valid
-    let validSquares = sq::(getValidSquares sq bd)
+    let newSquare = sq.piece
+            |> Maybe.map (\pc -> { sq | piece = Just { pc | active = True }}) 
+            |> Maybe.withDefault sq
+        validSquares = newSquare::(getValidSquares sq bd)
         checkMoves sq_ b = 
             Matrix.update (toLocation sq_.position) 
                 (\{ position, piece, valid } ->

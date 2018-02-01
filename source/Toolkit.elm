@@ -4,7 +4,7 @@ import Array exposing (..)
 import Matrix exposing (..)
 import Mouse exposing (..)
 
-import Data.Game as Game exposing (..)
+import Data.Chess as Game exposing (..)
 import Settings exposing (..)
 
 (=>) = (,)
