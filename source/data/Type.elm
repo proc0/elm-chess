@@ -1,4 +1,4 @@
-module Data.Chess exposing (..)
+module Data.Type exposing (..)
 
 import Matrix exposing (..)
 import Array exposing (..)
@@ -8,7 +8,7 @@ type Msg =
       Click Mouse.Position
     | Drag Mouse.Position
     | Drop Mouse.Position
-
+    
 type alias Chess =
     { board   : Board
     , player  : Player
@@ -33,12 +33,12 @@ type alias Move =
     (Square, Maybe Square)
 
 type alias Square = 
-    { position : Position
+    { point : Point
     , piece : Maybe Piece
     , valid : Bool
     }
 
-type alias Position =
+type alias Point =
     { x : Int
     , y : Int 
     }
@@ -60,4 +60,3 @@ type Role
     | Queen
     | King
     | Zebra
-

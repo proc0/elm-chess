@@ -1,35 +1,18 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Debug exposing (..)
 import Mouse exposing (..)
+import Debug exposing (..)
 
-import Data.Chess exposing (..)
-import Data.Model exposing (..)
-import Frame.Main as Frame exposing (..)
-import Frame.Moves exposing (..)
+import Data.Type exposing (..)
+import Model.Chess as Chess exposing (..)
+import State.Event as Event exposing (..)
 import View.Main as View exposing (..)
 
 main : Program Never Chess Msg
 main = Html.program
-    { init = init
+    { init = Chess.init ! []
     , view = View.render
-    , update = Frame.update
-    , subscriptions = subscriptions
+    , update = Event.update
+    , subscriptions = Event.subscriptions
     }
-
-init : ( Chess, Cmd Msg )
-init = let initBoard = fromFEN initialBoard
-           initPlayer = Player Nothing Nothing
-       in Chess initBoard initPlayer [] ! []
-
-subscriptions : Chess -> Sub Msg
-subscriptions {player} = 
-            case player.drag of 
-                Just sq ->
-                    Sub.batch 
-                        [ Mouse.moves Drag
-                        , Mouse.ups Drop 
-                        ]                   
-                Nothing -> Sub.none
-

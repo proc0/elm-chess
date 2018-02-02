@@ -1,20 +1,16 @@
-module View.Assets.Pieces exposing (..)
+module View.Asset exposing (..)
 
-import Data.Chess as Game exposing (..)
+import Data.Type exposing (..)
+import Model.FEN exposing (..)
 
-getSvgTag : String -> Game.Role -> String
+getSvg : Piece -> String
+getSvg  {color, role} = 
+    case color of
+        Black -> getSvgTag "b_" role
+        White -> getSvgTag "w_" role
+
+getSvgTag : String -> Role -> String
 getSvgTag prefix f = svgTag (prefix ++ String.fromChar (figCharMap f))
-
-figCharMap : Game.Role -> Char
-figCharMap fig = 
-    case fig of
-        Pawn    -> 'p'
-        Rook    -> 'r'
-        Bishop  -> 'b'
-        Knight  -> 'n'
-        Queen   -> 'q'
-        King    -> 'k'
-        Zebra   -> 'z'
 
 svgTag : String -> String
 svgTag s =

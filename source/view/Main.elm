@@ -9,10 +9,9 @@ import SvgParser exposing (parse)
 import Json.Decode as Json exposing (..)
 import Debug exposing (..)
 
-import Data.Chess as Game exposing (..)
-import Settings exposing (..)
-import Toolkit exposing (..)
-import View.Assets.Pieces exposing (..)
+import Data.Type exposing (..)
+import Data.Tool exposing (..)
+import View.Asset exposing (..)
 
 onMouseDown : Attribute Msg
 onMouseDown = on "mousedown" (Json.map Click Mouse.position)
@@ -55,11 +54,11 @@ filter_rank f r = List.filterMap (\s -> f s) r
 -- render piece from square
 r_piece : Square -> Maybe (Html Msg)
 r_piece s = case s.piece of
-                 Just pc -> Just (r_svg s.position pc)
+                 Just pc -> Just (r_svg s.point pc)
                  Nothing -> Nothing
 
 -- render svg piece
-r_svg : Game.Position -> Piece -> Html Msg
+r_svg : Point -> Piece -> Html Msg
 r_svg {x,y} ({active} as piece) = 
     let classes = 
             if active
@@ -72,20 +71,20 @@ r_svg {x,y} ({active} as piece) =
                 ]
             ]
     -- parse SVG from String
-    in case parse (getPieceSvgPrefix piece) of
+    in case parse (getSvg piece) of
         Err e -> text e
         Ok svg -> node "piece" 
                     (classes ++ styles) [svg]
 
 -- dragable svg markup
 r_dragSvg : Square -> Html Msg
-r_dragSvg {position,piece} = 
-    let x = position.x
-        y = position.y
+r_dragSvg { point, piece } = 
+    let x = point.x
+        y = point.y
     in case piece of
         Just pc ->
             -- parse SVG from String
-            case parse (getPieceSvgPrefix pc) of
+            case parse (getSvg pc) of
                 Err e -> text e
                 Ok svg -> node "piece" 
                             [ style 
@@ -95,12 +94,6 @@ r_dragSvg {position,piece} =
                                 ]
                             ] [svg]
         Nothing -> text "" --neutral
-
-getPieceSvgPrefix : Piece -> String
-getPieceSvgPrefix  {color, role} = 
-    case color of
-        Black -> getSvgTag "b_" role
-        White -> getSvgTag "w_" role
 
 -- render board
 ---------------

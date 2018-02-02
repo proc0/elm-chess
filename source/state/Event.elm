@@ -1,4 +1,4 @@
-module Frame.Main exposing (..)
+module State.Event exposing (..)
 
 import Array exposing (..)
 import Matrix exposing (..)
@@ -6,10 +6,20 @@ import Html exposing (..)
 import Mouse exposing (..)
 import Debug exposing (..)
 
-import Data.Chess exposing (..)
-import Frame.Moves exposing (..)
-import Settings exposing (..)
-import Toolkit exposing (..)
+import Data.Type exposing (..)
+import Data.Tool exposing (..)
+import Model.Board exposing (..)
+import State.Move exposing (..)
+
+subscriptions : Chess -> Sub Msg
+subscriptions {player} = 
+            case player.drag of 
+                Just sq ->
+                    Sub.batch 
+                        [ Mouse.moves Drag
+                        , Mouse.ups Drop 
+                        ]                   
+                Nothing -> Sub.none
 
 update : Msg -> Chess -> ( Chess, Cmd Msg )
 update msg ({ board, player, history } as model) =
@@ -17,10 +27,8 @@ update msg ({ board, player, history } as model) =
         selected : Maybe Square
         selected = 
             let target p = Matrix.get (toLocation <| getPosition p) board
-            in case msg of
-                Click xy -> target xy
-                Drag xy  -> target xy
-                Drop xy  -> target xy
+            in mapMsg target msg
+
         -- update player action
         -- persist piece select + drag
         playerMove : Player
@@ -45,7 +53,7 @@ update msg ({ board, player, history } as model) =
                     case player.drag of
                         Just d -> 
                             { player 
-                            | drag = Just { d | position = xy }
+                            | drag = Just { d | point = xy }
                             }
                         Nothing -> player
 
@@ -58,7 +66,7 @@ update msg ({ board, player, history } as model) =
         nextMove = 
             let clear = toggleValid False
                 defaults = clear board
-                halfMove s = Just (s, Nothing)
+                startMove s = Just (s, Nothing)
                 fullMove (s1,s2) = Just (s1, Just s2)
                 findTarget ps sq = 
                     Matrix.get 
@@ -78,7 +86,7 @@ update msg ({ board, player, history } as model) =
                                 Just tg ->
                                     let dest = Square pos sq.piece True
                                     -- prevent same square drop
-                                    in if tg.valid && tg.position /= sq.position
+                                    in if tg.valid && tg.point /= sq.point
                                     -- complete move by drag
                                     then fullMove (sq => dest)
                                     else Nothing
@@ -93,7 +101,7 @@ update msg ({ board, player, history } as model) =
                             -- if occupied by piece
                             case sel.piece of
                                 -- player starts move
-                                Just _ -> halfMove sel 
+                                Just _ -> startMove sel 
                                 Nothing -> 
                                     -- check if existing selection
                                     player.select |> Maybe.map 
@@ -106,7 +114,7 @@ update msg ({ board, player, history } as model) =
                                                 (\tg ->
                                                     let dest = Square pos sq.piece True
                                                     -- prevent same square click
-                                                    in if tg.valid && tg.position /= sq.position
+                                                    in if tg.valid && tg.point /= sq.point
                                                     -- complete move by click (from, to)
                                                     then fullMove (sq => dest)
                                                     else Nothing
@@ -120,7 +128,38 @@ update msg ({ board, player, history } as model) =
         nextBoard : Board
         nextBoard = 
             let clear = toggleValid False
-                defaults = clear board
+
+                default : Board
+                default = clear board
+
+                startMove : Square -> Board
+                startMove s1 = default 
+                        |> validate s1 
+                        |> liftPiece s1
+
+                fullMove : Square -> Square -> Board
+                fullMove s1 s2 =
+                        default
+                        |> validate s2 
+                        |> liftPiece s1 
+                        |> addPiece s2.point s2.piece 
+                        |> clear
+
+                finishMove : Square -> Board
+                finishMove s2 =
+                    let pc = s2.piece -- active false when dropped
+                           |> Maybe.map (\p -> { p | active = False })
+                    in default
+                        |> validate s2
+                        |> addPiece s2.point pc
+                        |> clear
+
+                undoMove : Square -> Board
+                undoMove s =
+                    let pc = s.piece -- active true if no move drop
+                           |> Maybe.map (\p -> { p | active = True })
+                    in addPiece s.point pc board
+
             in case msg of
                 -- no update
                 Drag _  -> board
@@ -132,18 +171,14 @@ update msg ({ board, player, history } as model) =
                             -- and clear board highilight
                             case sq2 of
                                 Just s2 -> 
-                                    defaults
-                                    |> validate s2 
-                                    |> liftPiece sq1 
-                                    |> addPiece s2.position s2.piece 
-                                    |> clear
+                                    case s2.piece of
+                                        Just _ -> fullMove sq1 s2
+                                        Nothing -> startMove sq1
                                 -- if half move
                                 -- highlight board and lift piece
-                                Nothing -> 
-                                    defaults 
-                                    |> validate sq1 
-                                    |> liftPiece sq1
-                        Nothing -> defaults
+                                Nothing -> startMove sq1
+                                    
+                        Nothing -> default
                 -- move by drag
                 Drop xy ->
                     case nextMove of
@@ -151,23 +186,14 @@ update msg ({ board, player, history } as model) =
                             case sq2 of
                                 -- if full move 
                                 -- add piece to board
-                                Just s2 -> 
-                                    let pc = s2.piece -- active false when dropped
-                                           |> Maybe.map (\p -> { p | active = False })
-                                    in defaults
-                                        |> validate s2
-                                        |> addPiece s2.position pc
-                                        |> clear
-                                Nothing -> defaults
+                                Just s2 -> finishMove s2
+                                Nothing -> default
                         Nothing -> 
                             -- invalid move, return piece back
                             -- using selection square
                             case player.select of
-                                Just sq -> 
-                                    let pc = sq.piece -- active true if no move drop
-                                           |> Maybe.map (\p -> { p | active = True })
-                                    in addPiece sq.position pc board
-                                Nothing -> defaults
+                                Just sq -> undoMove sq
+                                Nothing -> default
         -- update history based on next move
         nextHistory : History
         nextHistory = 
@@ -180,43 +206,5 @@ update msg ({ board, player, history } as model) =
 
         _ = log "move" nextMove
 
-    in Chess nextBoard playerMove nextHistory ! []
-                                           
-
-startDrag : Mouse.Position -> Square -> Square
-startDrag ps sq = 
-    case sq.piece of
-            Just p -> 
-                { sq 
-                | position = ps
-                , piece = Just ({ p | active = True })
-                }
-            Nothing -> sq
-
-updateDrag : Mouse.Position -> Square -> Maybe Player -> Maybe Player
-updateDrag xy sq player = 
-    Maybe.map (\p -> 
-        { p | drag = Just ({ sq | position = xy })
-        }) player
-
-
--- board manipulations
-----------------------
-
-toggleValid : Bool -> Board -> Board
-toggleValid isValid board=
-        Matrix.map (\{position,piece} -> 
-            --let newPiece = Maybe.map (\p -> { p | active = isValid }) piece
-            Square position piece isValid) board
-
-liftPiece : Square -> Board -> Board
-liftPiece sq bd = 
-    Matrix.update (toLocation sq.position) (\s -> { s | piece = Nothing }) bd
-
-addPiece : Mouse.Position -> Maybe Piece -> Board -> Board
-addPiece ps pc bd = 
-    Matrix.update (toLocation ps) (\s -> 
-        if s.valid 
-        then { s | piece = pc, valid = True } 
-        else s) bd
+    in Chess nextBoard playerMove nextHistory ! []                        
 
