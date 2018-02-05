@@ -32,7 +32,8 @@ toPosition (x_, y_) = {x=x_, y=y_}
 
 getPosition : Mouse.Position -> Point
 getPosition position = 
-    Point (position.x // squareSize) (position.y // squareSize)
+                                    -- minus 56px from header
+    Point (position.x // squareSize) ((position.y-56) // squareSize)
 
 px : Int -> String
 px value = (toString value) ++ "px"
@@ -40,9 +41,21 @@ px value = (toString value) ++ "px"
 --isBlack : Int -> Int -> Bool
 --isBlack x y = (rem (x + y) 2) == 0
 
-mapMsg : (Mouse.Position -> a) -> Msg -> a
+mapMsg : (Mouse.Position -> Maybe a) -> Msg -> Maybe a
 mapMsg f msg =
         case msg of
             Click xy -> f xy
             Drag xy -> f xy
             Drop xy -> f xy
+            _ -> Nothing
+
+--piecetoString : Piece -> String
+--piecetoString {role} =
+--    case role of
+--            Pawn    -> 'p'
+--            Rook    -> 'r'
+--            Bishop  -> 'b'
+--            Knight  -> 'n'
+--            Queen   -> 'q'
+--            King    -> 'k'
+--            Zebra   -> 'z'

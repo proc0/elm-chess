@@ -1,12 +1,14 @@
 module State.Move exposing (..)
 
 import Matrix exposing (..)
+import Char exposing (..)
 import Debug exposing (..)
 
 import Mouse exposing (..)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
+import Model.FEN exposing (..)
 import State.Rules exposing (..)
 
 startDrag : Mouse.Position -> Square -> Square
@@ -41,6 +43,15 @@ validate sq bd =
 getValidSquares : Square -> Board -> List Square
 getValidSquares sq bd = (flip filterSameSquares) bd <| getPossible sq bd
 
+getPossible : Square -> Board -> List Square
+getPossible square board = 
+    case square.piece of
+        Just pc -> List.map (flip moveSquare square) (pieceMoves square board)
+        Nothing -> []
+
+moveSquare : (Point -> Point) -> Square -> Square
+moveSquare move sq = Square (move sq.point) sq.piece True
+
 filterSameSquares : List Square -> Board -> List Square
 filterSameSquares squares bd =
     let filterSquare target =
@@ -73,11 +84,17 @@ isSameColor s1 s2 =
         Just v -> v
         Nothing -> True
 
-getPossible : Square -> Board -> List Square
-getPossible square board = 
-    case square.piece of
-        Just pc -> List.map (flip moveSquare square) (pieceMoves square board)
-        Nothing -> []
+toSAN : Move -> String
+toSAN (sq1, sq2) =
+        let toNotation sq = 
+                    sq.piece |> Maybe.map (\p -> 
+                            let ltr = figCharMap p.role
+                            in if p.role /= Pawn
+                                then String.fromChar (if p.color == White then toUpper ltr else ltr) ++ (String.fromChar <| fromCode (sq.point.x + 97)) ++ (toString <| 8-sq.point.y)
+                                else (String.fromChar <| fromCode (sq.point.x + 97)) ++ (toString <| 8-sq.point.y)
+                            ) 
+                        |> Maybe.withDefault ""
 
-moveSquare : (Point -> Point) -> Square -> Square
-moveSquare move sq = Square (move sq.point) sq.piece True
+            moveWhite = toNotation sq1
+            moveBlack = sq2 |> Maybe.map toNotation |> Maybe.withDefault ""
+        in moveWhite ++ " " ++ moveBlack

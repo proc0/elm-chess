@@ -10,14 +10,14 @@ import Data.Tool exposing (..)
 pieceMoves : Square -> Board -> List (Point -> Point)
 pieceMoves square board = 
     let ps = square.point
-        getCardinals p = cardinals board p
-        getDiagonals p = diagonals board p
+        getParallels = parallels board
+        getDiagonals = diagonals board
         moves role =
             case role of
                 Pawn    -> pawnMoves square board
                 Bishop  -> getDiagonals ps
-                Rook    -> getCardinals ps 
-                Queen   -> List.append (getDiagonals ps) (getCardinals ps)                
+                Rook    -> getParallels ps 
+                Queen   -> List.append (getDiagonals ps) (getParallels ps)                
                 Knight -> 
                     [ up 2 >> right 1
                     , up 2 >> left 1
@@ -148,7 +148,7 @@ diagonals board point =
         stepRange = List.map ((+) 1) boardside
         curPiece = 
             let sq = findSquare point board
-            in Maybe.withDefault (Piece White Zebra False) sq.piece
+            in Maybe.withDefault (Piece White Zebra False False) sq.piece
 
         step = List.foldl 
             (\(d1,d2) (m, c) -> 
@@ -168,8 +168,8 @@ diagonals board point =
                     ) (m, True) stepRange) ([],True)
     in fst <| step directions
 
-cardinals : Board -> Point -> List (Point -> Point)
-cardinals board point =
+parallels : Board -> Point -> List (Point -> Point)
+parallels board point =
     let directions = 
             [ up
             , right
@@ -179,7 +179,7 @@ cardinals board point =
         stepRange = List.map ((+) 1) boardside
         curPiece = 
             let sq = findSquare point board
-            in Maybe.withDefault (Piece White Zebra False) sq.piece
+            in Maybe.withDefault (Piece White Zebra False False) sq.piece
 
         step = List.foldl 
             (\d (m, c) -> 

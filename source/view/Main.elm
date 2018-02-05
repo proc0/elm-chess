@@ -1,6 +1,7 @@
 module View.Main exposing (..)
 
 import Matrix exposing (..)
+import Char exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -9,22 +10,56 @@ import SvgParser exposing (parse)
 import Json.Decode as Json exposing (..)
 import Debug exposing (..)
 
+import Material.Layout as Layout
+import Material.Options as Options exposing (css, cs, when)
+import Material.Color as Color
+import Material.Typography as Typography
+import Material.Table as Table
+import Material.Options as Options
+
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
+import Model.FEN exposing (..)
+import State.Move exposing (..)
 import View.Asset exposing (..)
 
 onMouseDown : Attribute Msg
 onMouseDown = on "mousedown" (Json.map Click Mouse.position)
 
 render : Chess -> Html Msg
-render { board, player } =
-    node "main" 
-        [ onMouseDown 
-        ]
-        [ r_player player
-        , r_pieces board
-        , r_board board 
-        ]
+render ({ board, player, history, ui } as game) =
+    (Layout.render Mdl ui.mdl [Layout.fixedHeader]
+            { header = [
+                  Options.div 
+                    [ Typography.title
+                    , Color.text (Color.white)
+                    ] 
+                    [ text ui.turn ]
+                ]
+            , drawer = []
+            , tabs = ([], [])
+            , main = [
+                r_game game
+                , Options.div [ cs "hud" ] [ 
+                    Table.table []
+                        (List.reverse history 
+                            |> List.map (\mv ->
+                                Table.tr [] [ Table.td [] [ text <| toSAN mv ]])
+                        )
+                    ]
+                ]
+            })
+
+-- render board and pieces
+r_game : Chess -> Html Msg
+r_game { board, player } =
+        node "chess" 
+            [ onMouseDown 
+            ]
+            [ r_player player
+            , r_pieces board
+            , r_board board 
+            ]
 
 -- render player layer
 ----------------------
@@ -66,7 +101,7 @@ r_svg {x,y} ({active} as piece) =
             else []
         styles = 
             [style 
-                [ "top" => px (y * squareSize)
+                [ "top" => px ((y * squareSize))
                 , "left" => px (x * squareSize)
                 ]
             ]
@@ -89,7 +124,8 @@ r_dragSvg { point, piece } =
                 Ok svg -> node "piece" 
                             [ style 
                                 [ "position" => "absolute"
-                                , "top" => px (y - 32)
+                                -- minus 56px from header
+                                , "top" => px ((y - 32) - 56)
                                 , "left" => px (x - 32)
                                 ]
                             ] [svg]

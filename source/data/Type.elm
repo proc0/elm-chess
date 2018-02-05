@@ -3,34 +3,31 @@ module Data.Type exposing (..)
 import Matrix exposing (..)
 import Array exposing (..)
 import Mouse exposing (..)
+import Material
 
 type Msg = 
       Click Mouse.Position
     | Drag Mouse.Position
     | Drop Mouse.Position
-    
+    | Mdl (Material.Msg Msg)
+
 type alias Chess =
     { board   : Board
     , player  : Player
     , history : History
+    , ui      : UI
     }
-
-type alias Board =
-    Matrix Square
 
 type alias Player =
     { select : Maybe Square
     , drag   : Maybe Square 
     }
 
+type alias Board =
+    Matrix Square
+
 type alias Rank 
     = List Square
-
-type alias History 
-    = List Move
-
-type alias Move =
-    (Square, Maybe Square)
 
 type alias Square = 
     { point : Point
@@ -38,15 +35,11 @@ type alias Square =
     , valid : Bool
     }
 
-type alias Point =
-    { x : Int
-    , y : Int 
-    }
-
 type alias Piece =
     { color  : Color
     , role   : Role
     , active : Bool
+    , moved  : Bool
     }
 
 type Color = 
@@ -60,3 +53,19 @@ type Role
     | Queen
     | King
     | Zebra
+
+type alias Move =
+    (Square, Maybe Square)
+
+type alias History 
+    = List Move
+
+type alias Point =
+    { x : Int
+    , y : Int 
+    }
+
+type alias UI =
+    { mdl : Material.Model
+    , turn : String
+    }

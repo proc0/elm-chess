@@ -1,5 +1,14 @@
+header.mdl-layout__header {
+    background-color: rgb(20, 45, 1) !important;
+}
+
 body {
     margin: 0;
+}
+
+chess {
+    display: flex;
+    float: left;
 }
 
 player.visible {
@@ -56,3 +65,18 @@ rank:nth-of-type(even) > square:nth-of-type(odd) {
     background: #D8A367;
 }
 
+.hud {
+    float: left;
+    height: 432px;
+    width: auto;
+    display: inline-block;
+    overflow: scroll; 
+}
+
+table thead {
+    position: fixed;
+    top: 56px;
+    z-index: 2;
+    background: white;
+    border: 1px solid #eaeaea;
+}

@@ -73,8 +73,8 @@ toSquare pt ch =
 
 toPiece : Char -> Piece
 toPiece ch =
-    let white rl = Piece White rl False
-        black rl = Piece Black rl False
+    let white rl = Piece White rl False False
+        black rl = Piece Black rl False False
         role = charFigMap ch
     in if isUpper ch
         then white role
