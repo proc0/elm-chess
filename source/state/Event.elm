@@ -6,6 +6,7 @@ import Matrix exposing (..)
 import Html exposing (..)
 import Mouse exposing (..)
 import Debug exposing (..)
+import Maybe.Extra as Maebe exposing (..)
 import Material.Layout as Layout
 import Material
 
@@ -15,108 +16,77 @@ import Model.FEN exposing (..)
 import Model.Board exposing (..)
 import State.Move exposing (..)
 
-subscriptions : Chess -> Sub Msg
-subscriptions { player, ui } = 
-            case player.drag of 
-                Just sq ->
+subscriptions : Game -> Sub Msg
+subscriptions { ui, players, turn } = 
+            let dragSub = 
                     Sub.batch 
                         [ Mouse.moves Drag
                         , Mouse.ups Drop
                         , Layout.subs Mdl ui.mdl
-                        ]                   
+                        ]                              
+            in case turn.moving of
+                Just moving -> 
+                    case moving of
+                        Touch pc -> dragSub
+                        Lift pc -> dragSub
+                        End mv -> Layout.subs Mdl ui.mdl
+                        Pass -> Sub.none
                 Nothing -> Layout.subs Mdl ui.mdl
 
-update : Msg -> Chess -> ( Chess, Cmd Msg )
+update : Msg -> Game -> ( Game, Cmd Msg )
 update msg 
-    ({ board
-     , player
+    ({ ui
+     , players
+     , board
+     , turn
      , history
-     , ui 
      } 
-     as model) =
+     as game) =
 
-    let -- get focus square
-        focus : Maybe Square
-        focus = 
+    let -- get selected square
+        selected : Maybe Square
+        selected = 
             let target p = Matrix.get (toLocation <| getPosition p) board
-            in mapMsg target msg
-            
-        -- calculate next turn color 
-        -- from last move
-        nextTurn : Color
-        nextTurn = 
-            let lastMove = List.head history 
-            in case lastMove of
-                Just (_, mv) ->
-                    case mv of
-                        Just m -> White
-                        Nothing -> Black
-                Nothing -> White
-
-        -- update player action
-        -- persist piece select + drag
-        nextPlayer : Player
-        nextPlayer = 
-            case msg of 
-                Click xy ->
-                    case focus of
-                        -- select/drag piece
-                        Just sel -> 
-                            { player 
-                            | select = focus
-                            , drag   = Just (startDrag xy sel) 
-                            }
-                        -- clear selection
-                        Nothing -> 
-                            { player 
-                            | select = Nothing
-                            , drag   = Nothing 
-                            }
-
-                Drag xy -> 
-                    case player.drag of
-                        Just d -> 
-                            { player 
-                            | drag = Just { d | point = xy }
-                            }
-                        Nothing -> player
-
-                Drop _  -> { player 
-                           | drag = Nothing 
-                           }
-                _ -> player
-
+            in msg |> mapMsg (\xy -> 
+                let tg = target xy
+                in Maybe.map (\t -> 
+                        Maybe.map (always t) t.piece) 
+                    tg) |> Maebe.join
 
         -- calculate possible next move
         nextMove : Maybe Move
         nextMove = 
-            let clear = toggleValid False
-                defaults = clear board
-                startMove s = Just (s, Nothing)
-                fullMove (s1,s2) = Just (s1, Just s2)
-                findTarget ps sq = 
+            let defaults = clear board
+                startMove s = Nothing
+                --startMove s = Just (s, Nothing)
+                fullMove (s1,s2) = 
+                    Maybe.map (\p -> Move p s1.point s2.point) s1.piece 
+                    --Just (s1, Just s2)
+                findTarget ps mv = 
                     Matrix.get 
                         (toLocation ps) 
-                        (validate sq defaults)
+                        (validate mv defaults)
             in case msg of
                 -- no move update when dragging
                 Drag _  -> Nothing
                 -- move by drag
                 Drop xy ->
                     -- if existing selection
-                    case player.select of
+                    case turn.select of
                         Just sq -> 
                             let pos = getPosition xy
+                                zeb = Piece White Zebra pos False
+                                mov = Move (sq.piece ? zeb) pos pos
                             -- check target square 
-                            in case (findTarget pos sq) of
+                            in case (findTarget pos mov) of
                                 Just tg ->
-                                    let dest = Square pos sq.piece True
-                                        rightColor = 
+                                    let dest = Square tg.point sq.piece True False
+                                        rightTurn = 
                                             case sq.piece of
-                                                Just pc -> pc.color == nextTurn
+                                                Just pc -> pc.color == turn.player.color
                                                 Nothing -> False
                                     -- prevent same square drop
-                                    in if tg.valid && tg.point /= sq.point && rightColor
+                                    in if tg.valid && tg.point /= sq.point && rightTurn
                                     -- complete move by drag
                                     then fullMove (sq => dest)
                                     else Nothing
@@ -125,7 +95,7 @@ update msg
                         Nothing -> Nothing                      
                 -- move by click
                 Click xy -> 
-                    focus |> Maybe.map
+                    selected |> Maybe.map
                         -- check focus square
                         (\sel ->
                             -- if occupied by piece
@@ -133,22 +103,24 @@ update msg
                                 -- player starts move
                                 Just _ -> startMove sel 
                                 Nothing -> 
-                                    -- check if existing selection
-                                    player.select |> Maybe.map 
+                                    -- check if square focused
+                                    turn.select |> Maybe.map 
                                         -- if player has selection
                                         -- then square click is a move                                            
                                         (\sq ->
                                             let pos = getPosition xy
+                                                zeb = (Piece White Zebra pos False)
+                                                mov = Move (sq.piece ? zeb) pos pos
                                             -- check clicked target square
-                                            in (findTarget pos sq) |> Maybe.map
+                                            in (findTarget pos mov) |> Maybe.map
                                                 (\tg ->
-                                                    let dest = Square pos sq.piece True
-                                                        rightColor = 
+                                                    let dest = Square tg.point sq.piece True False
+                                                        rightTurn = 
                                                             case sq.piece of
-                                                                Just pc -> pc.color == nextTurn
+                                                                Just pc -> pc.color == turn.player.color
                                                                 Nothing -> False
                                                     -- prevent same square click
-                                                    in if tg.valid && tg.point /= sq.point && rightColor
+                                                    in if tg.valid && tg.point /= sq.point && rightTurn
                                                     -- complete move by click (from, to)
                                                     then fullMove (sq => dest)
                                                     else Nothing
@@ -157,6 +129,65 @@ update msg
                                         ) |> Maybe.withDefault Nothing 
                         ) |> Maybe.withDefault Nothing
                 _ -> Nothing
+
+
+        nextTurn : Turn
+        nextTurn = 
+            let clickPiece xy tn =
+                    case selected of
+                        -- select/drag piece
+                        Just sel -> 
+                            { tn 
+                            | select = selected
+                            , moving = startDrag xy sel 
+                            }
+                        -- clear selection
+                        Nothing -> 
+                            case turn.select of
+                                Just sl ->
+                                    case sl.piece of
+                                        Just pc ->
+                                            { tn
+                                            | moving = Just <| End (Move pc sl.point (getPosition xy))
+                                            }
+                                        Nothing -> 
+                                            { tn 
+                                            | select = Nothing
+                                            , moving = Nothing 
+                                            }                                            
+                                Nothing ->
+                                    { tn 
+                                    | select = Nothing
+                                    , moving = Nothing 
+                                    }
+                dragPiece xy tn =
+                    let updateDrag = 
+                        case tn.moving of
+                            Just mv ->
+                                case mv of
+                                    Touch pc -> Just <| Lift { pc | point = xy }
+                                    Lift pc  -> Just <| Lift { pc | point = xy }
+                                    End m    -> Just <| End m
+                                    Pass     -> Just <| Pass
+                            Nothing -> Nothing
+                    in { tn 
+                       | moving = updateDrag 
+                       }
+            in case msg of 
+                Click xy -> clickPiece xy turn
+                Drag xy  -> dragPiece xy turn
+                Drop _   -> 
+                    case nextMove of
+                        Just mv ->
+                            { turn 
+                            | select = Nothing
+                            , moving = Just (End mv) 
+                            }
+                        Nothing ->
+                            { turn 
+                            | moving = Nothing 
+                            }                            
+                _ -> turn
 
         -- calculate next board 
         -- based on player move
@@ -167,111 +198,87 @@ update msg
                 default : Board
                 default = clear board
 
-                startMove : Square -> Board
-                startMove s1 = default 
-                        |> validate s1 
-                        |> liftPiece s1
+                start : Move -> Board
+                start move = default 
+                        |> validate move 
+                        |> liftPiece move
 
-                fullMove : Square -> Square -> Board
-                fullMove s1 s2 =
-                        let pc = s2.piece -- active false when dropped
-                           |> Maybe.map (\p -> { p | active = False, moved = True })                    
-                        in default
-                            |> validate s2 
-                            |> liftPiece s1 
-                            |> addPiece s2.point pc 
-                            |> clear
-
-                finishMove : Square -> Board
-                finishMove s2 =
-                    let pc = s2.piece -- active false when dropped
-                           |> Maybe.map (\p -> { p | active = False, moved = True })
-                    in default
-                        |> validate s2
-                        |> addPiece s2.point pc
+                fullMove : Move -> Board
+                fullMove move = default
+                        |> validate move
+                        |> liftPiece move 
+                        |> addPiece move
                         |> clear
 
-                undoMove : Square -> Board
-                undoMove s =
-                    let pc = s.piece -- active true if no move drop
-                           |> Maybe.map (\p -> { p | active = True })
-                    in addPiece s.point pc board
+                undoMove : Move -> Board
+                undoMove move = returnPiece move board |> clear
 
             in case msg of
                 -- no update
                 Drag _  -> board
                 -- move by click
-                Click xy -> 
-                    case nextMove of
-                        Just (sq1, sq2) -> 
-                            -- if full move, translate piece 
-                            -- and clear board highilight
-                            case sq2 of
-                                Just s2 -> 
-                                    case s2.piece of
-                                        Just _ -> fullMove sq1 s2
-                                        Nothing -> startMove sq1
-                                -- if half move
-                                -- highlight board and lift piece
-                                Nothing -> startMove sq1
-                                    
-                        Nothing -> default
-                -- move by drag
-                Drop xy ->
-                    case nextMove of
-                        Just (sq1, sq2) ->
-                            case sq2 of
-                                -- if full move 
-                                -- add piece to board
-                                Just s2 -> finishMove s2
-                                Nothing -> default
+                Click _ -> selected 
+                        |> Maybe.map (\sel ->
+                                case sel.piece of
+                                    Just p -> start (Move p sel.point sel.point)
+                                    Nothing -> default 
+                            )
+                        |> Maybe.withDefault default
+                -- drop after drag
+                Drop _ -> 
+                    case nextTurn.moving of
+                        Just moving -> 
+                            case moving of
+                                End move -> fullMove move
+                                _ -> default
                         Nothing -> 
-                            -- invalid move, return piece back
-                            -- using selection square
-                            case player.select of
-                                Just sq -> undoMove sq
+                            case turn.select of
+                                Just sl -> 
+                                    case sl.piece of
+                                        Just pc -> undoMove (Move pc sl.point sl.point)
+                                        Nothing -> default
                                 Nothing -> default
+                -- do nothing
                 _ -> board
-                
+
         -- update history based on next move
         nextHistory : History
-        nextHistory = 
-            let lastMove = List.head history
-                hist = let rev = List.tail history
-                        in Maybe.withDefault [] rev
-            in case lastMove of
-                Just (s1_,s2_) -> 
-                    case nextMove of
-                        Just ((sq1, sq2) as move) ->
-                            case sq2 of
-                                Just s2 -> 
-                                    if sq1 /= s2 
-                                    then (case s2_ of
-                                        Just s -> (s2, Nothing)::history
-                                        Nothing -> (s1_, sq2)::hist)
-                                    else history
-                                Nothing -> history
-                        Nothing -> history
-                Nothing -> 
-                    case nextMove of
-                        Just ((sq1, sq2) as move) ->
-                            case sq2 of
-                                Just s2 -> 
-                                    if sq1 /= s2
-                                    then [(s2, Nothing)]
-                                    else []
-                                Nothing -> []
-                        Nothing -> []
-
-        nextUI : UI 
+        nextHistory = history
+            --let lastMove = List.head history
+            --    hist = let rev = List.tail history
+            --            in Maybe.withDefault [] rev
+            --in case lastMove of
+            --    Just (s1_,s2_) -> 
+            --        case nextMove of
+            --            Just ((sq1, sq2) as move) ->
+            --                case sq2 of
+            --                    Just s2 -> 
+            --                        if sq1 /= s2 
+            --                        then (case s2_ of
+            --                            Just s -> (s2, Nothing)::history
+            --                            Nothing -> (s1_, sq2)::hist)
+            --                        else history
+            --                    Nothing -> history
+            --            Nothing -> history
+            --    Nothing -> 
+            --        case nextMove of
+            --            Just ((sq1, sq2) as move) ->
+            --                case sq2 of
+            --                    Just s2 -> 
+            --                        if sq1 /= s2
+            --                        then [(s2, Nothing)]
+            --                        else []
+            --                    Nothing -> []
+            --            Nothing -> []
+        nextUI : UI
         nextUI =
-            if nextTurn == White
+            if turn.player.color == White
             then { ui | turn = "White's turn"}
             else { ui | turn = "Black's turn"}
-
+        --_ = log "log" nextPlayers
     in case msg of
         Mdl message -> 
             let (nextMaterial, subMsg) = Material.update Mdl message nextUI
-            in Chess board player history nextMaterial ! [subMsg]                         
+            in Game nextMaterial players board turn history ! [subMsg]                         
         _ -> 
-            Chess nextBoard nextPlayer nextHistory nextUI ! []
+            Game nextUI players nextBoard nextTurn nextHistory ! []

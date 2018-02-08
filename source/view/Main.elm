@@ -26,8 +26,8 @@ import View.Asset exposing (..)
 onMouseDown : Attribute Msg
 onMouseDown = on "mousedown" (Json.map Click Mouse.position)
 
-render : Chess -> Html Msg
-render ({ board, player, history, ui } as game) =
+render : Game -> Html Msg
+render ({ ui, board, history } as game) =
     (Layout.render Mdl ui.mdl [Layout.fixedHeader]
             { header = [
                   Options.div 
@@ -51,23 +51,27 @@ render ({ board, player, history, ui } as game) =
             })
 
 -- render board and pieces
-r_game : Chess -> Html Msg
-r_game { board, player } =
+r_game : Game -> Html Msg
+r_game { board, turn } =
         node "chess" 
             [ onMouseDown 
             ]
-            [ r_player player
+            [ r_player turn
             , r_pieces board
             , r_board board 
             ]
 
 -- render player layer
 ----------------------
-r_player : Player -> Html Msg
-r_player {select, drag} =
+r_player : Turn -> Html Msg
+r_player {player, moving} =
     let mv_piece =
-        case drag of
-            Just d -> ([class "visible"], [r_dragSvg d])
+        case moving of
+            Just mv -> 
+                case mv of
+                    Touch pc -> ([classList [("visible", True), (toString player.color, True)]], [r_svg pc.point pc])
+                    Lift pc -> ([classList [("visible", True), (toString player.color, True)]], [r_dragSvg pc])
+                    _ -> ([], [])
             Nothing -> ([], [])        
     in (uncurry (node "player")) mv_piece
 
@@ -94,42 +98,34 @@ r_piece s = case s.piece of
 
 -- render svg piece
 r_svg : Point -> Piece -> Html Msg
-r_svg {x,y} ({active} as piece) = 
-    let classes = 
-            if active
-            then [class "active"]
-            else []
-        styles = 
+r_svg {x,y} piece = 
+    let styles = 
             [style 
-                [ "top" => px ((y * squareSize))
+                [ "top" => px (y * squareSize)
                 , "left" => px (x * squareSize)
                 ]
             ]
     -- parse SVG from String
     in case parse (getSvg piece) of
         Err e -> text e
-        Ok svg -> node "piece" 
-                    (classes ++ styles) [svg]
+        Ok svg -> node "piece" styles [svg]
 
 -- dragable svg markup
-r_dragSvg : Square -> Html Msg
-r_dragSvg { point, piece } = 
+r_dragSvg : Piece -> Html Msg
+r_dragSvg ({ point } as piece) = 
     let x = point.x
         y = point.y
-    in case piece of
-        Just pc ->
-            -- parse SVG from String
-            case parse (getSvg pc) of
-                Err e -> text e
-                Ok svg -> node "piece" 
-                            [ style 
-                                [ "position" => "absolute"
-                                -- minus 56px from header
-                                , "top" => px ((y - 32) - 56)
-                                , "left" => px (x - 32)
-                                ]
-                            ] [svg]
-        Nothing -> text "" --neutral
+    in -- parse SVG from String
+        case parse (getSvg piece) of
+            Err e -> text e
+            Ok svg -> node "piece" 
+                        [ style 
+                            [ "position" => "absolute"
+                            -- minus 56px from header
+                            , "top" => px ((y - 32) - 56)
+                            , "left" => px (x - 32)
+                            ]
+                        ] [svg]
 
 -- render board
 ---------------
@@ -144,12 +140,9 @@ r_rank f r = node "rank" [] (List.map f r)
 r_square : Square -> Html Msg
 r_square sq = 
     let activeClass = 
-            case sq.piece of
-                Just {active} -> 
-                    if active
-                    then "active"
-                    else "selected"
-                Nothing -> "selected"
+            if sq.active
+            then "active"
+            else "selected"
         attrs = 
             if sq.valid 
             then [class activeClass] 

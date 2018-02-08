@@ -11,46 +11,37 @@ import Data.Tool exposing (..)
 import Model.FEN exposing (..)
 import State.Rules exposing (..)
 
-startDrag : Mouse.Position -> Square -> Square
+startDrag : Mouse.Position -> Square -> Maybe Moving
 startDrag ps sq = 
-    case sq.piece of
-            Just p -> 
-                { sq 
-                | point = ps
-                , piece = Just ({ p | active = True })
-                }
-            Nothing -> sq
+    sq.piece |> Maybe.map (\p -> Lift { p | point = ps })
 
-updateDrag : Mouse.Position -> Square -> Maybe Player -> Maybe Player
-updateDrag xy sq player = 
-    Maybe.map (\p -> 
-        { p | drag = Just ({ sq | point = xy })
-        }) player
+--updateDrag : Mouse.Position -> Square -> Maybe Player -> Maybe Player
+--updateDrag xy sq player = 
+--    Maybe.map (\p -> 
+--        { p | drag = Just ({ sq | point = xy })
+--        }) player
 
-validate : Square -> Board -> Board
-validate sq bd =
+validate : Move -> Board -> Board
+validate move board =
     -- append input square as valid
-    let newSquare = sq.piece
-            |> Maybe.map (\pc -> { sq | piece = Just { pc | active = True }}) 
-            |> Maybe.withDefault sq
-        validSquares = newSquare::(getValidSquares sq bd)
-        checkMoves sq_ b = 
-            Matrix.update (toLocation sq_.point) 
-                (\{ point, piece, valid } ->
-                    Square point piece True) b 
-    in List.foldl checkMoves bd validSquares
+    let pc = move.piece
+        newSquare = Square move.start (Just pc) True True
+        validSquares = newSquare::(getValidSquares move board)
+        _ = log "valid" validSquares
+        checkMoves sq bd = 
+            Matrix.update (toLocation sq.point) 
+                (\{ point, piece, valid, active } ->
+                    Square point piece True active) bd 
+    in List.foldl checkMoves board validSquares
 
-getValidSquares : Square -> Board -> List Square
-getValidSquares sq bd = (flip filterSameSquares) bd <| getPossible sq bd
+getValidSquares : Move -> Board -> List Square
+getValidSquares move board = (flip filterSameSquares) board <| getPossible move board
 
-getPossible : Square -> Board -> List Square
-getPossible square board = 
-    case square.piece of
-        Just pc -> List.map (flip moveSquare square) (pieceMoves square board)
-        Nothing -> []
+getPossible : Move -> Board -> List Square
+getPossible move board = List.map (flip moveSquare move) (pieceMoves move board)
 
-moveSquare : (Point -> Point) -> Square -> Square
-moveSquare move sq = Square (move sq.point) sq.piece True
+moveSquare : (Point -> Point) -> Move -> Square
+moveSquare move mv = Square (move mv.start) (Just mv.piece) True False
 
 filterSameSquares : List Square -> Board -> List Square
 filterSameSquares squares bd =
@@ -85,16 +76,11 @@ isSameColor s1 s2 =
         Nothing -> True
 
 toSAN : Move -> String
-toSAN (sq1, sq2) =
-        let toNotation sq = 
-                    sq.piece |> Maybe.map (\p -> 
-                            let ltr = figCharMap p.role
-                            in if p.role /= Pawn
-                                then String.fromChar (if p.color == White then toUpper ltr else ltr) ++ (String.fromChar <| fromCode (sq.point.x + 97)) ++ (toString <| 8-sq.point.y)
-                                else (String.fromChar <| fromCode (sq.point.x + 97)) ++ (toString <| 8-sq.point.y)
-                            ) 
-                        |> Maybe.withDefault ""
+toSAN move =
+        let toNotation mv = 
+            let ltr = figCharMap mv.piece.role
+            in if mv.piece.role /= Pawn
+               then String.fromChar (if mv.piece.color == White then toUpper ltr else ltr) ++ (String.fromChar <| fromCode (mv.start.x + 97)) ++ (toString <| 8-mv.start.y)
+               else (String.fromChar <| fromCode (mv.start.x + 97)) ++ (toString <| 8-mv.start.y)
+        in toNotation move
 
-            moveWhite = toNotation sq1
-            moveBlack = sq2 |> Maybe.map toNotation |> Maybe.withDefault ""
-        in moveWhite ++ " " ++ moveBlack

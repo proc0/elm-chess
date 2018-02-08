@@ -65,16 +65,16 @@ expandMatch { match } =
 
 toSquare : Point -> Char -> Square
 toSquare pt ch = 
-    let vacant = Square pt Nothing False
-        occupied = Square pt (Just <| toPiece ch) False
+    let vacant = Square pt Nothing False False
+        occupied = Square pt (Just <| toPiece ch pt) False False
     in if charFigMap ch == Zebra -- empty square sentinel
         then vacant              -- guards against invalid 
         else occupied            -- piece letters
 
-toPiece : Char -> Piece
-toPiece ch =
-    let white rl = Piece White rl False False
-        black rl = Piece Black rl False False
+toPiece : Char -> Point -> Piece
+toPiece ch pt =
+    let white rl = Piece White rl pt False
+        black rl = Piece Black rl pt False
         role = charFigMap ch
     in if isUpper ch
         then white role

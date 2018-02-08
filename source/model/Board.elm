@@ -12,19 +12,31 @@ import Model.FEN exposing (..)
 -- board manipulations
 ----------------------
 
+clear : Board -> Board
+clear board = toggleValid False board
+
 toggleValid : Bool -> Board -> Board
 toggleValid isValid board=
-        Matrix.map (\{ point, piece } -> 
+        Matrix.map (\{ point, piece, active } -> 
             --let newPiece = Maybe.map (\p -> { p | active = isValid }) piece
-            Square point piece isValid) board
+            Square point piece isValid False) board
 
-liftPiece : Square -> Board -> Board
-liftPiece sq bd = 
-    Matrix.update (toLocation sq.point) (\s -> { s | piece = Nothing }) bd
+liftPiece : Move -> Board -> Board
+liftPiece mv bd = 
+    Matrix.update (toLocation mv.start) (\s -> { s | piece = Nothing, active = True }) bd
 
-addPiece : Mouse.Position -> Maybe Piece -> Board -> Board
-addPiece ps pc bd = 
-    Matrix.update (toLocation ps) (\s -> 
+addPiece : Move -> Board -> Board
+addPiece mv bd = 
+    let pc = mv.piece
+    in Matrix.update (toLocation mv.end) (\s -> 
         if s.valid 
-        then { s | piece = pc, valid = True } 
+        then { s | piece = Just { pc | moved = True }, valid = True, active = False } 
+        else s) bd
+
+returnPiece : Move -> Board -> Board
+returnPiece mv bd = 
+    let pc = mv.piece
+    in Matrix.update (toLocation mv.start) (\s -> 
+        if s.valid 
+        then { s | valid = True, active = True } 
         else s) bd
