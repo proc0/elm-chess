@@ -52,9 +52,9 @@ mapRank : Int -> String -> Rank
 mapRank y row =
     let pieces = expand row 
                  |> String.toList
-        posons = List.map2 (,) boardside (List.repeat 8 y)
-                 |> List.map toPosition
-    in List.map2 toSquare posons pieces
+        points = List.map2 (,) boardside (List.repeat 8 y)
+                 |> List.map swap |> List.map (uncurry loc)
+    in List.map2 toSquare points pieces
 
 expand : String -> String
 expand s =
@@ -63,18 +63,18 @@ expand s =
 expandMatch { match } =
     String.repeat (Result.withDefault 0 (String.toInt match)) " "
 
-toSquare : Point -> Char -> Square
-toSquare pt ch = 
-    let vacant = Square pt Nothing False False
-        occupied = Square pt (Just <| toPiece ch pt) False False
+toSquare : Location -> Char -> Square
+toSquare lc ch = 
+    let vacant = Square lc Nothing False False
+        occupied = Square lc (Just <| toPiece ch lc) False False
     in if charFigMap ch == Zebra -- empty square sentinel
         then vacant              -- guards against invalid 
         else occupied            -- piece letters
 
-toPiece : Char -> Point -> Piece
-toPiece ch pt =
-    let white rl = Piece White rl pt False
-        black rl = Piece Black rl pt False
+toPiece : Char -> Location -> Piece
+toPiece ch lc =
+    let white rl = Piece (toBoardPosition lc) White rl False
+        black rl = Piece (toBoardPosition lc) Black rl False
         role = charFigMap ch
     in if isUpper ch
         then white role

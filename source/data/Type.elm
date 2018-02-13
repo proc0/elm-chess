@@ -6,24 +6,20 @@ import Mouse exposing (..)
 import Material
 
 type alias Game =
-    { ui : UI
+    { ui      : UI
     , players : Players
     , board   : Board
-    , turn    : Turn
     , history : History
     }
 
-type Msg = 
-      Click Mouse.Position
-    | Drag Mouse.Position
-    | Drop Mouse.Position
-    | Mdl (Material.Msg Msg)
-
+--        Pieces         --
+--=======================--
 type Color = 
-    White | Black
+      White 
+    | Black
 
-type Role
-    = Pawn
+type Role =
+      Pawn
     | Rook
     | Bishop
     | Knight
@@ -31,62 +27,71 @@ type Role
     | King
     | Zebra
 
-type alias Point =
-    { x : Int
-    , y : Int 
+type alias Piece =
+    { position : Position
+    , color : Color
+    , role : Role
+    -- is not first move
+    , moved : Bool
     }
 
-type alias Piece =
-    { color  : Color
-    , role   : Role
-    , point  : Point
-    , moved  : Bool
-    }
+--        Board          --
+--=======================--
 
 type alias Square = 
-    { point  : Point
-    , piece  : Maybe Piece
-    , valid  : Bool
+    { location : Location
+    -- maybe occupied
+    , piece : Maybe Piece
+    -- is potential move
+    , valid : Bool
+    -- is selected 
     , active : Bool
     }
 
-type alias Move =
-    { piece : Piece
-    , start : Point
-    , end : Point
+type alias Rank =
+    List Square
+
+type alias Board =
+    Matrix Square
+
+--        Player         --
+--=======================--
+
+type alias Player =
+    { color  : Color
+    -- clicks on square
+    , select : Maybe Square
+    -- drags piece
+    , moving : Maybe Piece
+    -- has captured pieces
+    , captures : List Piece
     }
 
-type Moving = 
-      Touch Piece
-    | Lift Piece
-    | End Move
-    | Pass
+type alias Players = 
+    (Player, Player)
 
-type alias Turn =
-    { player : Player
-    , select : Maybe Square
-    , moving : Maybe Moving
+type alias Move =
+    { piece : Piece
+    -- todo: possible vector?
+    , start : Location
+    , end : Location
+    , capture : Maybe Piece
     }
 
 type alias History 
     = List Move
 
-type alias Player =
-    { color  : Color
-    , pieces : List Piece
-    }
+--          UI           --
+--=======================--
 
-type alias Players = 
-        (Player, Player)
-
-type alias Rank =
-        List Square
-
-type alias Board =
-        Matrix Square
+type Msg = 
+      Click Position
+    | Drag Position
+    | Drop Position
+    | Mdl (Material.Msg Msg)
 
 type alias UI =
-    { mdl  : Material.Model
+    { mdl : Material.Model
     , turn : String
     }
 

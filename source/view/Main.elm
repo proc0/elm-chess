@@ -52,26 +52,22 @@ render ({ ui, board, history } as game) =
 
 -- render board and pieces
 r_game : Game -> Html Msg
-r_game { board, turn } =
+r_game { board, players } =
         node "chess" 
             [ onMouseDown 
             ]
-            [ r_player turn
+            [ r_player (fst players)
             , r_pieces board
             , r_board board 
             ]
 
 -- render player layer
 ----------------------
-r_player : Turn -> Html Msg
-r_player {player, moving} =
+r_player : Player -> Html Msg
+r_player {color, moving} =
     let mv_piece =
         case moving of
-            Just mv -> 
-                case mv of
-                    Touch pc -> ([classList [("visible", True), (toString player.color, True)]], [r_svg pc.point pc])
-                    Lift pc -> ([classList [("visible", True), (toString player.color, True)]], [r_dragSvg pc])
-                    _ -> ([], [])
+            Just pc -> ([classList [("visible", True), (toString color, True)]], [r_dragSvg pc])
             Nothing -> ([], [])        
     in (uncurry (node "player")) mv_piece
 
@@ -93,16 +89,18 @@ filter_rank f r = List.filterMap (\s -> f s) r
 -- render piece from square
 r_piece : Square -> Maybe (Html Msg)
 r_piece s = case s.piece of
-                 Just pc -> Just (r_svg s.point pc)
+                 Just pc -> Just (r_svg pc)
                  Nothing -> Nothing
 
 -- render svg piece
-r_svg : Point -> Piece -> Html Msg
-r_svg {x,y} piece = 
-    let styles = 
+r_svg : Piece -> Html Msg
+r_svg ({ position } as piece) = 
+    let {x,y} = position
+        --_ = log "coors" (x,y)
+        styles = 
             [style 
-                [ "top" => px (y * squareSize)
-                , "left" => px (x * squareSize)
+                [ "top" => px y
+                , "left" => px x
                 ]
             ]
     -- parse SVG from String
@@ -112,9 +110,9 @@ r_svg {x,y} piece =
 
 -- dragable svg markup
 r_dragSvg : Piece -> Html Msg
-r_dragSvg ({ point } as piece) = 
-    let x = point.x
-        y = point.y
+r_dragSvg ({ position } as piece) = 
+    let x = position.x
+        y = position.y
     in -- parse SVG from String
         case parse (getSvg piece) of
             Err e -> text e

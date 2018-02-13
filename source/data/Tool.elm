@@ -21,27 +21,32 @@ squareSize = 54
 fst = Tuple.first
 snd = Tuple.second
 
-pos : Int -> Int -> Point
+swap : (a,b) -> (b,a)
+swap (a,b) = (b,a)
+
+pos : Int -> Int -> Position
 pos x_ y_ = {x=x_, y=y_}
 
-toLocation : Point -> Matrix.Location
-toLocation p = loc p.y p.x
+toLocation : Position -> Location
+toLocation p = loc p.y p.x -- loc col row
 
-toPosition : (Int, Int) -> Point
-toPosition (x_, y_) = {x=x_, y=y_}
+toPosition : (Int, Int) -> Position
+toPosition (x_, y_) = {x=y_, y=x_} -- {row, col}
 
-getPosition : Mouse.Position -> Point
+getPosition : Position -> Position
 getPosition position = 
                                     -- minus 56px from header
-    Point (position.x // squareSize) ((position.y-56) // squareSize)
+    Position (position.x // squareSize) ((position.y-56) // squareSize)
+
+toBoardPosition : Location -> Position
+toBoardPosition location = 
+    let p = location |> toPosition
+    in Position (p.x * squareSize) (p.y * squareSize)
 
 px : Int -> String
 px value = (toString value) ++ "px"
 
---isBlack : Int -> Int -> Bool
---isBlack x y = (rem (x + y) 2) == 0
-
-mapMsg : (Mouse.Position -> Maybe a) -> Msg -> Maybe a
+mapMsg : (Position -> Maybe a) -> Msg -> Maybe a
 mapMsg f msg =
         case msg of
             Click xy -> f xy
@@ -49,13 +54,17 @@ mapMsg f msg =
             Drop xy -> f xy
             _ -> Nothing
 
---piecetoString : Piece -> String
---piecetoString {role} =
---    case role of
---            Pawn    -> 'p'
---            Rook    -> 'r'
---            Bishop  -> 'b'
---            Knight  -> 'n'
---            Queen   -> 'q'
---            King    -> 'k'
---            Zebra   -> 'z'
+zeroLoc : Location
+zeroLoc = loc 0 0
+
+zeroPs : Position
+zeroPs = { x=0, y=0 }
+
+nullPiece : Piece
+nullPiece = Piece zeroPs Black Zebra False
+
+idleMove : Move 
+idleMove = Move nullPiece zeroLoc zeroLoc Nothing
+
+emptySquare : Square
+emptySquare = Square zeroLoc Nothing False False

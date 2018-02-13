@@ -7,17 +7,17 @@ import Debug exposing (..)
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
 
-pieceMoves : Move -> Board -> List (Point -> Point)
+pieceMoves : Move -> Board -> List (Location -> Location)
 pieceMoves move board = 
-    let ps = move.start
+    let lc = move.start
         getParallels = parallels board
         getDiagonals = diagonals board
         moves role =
             case role of
                 Pawn    -> pawnMoves move board
-                Bishop  -> getDiagonals ps
-                Rook    -> getParallels ps 
-                Queen   -> List.append (getDiagonals ps) (getParallels ps)                
+                Bishop  -> getDiagonals lc
+                Rook    -> getParallels lc 
+                Queen   -> List.append (getDiagonals lc) (getParallels lc)                
                 Knight -> 
                     [ up 2 >> right 1
                     , up 2 >> left 1
@@ -43,7 +43,7 @@ pieceMoves move board =
         White -> moves move.piece.role
         Black -> moves move.piece.role
 
-pawnMoves : Move -> Board -> List (Point -> Point)
+pawnMoves : Move -> Board -> List (Location -> Location)
 pawnMoves move board = 
     let pawnMove =
             case move.piece.color of
@@ -60,27 +60,27 @@ pawnMoves move board =
             ) (Just move)
     in Maybe.withDefault [] totalMoves
 
-pawnFirstMove : Move -> List (Point -> Point)
+pawnFirstMove : Move -> List (Location -> Location)
 pawnFirstMove mv =
     -- check rank and add two steps
-    let whiteMove pt =
-            if pt.y == 6
+    let whiteMove (y,x) =
+            if y == 6
             then Just (up 2)
             else Nothing
-        blackMove pt =
-            if pt.y == 1
+        blackMove (y,x) =
+            if y == 1
             then Just (down 2)
             else Nothing
     -- wrap and perform respective check
     in List.concatMap (\pc ->
-                List.filterMap (\{color, point} -> 
-                    case color of
-                        White -> whiteMove point
-                        Black -> blackMove point
+                List.filterMap (\{ piece, start } -> 
+                    case piece.color of
+                        White -> whiteMove start
+                        Black -> blackMove start
                     ) [pc]
-        ) [mv.piece]
+        ) [mv]
 
-pawnCaptures : Move -> Board -> List (Point -> Point)
+pawnCaptures : Move -> Board -> List (Location -> Location)
 pawnCaptures mv bd =
         let position = mv.start
             eats color = 
@@ -94,40 +94,59 @@ pawnCaptures mv bd =
                         , down 1 >> right 1
                         ]
             checkSquare moves =
-                let target = Matrix.get (toLocation <| moves position) bd
+                let target = Matrix.get (moves position) bd
                     posons = Maybe.map (\t -> Maybe.map (\_ -> moves) t.piece) target
                 in Maybe.withDefault (Just idle) posons
         in List.filterMap checkSquare (eats mv.piece.color)
                    
 -- pedantic
-idle : Point -> Point
-idle p = p
+idle : Location -> Location
+idle l = l
 
-up : Int -> Point -> Point
-up n p = 
-    { x = p.x
-    , y = p.y - n
-    }
+up : Int -> Location -> Location
+up n (y,x) = loc (y - n) x
 
-down : Int -> Point -> Point
-down n p = 
-    { x = p.x
-    , y = p.y + n
-    }
 
-left : Int -> Point -> Point
-left n p = 
-    { x = p.x - n
-    , y = p.y 
-    }
+down : Int -> Location -> Location
+down n (y,x) = loc (y + n) x
 
-right   : Int -> Point -> Point
-right n p = 
-    { x = p.x + n
-    , y = p.y
-    }
+left : Int -> Location -> Location
+left n (y,x) = loc y (x - n)
 
-diagonals : Board -> Point -> List (Point -> Point)
+
+right   : Int -> Location -> Location
+right n (y,x) = loc y (x + n)
+
+
+--idle : Position -> Position
+--idle p = p
+
+--up : Int -> Position -> Position
+--up n p = 
+--    { x = p.x
+--    , y = p.y - n
+--    }
+
+--down : Int -> Position -> Position
+--down n p = 
+--    { x = p.x
+--    , y = p.y + n
+--    }
+
+--left : Int -> Position -> Position
+--left n p = 
+--    { x = p.x - n
+--    , y = p.y 
+--    }
+
+--right   : Int -> Position -> Position
+--right n p = 
+--    { x = p.x + n
+--    , y = p.y
+--    }
+
+
+diagonals : Board -> Location -> List (Location -> Location)
 diagonals board point = 
     let directions = 
             [ (up, left)
@@ -138,7 +157,7 @@ diagonals board point =
         stepRange = List.map ((+) 1) boardside
         curPiece = 
             let sq = findSquare point board
-            in Maybe.withDefault (Piece White Zebra point False) sq.piece
+            in Maybe.withDefault nullPiece sq.piece
 
         step = List.foldl 
             (\(d1,d2) (m, c) -> 
@@ -158,7 +177,7 @@ diagonals board point =
                     ) (m, True) stepRange) ([],True)
     in fst <| step directions
 
-parallels : Board -> Point -> List (Point -> Point)
+parallels : Board -> Location -> List (Location -> Location)
 parallels board point =
     let directions = 
             [ up
@@ -169,7 +188,7 @@ parallels board point =
         stepRange = List.map ((+) 1) boardside
         curPiece = 
             let sq = findSquare point board
-            in Maybe.withDefault (Piece White Zebra point False) sq.piece
+            in Maybe.withDefault nullPiece sq.piece
 
         step = List.foldl 
             (\d (m, c) -> 
@@ -187,10 +206,9 @@ parallels board point =
                         ) (m, True) stepRange) ([],True)
     in fst <| step directions
 
-findSquare : Point -> Board -> Square
+findSquare : Location -> Board -> Square
 findSquare pos board = 
-    let sq = Matrix.get (toLocation pos) board
-        emptySquare = Square pos Nothing False False
+    let sq = Matrix.get pos board
     in case sq of
             Just s -> s
             Nothing -> emptySquare

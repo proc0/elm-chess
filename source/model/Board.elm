@@ -9,6 +9,9 @@ import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.FEN exposing (..)
 
+initBoard : Board
+initBoard = fromFEN initialBoard
+
 -- board manipulations
 ----------------------
 
@@ -16,27 +19,25 @@ clear : Board -> Board
 clear board = toggleValid False board
 
 toggleValid : Bool -> Board -> Board
-toggleValid isValid board=
-        Matrix.map (\{ point, piece, active } -> 
-            --let newPiece = Maybe.map (\p -> { p | active = isValid }) piece
-            Square point piece isValid False) board
+toggleValid isValid board =
+        Matrix.map (\sq -> { sq | valid = isValid, active = False }) board
 
-liftPiece : Move -> Board -> Board
-liftPiece mv bd = 
-    Matrix.update (toLocation mv.start) (\s -> { s | piece = Nothing, active = True }) bd
+liftPiece : Piece -> Board -> Board
+liftPiece pc bd = 
+    Matrix.update (toLocation <| getPosition pc.position) (\s -> { s | piece = Nothing, active = True }) bd
 
 addPiece : Move -> Board -> Board
 addPiece mv bd = 
     let pc = mv.piece
-    in Matrix.update (toLocation mv.end) (\s -> 
+    in Matrix.update mv.end (\s -> 
         if s.valid 
-        then { s | piece = Just { pc | moved = True }, valid = True, active = False } 
+        then { s | piece = Just { pc | position = (toBoardPosition s.location), moved = True }, valid = False, active = False } 
         else s) bd
 
 returnPiece : Move -> Board -> Board
 returnPiece mv bd = 
     let pc = mv.piece
-    in Matrix.update (toLocation mv.start) (\s -> 
+    in Matrix.update mv.start (\s -> 
         if s.valid 
         then { s | valid = True, active = True } 
         else s) bd
