@@ -24,20 +24,20 @@ toggleValid isValid board =
 
 liftPiece : Piece -> Board -> Board
 liftPiece pc bd = 
-    Matrix.update (toLocation <| getPosition pc.position) (\s -> { s | piece = Nothing, active = True }) bd
+    Matrix.update (toLocation <| fromMousePosition pc.position) (\s -> { s | piece = Nothing, active = True }) bd
 
-addPiece : Move -> Board -> Board
-addPiece mv bd = 
-    let pc = mv.piece
-    in Matrix.update mv.end (\s -> 
+addPiece : Piece -> Board -> Board
+addPiece pc bd = 
+    let lc = toLocation <| fromMousePosition pc.position
+    in Matrix.update lc (\s -> 
         if s.valid 
-        then { s | piece = Just { pc | position = (toBoardPosition s.location), moved = True }, valid = False, active = False } 
+        then { s | piece = Just { pc | position = (toBoardPosition lc), moved = True }, valid = False, active = False } 
         else s) bd
 
-returnPiece : Move -> Board -> Board
-returnPiece mv bd = 
-    let pc = mv.piece
-    in Matrix.update mv.start (\s -> 
+returnPiece : Piece -> Board -> Board
+returnPiece pc bd = 
+    let lc = toLocation <| fromMousePosition pc.position
+    in Matrix.update lc (\s -> 
         if s.valid 
         then { s | valid = True, active = True } 
         else s) bd

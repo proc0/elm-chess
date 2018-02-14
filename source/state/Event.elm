@@ -44,7 +44,7 @@ update msg
         selected : Maybe Square
         selected = 
             let target mouse = 
-                Matrix.get (toLocation <| getPosition mouse) board
+                Matrix.get (toLocation <| fromMousePosition mouse) board
             in 
             msg |> mapMsg (\xy -> 
                     Maebe.join <| Maybe.map (\t -> 
@@ -67,32 +67,28 @@ update msg
                     case selected of
                         Just sel -> makeNext selected (updatePiecePos xy sel.piece)
                         _ -> makeNext Nothing Nothing
-                Drag xy -> { currentPlayer | moving = updatePiecePos xy currentPlayer.moving }
-                Drop xy -> makeNext selected Nothing
-                _ -> currentPlayer      
+                Drag xy -> 
+                    { currentPlayer 
+                    | moving = updatePiecePos xy currentPlayer.moving 
+                    }
+                Drop xy -> makeNext Nothing Nothing
+                _ -> currentPlayer
 
         nextMove : Maybe Move
         nextMove =
             case msg of
                 Drop xy -> 
-                    case currentPlayer.select of
-                        Just sel -> 
-                            case selected of
-                                Just sel2 -> 
-                                    if sel.location /= sel2.location
-                                    then
-                                        case sel.piece of
-                                            Just pc ->
-                                                case sel2.piece of
-                                                    Just pc2 -> Just <| Move pc sel.location sel2.location sel2.piece
-                                                    Nothing -> Just <| Move pc sel.location sel2.location Nothing
-                                            Nothing -> Nothing
-                                    else
-                                        Nothing
+                    case currentPlayer.moving of
+                        Just mov -> 
+                            case nextPlayer.moving of
+                                Just mov2 -> Nothing
                                 _ -> 
-                                    case sel.piece of
-                                        Just pc -> Just <| Move pc sel.location (toLocation <| getPosition xy) Nothing
-                                        Nothing -> Nothing
+                                    case currentPlayer.select of
+                                        Just sel ->
+                                            case sel.piece of
+                                                Just pc -> Just <| Move mov sel.location sel.location Nothing
+                                                _ -> Nothing
+                                        _ -> Nothing
                         _ -> Nothing                
                 _ -> Nothing
 
@@ -112,21 +108,21 @@ update msg
 
                 start : Piece -> Board
                 start piece = default 
-                        |> validate (Move piece (toLocation <| getPosition piece.position) (toLocation <| getPosition piece.position) Nothing)
+                        |> validate piece
                         |> liftPiece piece
 
-                endMove : Move -> Board
-                endMove move = default
-                        --|> validate move
-                        |> addPiece move
-                        --|> clear
+                end : Piece -> Board
+                end piece = default
+                        |> validate piece
+                        |> addPiece piece
+                        |> clear
 
-                undoMove : Move -> Board
-                undoMove move = returnPiece move board |> clear
+                undoMove : Piece -> Board
+                undoMove piece = returnPiece piece board |> clear
 
             in 
             case nextMove of
-                Just mv -> endMove mv
+                Just mv -> end mv.piece
                 _ -> 
                     case currentPlayer.moving of
                         Just curMvg -> board
@@ -145,7 +141,7 @@ update msg
         nextUI : UI
         nextUI = { ui | turn = toString currentPlayer.color ++ "'s turn" }
 
-        _ = log "log" nextMove
+        _ = log "log" selected
     in case msg of
         Mdl message -> 
             let (nextMaterial, subMsg) = Material.update Mdl message nextUI

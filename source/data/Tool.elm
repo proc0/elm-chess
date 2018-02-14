@@ -33,15 +33,19 @@ toLocation p = loc p.y p.x -- loc col row
 toPosition : (Int, Int) -> Position
 toPosition (x_, y_) = {x=y_, y=x_} -- {row, col}
 
-getPosition : Position -> Position
-getPosition position = 
-                                    -- minus 56px from header
-    Position (position.x // squareSize) ((position.y-56) // squareSize)
+fromMousePosition : Position -> Position
+fromMousePosition position = 
+    let x = position.x // squareSize
+            -- minus 56px from header
+        y = (position.y-56) // squareSize
+    in Position x y
 
 toBoardPosition : Location -> Position
 toBoardPosition location = 
     let p = location |> toPosition
-    in Position (p.x * squareSize) (p.y * squareSize)
+        x = p.x * squareSize
+        y = p.y * squareSize
+    in Position x y
 
 px : Int -> String
 px value = (toString value) ++ "px"

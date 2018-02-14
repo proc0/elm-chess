@@ -10,13 +10,13 @@ import Debug exposing (..)
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
 
--- Forsythe Edwards Notation (FEN) -> Board
+--             Forsythe Edwards Notation (FEN)             --
+--=========================================================--
 
 initialPieces = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 initialBoard = initialPieces ++ " w KQkq - 0 1"
 
--- examples
-
+-- other examples
 --testingEngine = "K6k/3n2pp/8/1P6/B7/8/6PP/8 w - - 0 1"
 --whiteInCheck = "rnb1kbnr/pppppppp/4q3/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"
 --blackCheckMate = "1R6/8/kQ6/8/8/8/6K1/8 w - - 0 1"
