@@ -7,30 +7,12 @@ import Html exposing (..)
 import Mouse exposing (..)
 import Debug exposing (..)
 import Maybe.Extra as Maebe exposing (..)
-import Material.Layout as Layout
 import Material
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
-import Model.FEN exposing (..)
 import Model.Board exposing (..)
-import State.Move exposing (..)
-
-subscriptions : Game -> Sub Event
-subscriptions { ui, players } = 
-    let player = fst players
-        layout = Layout.subs Mdl ui.mdl
-    in -- if player 
-    case player.action of
-        -- is moving
-        Moving _ -> 
-            Sub.batch 
-                -- track position
-                [ Mouse.moves Drag
-                , Mouse.ups Drop
-                , layout
-                ]
-        _ -> layout
+import State.Action exposing (..)
 
 select : Board -> Position -> Maybe Selection
 select board position = 
@@ -46,13 +28,13 @@ select board position =
     selecting position
 
 update : Event -> Game -> ( Game, Cmd Event )
-update msg ({ ui, players, board, history } as game) =
+update event ({ ui, players, board, history } as game) =
     let player : Player
         player = fst players
 
         action : Action
         action = 
-            case msg of
+            case event of
                 Click ps -> 
                     let selection = select board ps
                         guardColor sel =
@@ -64,33 +46,15 @@ update msg ({ ui, players, board, history } as game) =
                 Drop ps -> whenMoving (endMove ps) player.action
                 _ -> Idle
 
-        --TODO: move board functions to board model, refactor so board is first arg
         board_ : Board
         board_ = 
-            let pickup : Piece -> Board
-                pickup piece = 
-                    clear board 
-                    |> validate piece
-                    |> liftPiece piece
-
-                drop : Piece -> Board
-                drop piece = 
-                    board
-                    |> addPiece piece
-                    |> clear
-
-                undo : Piece -> Board
-                undo piece = 
-                    returnPiece piece board 
-                    |> clear
-            in 
             case action of
                 Moving selected -> 
                     case player.action of
                         Moving _ -> board
-                        _ -> pickup selected.piece
-                End move -> drop move.piece
-                Undo moving -> undo moving.piece
+                        _ -> pickup board selected.piece
+                End move -> drop board move.piece
+                Undo moving -> undo board moving.piece
                 _ -> board
 
         player_ : Player
@@ -111,14 +75,18 @@ update msg ({ ui, players, board, history } as game) =
                 _ -> history
 
         ui_ : UI
-        ui_ = { ui | turn = toString (fst players_).color ++ "'s turn" }
+        ui_ = 
+            { ui 
+            | turn = toString (fst players_).color ++ "'s turn" 
+            }
 
-        game mat_ =
+        game_ mat_ =
             Game mat_ players_ board_ hist_
     in 
-    case msg of
+    case event of
         Mdl message -> 
             -- update Material UI 
-            let (mat_, sub_) = Material.update Mdl message ui_
-            in game mat_ ! [sub_]
-        _ -> game ui_ ! []
+            let (mat_, sub_) = 
+                Material.update Mdl message ui_
+            in game_ mat_ ! [sub_]
+        _ -> game_ ui_ ! []

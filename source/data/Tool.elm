@@ -14,7 +14,7 @@ boardside = List.range 0 7
 squareSize : Int
 squareSize = 54
 
-------
+-- Global tools
 
 (=>) = (,)
 
@@ -23,6 +23,8 @@ snd = Tuple.second
 
 swap : (a,b) -> (b,a)
 swap (a,b) = (b,a)
+
+-- Type castings
 
 pos : Int -> Int -> Position
 pos x_ y_ = {x=x_, y=y_}
@@ -50,13 +52,7 @@ toBoardPosition location =
 px : Int -> String
 px value = (toString value) ++ "px"
 
---mapMsg : (Position -> Maybe a) -> Msg -> Maybe a
---mapMsg f msg =
---        case msg of
---            Click xy -> f xy
---            --Drag xy -> f xy
---            --Drop xy -> f xy
---            _ -> Nothing
+-- Nuetral type instances
 
 zeroLoc : Location
 zeroLoc = loc 0 0

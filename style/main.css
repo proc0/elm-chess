@@ -31,6 +31,9 @@ pieces piece {
     cursor: -webkit-grab;
 }
 
+chess.white .black piece, chess.black .white piece {
+    cursor: default !important;
+}
 /* piece.active {
      border: 3px solid red;
 } */

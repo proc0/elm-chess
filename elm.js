@@ -15943,7 +15943,7 @@ var _darrensiegel$elm_chess_client$Model_Board$validate = F2(
 		};
 		return A3(_elm_lang$core$List$foldl, validateSquares, board, validLocations);
 	});
-var _darrensiegel$elm_chess_client$Model_Board$returnPiece = F2(
+var _darrensiegel$elm_chess_client$Model_Board$put = F2(
 	function (piece, board) {
 		var undo = F2(
 			function (lc, sq) {
@@ -15960,7 +15960,7 @@ var _darrensiegel$elm_chess_client$Model_Board$returnPiece = F2(
 			});
 		return A2(_chendrix$elm_matrix$Matrix$mapWithLocation, undo, board);
 	});
-var _darrensiegel$elm_chess_client$Model_Board$addPiece = F2(
+var _darrensiegel$elm_chess_client$Model_Board$add = F2(
 	function (pc, bd) {
 		var lc = _darrensiegel$elm_chess_client$Data_Tool$toLocation(
 			_darrensiegel$elm_chess_client$Data_Tool$fromMousePosition(pc.position));
@@ -15984,7 +15984,7 @@ var _darrensiegel$elm_chess_client$Model_Board$addPiece = F2(
 			},
 			bd);
 	});
-var _darrensiegel$elm_chess_client$Model_Board$liftPiece = F2(
+var _darrensiegel$elm_chess_client$Model_Board$remove = F2(
 	function (pc, bd) {
 		return A3(
 			_chendrix$elm_matrix$Matrix$update,
@@ -15997,22 +15997,62 @@ var _darrensiegel$elm_chess_client$Model_Board$liftPiece = F2(
 			},
 			bd);
 	});
-var _darrensiegel$elm_chess_client$Model_Board$toggleValid = F2(
-	function (isValid, board) {
-		return A2(
-			_chendrix$elm_matrix$Matrix$map,
-			function (sq) {
-				return _elm_lang$core$Native_Utils.update(
-					sq,
-					{valid: isValid, active: false});
-			},
-			board);
-	});
 var _darrensiegel$elm_chess_client$Model_Board$clear = function (board) {
-	return A2(_darrensiegel$elm_chess_client$Model_Board$toggleValid, false, board);
+	return A2(
+		_chendrix$elm_matrix$Matrix$map,
+		function (sq) {
+			return _elm_lang$core$Native_Utils.update(
+				sq,
+				{valid: false, active: false});
+		},
+		board);
 };
+var _darrensiegel$elm_chess_client$Model_Board$undo = F2(
+	function (board, piece) {
+		return _darrensiegel$elm_chess_client$Model_Board$clear(
+			A2(_darrensiegel$elm_chess_client$Model_Board$put, piece, board));
+	});
+var _darrensiegel$elm_chess_client$Model_Board$drop = F2(
+	function (board, piece) {
+		return _darrensiegel$elm_chess_client$Model_Board$clear(
+			A2(_darrensiegel$elm_chess_client$Model_Board$add, piece, board));
+	});
+var _darrensiegel$elm_chess_client$Model_Board$pickup = F2(
+	function (board, piece) {
+		return A2(
+			_darrensiegel$elm_chess_client$Model_Board$remove,
+			piece,
+			A2(
+				_darrensiegel$elm_chess_client$Model_Board$validate,
+				piece,
+				_darrensiegel$elm_chess_client$Model_Board$clear(board)));
+	});
 var _darrensiegel$elm_chess_client$Model_Board$initBoard = _darrensiegel$elm_chess_client$Model_FEN$fromFEN(_darrensiegel$elm_chess_client$Model_FEN$initialBoard);
 
+var _darrensiegel$elm_chess_client$Model_Game$subscriptions = function (_p0) {
+	var _p1 = _p0;
+	var layout = A2(_debois$elm_mdl$Material_Layout$subs, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p1.ui.mdl);
+	var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p1.players);
+	var _p2 = player.action;
+	if (_p2.ctor === 'Moving') {
+		return _elm_lang$core$Platform_Sub$batch(
+			{
+				ctor: '::',
+				_0: _elm_lang$mouse$Mouse$moves(_darrensiegel$elm_chess_client$Data_Type$Drag),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$mouse$Mouse$ups(_darrensiegel$elm_chess_client$Data_Type$Drop),
+					_1: {
+						ctor: '::',
+						_0: layout,
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	} else {
+		return layout;
+	}
+};
 var _darrensiegel$elm_chess_client$Model_Game$init = function () {
 	var history = {ctor: '[]'};
 	var ui = A2(_darrensiegel$elm_chess_client$Data_Type$UI, _debois$elm_mdl$Material$model, '');
@@ -16205,7 +16245,7 @@ _elm_community$maybe_extra$Maybe_Extra_ops['?'] = F2(
 		return A2(_elm_lang$core$Maybe$withDefault, x, mx);
 	});
 
-var _darrensiegel$elm_chess_client$State_Move$whenMoving = F2(
+var _darrensiegel$elm_chess_client$State_Action$whenMoving = F2(
 	function (change, action) {
 		var _p0 = action;
 		if (_p0.ctor === 'Moving') {
@@ -16214,14 +16254,14 @@ var _darrensiegel$elm_chess_client$State_Move$whenMoving = F2(
 			return _darrensiegel$elm_chess_client$Data_Type$Idle;
 		}
 	});
-var _darrensiegel$elm_chess_client$State_Move$endMove = F2(
+var _darrensiegel$elm_chess_client$State_Action$endMove = F2(
 	function (pos, select) {
 		var destination = _darrensiegel$elm_chess_client$Data_Tool$toLocation(
 			_darrensiegel$elm_chess_client$Data_Tool$fromMousePosition(pos));
 		return (!_elm_lang$core$Native_Utils.eq(destination, select.location)) ? _darrensiegel$elm_chess_client$Data_Type$End(
 			A4(_darrensiegel$elm_chess_client$Data_Type$Move, select.location, destination, select.piece, _elm_lang$core$Maybe$Nothing)) : _darrensiegel$elm_chess_client$Data_Type$Undo(select);
 	});
-var _darrensiegel$elm_chess_client$State_Move$updateMoving = F2(
+var _darrensiegel$elm_chess_client$State_Action$updateMoving = F2(
 	function (pos, _p1) {
 		var _p2 = _p1;
 		return _darrensiegel$elm_chess_client$Data_Type$Moving(
@@ -16232,7 +16272,7 @@ var _darrensiegel$elm_chess_client$State_Move$updateMoving = F2(
 					_p2.piece,
 					{position: pos})));
 	});
-var _darrensiegel$elm_chess_client$State_Move$startMoving = F2(
+var _darrensiegel$elm_chess_client$State_Action$startMoving = F2(
 	function (pos, _p3) {
 		var _p4 = _p3;
 		return _darrensiegel$elm_chess_client$Data_Type$Moving(
@@ -16269,19 +16309,19 @@ var _darrensiegel$elm_chess_client$State_Event$select = F2(
 		return selecting(position);
 	});
 var _darrensiegel$elm_chess_client$State_Event$update = F2(
-	function (msg, _p1) {
+	function (event, _p1) {
 		var _p2 = _p1;
 		var _p14 = _p2.players;
 		var _p13 = _p2.history;
 		var _p12 = _p2.board;
 		var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p14);
 		var action = function () {
-			var _p3 = msg;
+			var _p3 = event;
 			switch (_p3.ctor) {
 				case 'Click':
 					var _p4 = _p3._0;
 					var guardColor = function (sel) {
-						return _elm_lang$core$Native_Utils.eq(sel.piece.color, player.color) ? A2(_darrensiegel$elm_chess_client$State_Move$startMoving, _p4, sel) : _darrensiegel$elm_chess_client$Data_Type$Idle;
+						return _elm_lang$core$Native_Utils.eq(sel.piece.color, player.color) ? A2(_darrensiegel$elm_chess_client$State_Action$startMoving, _p4, sel) : _darrensiegel$elm_chess_client$Data_Type$Idle;
 					};
 					var selection = A2(_darrensiegel$elm_chess_client$State_Event$select, _p12, _p4);
 					return A2(
@@ -16290,13 +16330,13 @@ var _darrensiegel$elm_chess_client$State_Event$update = F2(
 						_darrensiegel$elm_chess_client$Data_Type$Idle);
 				case 'Drag':
 					return A2(
-						_darrensiegel$elm_chess_client$State_Move$whenMoving,
-						_darrensiegel$elm_chess_client$State_Move$updateMoving(_p3._0),
+						_darrensiegel$elm_chess_client$State_Action$whenMoving,
+						_darrensiegel$elm_chess_client$State_Action$updateMoving(_p3._0),
 						player.action);
 				case 'Drop':
 					return A2(
-						_darrensiegel$elm_chess_client$State_Move$whenMoving,
-						_darrensiegel$elm_chess_client$State_Move$endMove(_p3._0),
+						_darrensiegel$elm_chess_client$State_Action$whenMoving,
+						_darrensiegel$elm_chess_client$State_Action$endMove(_p3._0),
 						player.action);
 				default:
 					return _darrensiegel$elm_chess_client$Data_Type$Idle;
@@ -16311,23 +16351,6 @@ var _darrensiegel$elm_chess_client$State_Event$update = F2(
 			}
 		}();
 		var board_ = function () {
-			var undo = function (piece) {
-				return _darrensiegel$elm_chess_client$Model_Board$clear(
-					A2(_darrensiegel$elm_chess_client$Model_Board$returnPiece, piece, _p12));
-			};
-			var drop = function (piece) {
-				return _darrensiegel$elm_chess_client$Model_Board$clear(
-					A2(_darrensiegel$elm_chess_client$Model_Board$addPiece, piece, _p12));
-			};
-			var pickup = function (piece) {
-				return A2(
-					_darrensiegel$elm_chess_client$Model_Board$liftPiece,
-					piece,
-					A2(
-						_darrensiegel$elm_chess_client$Model_Board$validate,
-						piece,
-						_darrensiegel$elm_chess_client$Model_Board$clear(_p12)));
-			};
 			var _p6 = action;
 			switch (_p6.ctor) {
 				case 'Moving':
@@ -16335,12 +16358,12 @@ var _darrensiegel$elm_chess_client$State_Event$update = F2(
 					if (_p7.ctor === 'Moving') {
 						return _p12;
 					} else {
-						return pickup(_p6._0.piece);
+						return A2(_darrensiegel$elm_chess_client$Model_Board$pickup, _p12, _p6._0.piece);
 					}
 				case 'End':
-					return drop(_p6._0.piece);
+					return A2(_darrensiegel$elm_chess_client$Model_Board$drop, _p12, _p6._0.piece);
 				case 'Undo':
-					return undo(_p6._0.piece);
+					return A2(_darrensiegel$elm_chess_client$Model_Board$undo, _p12, _p6._0.piece);
 				default:
 					return _p12;
 			}
@@ -16382,17 +16405,17 @@ var _darrensiegel$elm_chess_client$State_Event$update = F2(
 						_darrensiegel$elm_chess_client$Data_Tool$fst(players_).color),
 					'\'s turn')
 			});
-		var game = function (mat_) {
+		var game_ = function (mat_) {
 			return A4(_darrensiegel$elm_chess_client$Data_Type$Game, mat_, players_, board_, hist_);
 		};
-		var _p10 = msg;
+		var _p10 = event;
 		if (_p10.ctor === 'Mdl') {
 			var _p11 = A3(_debois$elm_mdl$Material$update, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p10._0, ui_);
 			var mat_ = _p11._0;
 			var sub_ = _p11._1;
 			return A2(
 				_elm_lang$core$Platform_Cmd_ops['!'],
-				game(mat_),
+				game_(mat_),
 				{
 					ctor: '::',
 					_0: sub_,
@@ -16401,34 +16424,10 @@ var _darrensiegel$elm_chess_client$State_Event$update = F2(
 		} else {
 			return A2(
 				_elm_lang$core$Platform_Cmd_ops['!'],
-				game(ui_),
+				game_(ui_),
 				{ctor: '[]'});
 		}
 	});
-var _darrensiegel$elm_chess_client$State_Event$subscriptions = function (_p15) {
-	var _p16 = _p15;
-	var layout = A2(_debois$elm_mdl$Material_Layout$subs, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p16.ui.mdl);
-	var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p16.players);
-	var _p17 = player.action;
-	if (_p17.ctor === 'Moving') {
-		return _elm_lang$core$Platform_Sub$batch(
-			{
-				ctor: '::',
-				_0: _elm_lang$mouse$Mouse$moves(_darrensiegel$elm_chess_client$Data_Type$Drag),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$mouse$Mouse$ups(_darrensiegel$elm_chess_client$Data_Type$Drop),
-					_1: {
-						ctor: '::',
-						_0: layout,
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	} else {
-		return layout;
-	}
-};
 
 var _elm_lang$lazy$Native_Lazy = function() {
 
@@ -18639,31 +18638,96 @@ var _darrensiegel$elm_chess_client$View_Main$filter_rank = F2(
 			r);
 	});
 var _darrensiegel$elm_chess_client$View_Main$map_board = F2(
-	function (f, b) {
-		return _elm_lang$core$List$concat(
-			A2(
-				_elm_lang$core$List$map,
-				function (r) {
-					return A2(_darrensiegel$elm_chess_client$View_Main$filter_rank, f, r);
-				},
-				b));
+	function (f, _p9) {
+		var _p10 = _p9;
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_darrensiegel$elm_chess_client$View_Main$filter_rank, f, _p10._0),
+			_1: A2(_darrensiegel$elm_chess_client$View_Main$filter_rank, f, _p10._1)
+		};
 	});
 var _darrensiegel$elm_chess_client$View_Main$r_pieces = function (board) {
+	var sortSqs = A2(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (sq, mem) {
+				var _p11 = sq.piece;
+				if (_p11.ctor === 'Just') {
+					var _p12 = _p11._0.color;
+					if (_p12.ctor === 'Black') {
+						return {
+							ctor: '_Tuple2',
+							_0: _darrensiegel$elm_chess_client$Data_Tool$fst(mem),
+							_1: A2(
+								_elm_lang$core$Basics_ops['++'],
+								_darrensiegel$elm_chess_client$Data_Tool$snd(mem),
+								{
+									ctor: '::',
+									_0: sq,
+									_1: {ctor: '[]'}
+								})
+						};
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: A2(
+								_elm_lang$core$Basics_ops['++'],
+								_darrensiegel$elm_chess_client$Data_Tool$fst(mem),
+								{
+									ctor: '::',
+									_0: sq,
+									_1: {ctor: '[]'}
+								}),
+							_1: _darrensiegel$elm_chess_client$Data_Tool$snd(mem)
+						};
+					}
+				} else {
+					return mem;
+				}
+			}),
+		{
+			ctor: '_Tuple2',
+			_0: {ctor: '[]'},
+			_1: {ctor: '[]'}
+		});
 	var pieces = A2(
 		_darrensiegel$elm_chess_client$View_Main$map_board,
 		_darrensiegel$elm_chess_client$View_Main$r_piece,
-		_chendrix$elm_matrix$Matrix$toList(board));
+		sortSqs(
+			_chendrix$elm_matrix$Matrix$flatten(board)));
 	return A3(
 		_elm_lang$html$Html$node,
 		'pieces',
 		{ctor: '[]'},
-		pieces);
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('white'),
+					_1: {ctor: '[]'}
+				},
+				_darrensiegel$elm_chess_client$Data_Tool$fst(pieces)),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('black'),
+						_1: {ctor: '[]'}
+					},
+					_darrensiegel$elm_chess_client$Data_Tool$snd(pieces)),
+				_1: {ctor: '[]'}
+			}
+		});
 };
-var _darrensiegel$elm_chess_client$View_Main$r_player = function (_p9) {
-	var _p10 = _p9;
+var _darrensiegel$elm_chess_client$View_Main$r_player = function (_p13) {
+	var _p14 = _p13;
 	var mv_piece = function () {
-		var _p11 = _p10.action;
-		if (_p11.ctor === 'Moving') {
+		var _p15 = _p14.action;
+		if (_p15.ctor === 'Moving') {
 			return {
 				ctor: '_Tuple2',
 				_0: {
@@ -18676,7 +18740,7 @@ var _darrensiegel$elm_chess_client$View_Main$r_player = function (_p9) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: _elm_lang$core$Basics$toString(_p10.color),
+									_0: _elm_lang$core$Basics$toString(_p14.color),
 									_1: true
 								},
 								_1: {ctor: '[]'}
@@ -18686,7 +18750,7 @@ var _darrensiegel$elm_chess_client$View_Main$r_player = function (_p9) {
 				},
 				_1: {
 					ctor: '::',
-					_0: _darrensiegel$elm_chess_client$View_Main$r_dragSvg(_p11._0.piece),
+					_0: _darrensiegel$elm_chess_client$View_Main$r_dragSvg(_p15._0.piece),
 					_1: {ctor: '[]'}
 				}
 			};
@@ -18707,39 +18771,47 @@ var _darrensiegel$elm_chess_client$View_Main$onMouseDown = A2(
 	_elm_lang$html$Html_Events$on,
 	'mousedown',
 	A2(_elm_lang$core$Json_Decode$map, _darrensiegel$elm_chess_client$Data_Type$Click, _elm_lang$mouse$Mouse$position));
-var _darrensiegel$elm_chess_client$View_Main$r_game = function (_p12) {
-	var _p13 = _p12;
-	var _p14 = _p13.board;
+var _darrensiegel$elm_chess_client$View_Main$r_game = function (_p16) {
+	var _p17 = _p16;
+	var _p19 = _p17.players;
+	var _p18 = _p17.board;
 	return A3(
 		_elm_lang$html$Html$node,
 		'chess',
 		{
 			ctor: '::',
 			_0: _darrensiegel$elm_chess_client$View_Main$onMouseDown,
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class(
+					_elm_lang$core$String$toLower(
+						_elm_lang$core$Basics$toString(
+							_darrensiegel$elm_chess_client$Data_Tool$fst(_p19).color))),
+				_1: {ctor: '[]'}
+			}
 		},
 		{
 			ctor: '::',
 			_0: _darrensiegel$elm_chess_client$View_Main$r_player(
-				_darrensiegel$elm_chess_client$Data_Tool$fst(_p13.players)),
+				_darrensiegel$elm_chess_client$Data_Tool$fst(_p19)),
 			_1: {
 				ctor: '::',
-				_0: _darrensiegel$elm_chess_client$View_Main$r_pieces(_p14),
+				_0: _darrensiegel$elm_chess_client$View_Main$r_pieces(_p18),
 				_1: {
 					ctor: '::',
-					_0: _darrensiegel$elm_chess_client$View_Main$r_board(_p14),
+					_0: _darrensiegel$elm_chess_client$View_Main$r_board(_p18),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
-var _darrensiegel$elm_chess_client$View_Main$render = function (_p15) {
-	var _p16 = _p15;
-	var _p17 = _p16.ui;
+var _darrensiegel$elm_chess_client$View_Main$render = function (_p20) {
+	var _p21 = _p20;
+	var _p22 = _p21.ui;
 	return A4(
 		_debois$elm_mdl$Material_Layout$render,
 		_darrensiegel$elm_chess_client$Data_Type$Mdl,
-		_p17.mdl,
+		_p22.mdl,
 		{
 			ctor: '::',
 			_0: _debois$elm_mdl$Material_Layout$fixedHeader,
@@ -18761,7 +18833,7 @@ var _darrensiegel$elm_chess_client$View_Main$render = function (_p15) {
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(_p17.turn),
+						_0: _elm_lang$html$Html$text(_p22.turn),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -18774,7 +18846,7 @@ var _darrensiegel$elm_chess_client$View_Main$render = function (_p15) {
 			},
 			main: {
 				ctor: '::',
-				_0: _darrensiegel$elm_chess_client$View_Main$r_game(_p16),
+				_0: _darrensiegel$elm_chess_client$View_Main$r_game(_p21),
 				_1: {
 					ctor: '::',
 					_0: A2(
@@ -18809,7 +18881,7 @@ var _darrensiegel$elm_chess_client$View_Main$render = function (_p15) {
 												_1: {ctor: '[]'}
 											});
 									},
-									_elm_lang$core$List$reverse(_p16.history))),
+									_elm_lang$core$List$reverse(_p21.history))),
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -18830,7 +18902,7 @@ var _darrensiegel$elm_chess_client$Main$main = _elm_lang$html$Html$program(
 			}),
 		view: _darrensiegel$elm_chess_client$View_Main$render,
 		update: _darrensiegel$elm_chess_client$State_Event$update,
-		subscriptions: _darrensiegel$elm_chess_client$State_Event$subscriptions
+		subscriptions: _darrensiegel$elm_chess_client$Model_Game$subscriptions
 	})();
 
 var Elm = {};

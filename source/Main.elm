@@ -15,5 +15,5 @@ main = Html.program
     { init = Game.init ! [Layout.sub0 Mdl]
     , view = View.render
     , update = Event.update
-    , subscriptions = Event.subscriptions
+    , subscriptions = Game.subscriptions
     }

@@ -16,28 +16,41 @@ initBoard = fromFEN initialBoard
 
 -- board manipulations
 ----------------------
+pickup : Board -> Piece -> Board
+pickup board piece = 
+    clear board 
+    |> validate piece
+    |> remove piece
+
+drop : Board -> Piece -> Board
+drop board piece = 
+    board
+    |> add piece
+    |> clear
+
+undo : Board -> Piece -> Board
+undo board piece = 
+    put piece board 
+    |> clear
 
 clear : Board -> Board
-clear board = toggleValid False board
+clear board =
+        Matrix.map (\sq -> { sq | valid = False, active = False }) board
 
-toggleValid : Bool -> Board -> Board
-toggleValid isValid board =
-        Matrix.map (\sq -> { sq | valid = isValid, active = False }) board
-
-liftPiece : Piece -> Board -> Board
-liftPiece pc bd = 
+remove : Piece -> Board -> Board
+remove pc bd = 
     Matrix.update (toLocation <| fromMousePosition pc.position) (\s -> { s | piece = Nothing, active = True }) bd
 
-addPiece : Piece -> Board -> Board
-addPiece pc bd = 
+add : Piece -> Board -> Board
+add pc bd = 
     let lc = toLocation <| fromMousePosition pc.position
     in Matrix.update lc (\s -> 
         if s.valid 
         then { s | piece = Just { pc | position = (toBoardPosition lc), moved = True }, valid = False, active = False } 
         else s) bd
 
-returnPiece : Piece -> Board -> Board
-returnPiece piece board = 
+put : Piece -> Board -> Board
+put piece board = 
     let undo lc sq = 
         if sq.active 
         then { sq | piece = Just { piece | position = toBoardPosition lc } }

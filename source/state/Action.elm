@@ -1,4 +1,4 @@
-module State.Move exposing (..)
+module State.Action exposing (..)
 
 import Matrix exposing (..)
 import Char exposing (..)

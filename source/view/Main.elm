@@ -8,6 +8,7 @@ import Html.Events exposing (..)
 import Mouse exposing (..)
 import SvgParser exposing (parse)
 import Json.Decode as Json exposing (..)
+import Maybe.Extra as Maebe exposing (..)
 import Debug exposing (..)
 
 import Material.Layout as Layout
@@ -54,7 +55,8 @@ render ({ ui, board, history } as game) =
 r_game : Game -> Html Event
 r_game { board, players } =
         node "chess" 
-            [ onMouseDown 
+            [ onMouseDown,
+              class <| String.toLower <| toString (fst players).color
             ]
             [ r_player (fst players)
             , r_pieces board
@@ -75,12 +77,23 @@ r_player {color, action} =
 ----------------
 r_pieces : Board -> Html Event
 r_pieces board = 
-    let pieces = map_board r_piece (Matrix.toList board)
-    in node "pieces" [] pieces
+    let sortSqs = 
+            List.foldl (\sq mem -> 
+                case sq.piece of
+                    Just pc ->
+                        case pc.color of
+                            Black -> (fst mem, snd mem ++ [sq])
+                            White -> (fst mem ++ [sq], snd mem)
+                    _ -> mem) ([], [])
+        pieces = map_board r_piece <| sortSqs <| Matrix.flatten board
+    in node "pieces" [] 
+        [ div [class "white"] (fst pieces)
+        , div [class "black"] (snd pieces)
+        ]
 
-map_board : (Square -> Maybe (Html Event)) -> List Rank -> List (Html Event)
-map_board f b = 
-    List.map (\r -> filter_rank f r) b |> List.concat
+map_board : (Square -> Maybe (Html Event)) -> (Rank, Rank) -> (List (Html Event), List (Html Event))
+map_board f (rw, rb) = 
+    (filter_rank f rw, filter_rank f rb)
 
 -- empty squares will be filtered
 filter_rank : (Square -> Maybe (Html Event)) -> Rank -> List (Html Event)
