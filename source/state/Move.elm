@@ -9,30 +9,26 @@ import Mouse exposing (..)
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.FEN exposing (..)
-import State.Rules exposing (..)
+import Model.Rules exposing (..)
 
-updatePiecePos : Mouse.Position -> Maybe Piece -> Maybe Piece
-updatePiecePos xy pc = Maybe.map (\p -> { p | position = xy }) pc
+startMoving : Mouse.Position -> Selection -> Action
+startMoving pos {location, piece} =  
+    Moving <| Selection location ({ piece | position = pos })
 
-validate : Piece -> Board -> Board
-validate piece board =
-    let lc = toLocation <| fromMousePosition piece.position
-        validMoves = pieceMoves piece board
-        -- append input location as valid
-        validLocations = lc::(List.map (\t -> t lc) validMoves)
-        validateSquare sq = { sq | valid = True }
-        validateSquares lc bd = 
-            Matrix.update lc validateSquare bd
-    in List.foldl validateSquares board validLocations
+updateMoving : Mouse.Position -> Selection -> Action
+updateMoving pos {location, piece} = 
+    Moving <| Selection location ({ piece | position = pos })
 
-toSAN : Move -> String
-toSAN move =
-        let toNotation mv = 
-            let ltr = figCharMap mv.piece.role
-                (y1,x1) = mv.start
-                --(x2,y2) = mv.end
-            in if mv.piece.role /= Pawn
-               then String.fromChar (if mv.piece.color == White then toUpper ltr else ltr) ++ (String.fromChar <| fromCode (x1 + 97)) ++ (toString <| 8-y1)
-               else (String.fromChar <| fromCode (x1 + 97)) ++ (toString <| 8-y1)
-        in toNotation move
+endMove : Mouse.Position -> Selection -> Action
+endMove pos select = 
+    let destination = toLocation <| fromMousePosition pos
+    in 
+    if destination /= select.location
+    then End <| Move select.location destination select.piece Nothing
+    else Undo select
 
+whenMoving : (Selection -> Action) -> Action -> Action
+whenMoving change action = 
+    case action of
+        Moving selection -> change selection
+        _ -> Idle

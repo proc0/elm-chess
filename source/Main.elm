@@ -10,7 +10,7 @@ import Model.Game as Game exposing (..)
 import State.Event as Event exposing (..)
 import View.Main as View exposing (..)
 
-main : Program Never Game Msg
+main : Program Never Game Event
 main = Html.program
     { init = Game.init ! [Layout.sub0 Mdl]
     , view = View.render

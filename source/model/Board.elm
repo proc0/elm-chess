@@ -2,12 +2,14 @@ module Model.Board exposing (..)
 
 import Array exposing (..)
 import Matrix exposing (..)
+import Debug exposing (..)
 
 import Mouse exposing (..)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.FEN exposing (..)
+import Model.Rules exposing (..)
 
 initBoard : Board
 initBoard = fromFEN initialBoard
@@ -35,9 +37,22 @@ addPiece pc bd =
         else s) bd
 
 returnPiece : Piece -> Board -> Board
-returnPiece pc bd = 
-    let lc = toLocation <| fromMousePosition pc.position
-    in Matrix.update lc (\s -> 
-        if s.valid 
-        then { s | valid = True, active = True } 
-        else s) bd
+returnPiece piece board = 
+    let undo lc sq = 
+        if sq.active 
+        then { sq | piece = Just { piece | position = toBoardPosition lc } }
+        else sq
+    in Matrix.mapWithLocation undo board
+
+validate : Piece -> Board -> Board
+validate piece board =
+    let lc = toLocation <| fromMousePosition piece.position
+        validMoves = pieceMoves piece board
+        -- append input location as valid
+        validLocations = lc::(List.map (\t -> t lc) validMoves)
+        validateSquare sq = { sq | valid = True }
+        validateSquares lc bd = 
+            Matrix.update lc validateSquare bd
+        --_ = log "valid" validLocations
+    in List.foldl validateSquares board validLocations
+

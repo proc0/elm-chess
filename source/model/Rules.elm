@@ -1,4 +1,4 @@
-module State.Rules exposing (..)
+module Model.Rules exposing (..)
 
 import Array exposing (..)
 import Matrix exposing (..)

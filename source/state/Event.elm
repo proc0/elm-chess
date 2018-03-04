@@ -16,135 +16,109 @@ import Model.FEN exposing (..)
 import Model.Board exposing (..)
 import State.Move exposing (..)
 
-subscriptions : Game -> Sub Msg
+subscriptions : Game -> Sub Event
 subscriptions { ui, players } = 
-    let player = fst players 
-        trackUI = Layout.subs Mdl ui.mdl                  
-        trackDrag = 
+    let player = fst players
+        layout = Layout.subs Mdl ui.mdl
+    in -- if player 
+    case player.action of
+        -- is moving
+        Moving _ -> 
             Sub.batch 
+                -- track position
                 [ Mouse.moves Drag
                 , Mouse.ups Drop
-                , trackUI
+                , layout
                 ]
+        _ -> layout
+
+select : Board -> Position -> Maybe Selection
+select board position = 
+    let locate xy = 
+            Matrix.get (toLocation <| fromMousePosition xy) board
+        check square = 
+            let selection piece = Selection square.location piece
+            in 
+            Maybe.map selection square.piece
+        selecting = 
+            Maebe.join << Maybe.map check << locate
     in 
-    case player.moving of
-        Just _  -> trackDrag
-        Nothing -> trackUI
+    selecting position
 
-update : Msg -> Game -> ( Game, Cmd Msg )
-update msg 
-    ({ ui
-     , players
-     , board
-     , history
-     } 
-     as game) =
+update : Event -> Game -> ( Game, Cmd Event )
+update msg ({ ui, players, board, history } as game) =
+    let player : Player
+        player = fst players
 
-    let -- get selected square
-        selected : Maybe Square
-        selected = 
-            let target mouse = 
-                Matrix.get (toLocation <| fromMousePosition mouse) board
-            in 
-            msg |> mapMsg (\xy -> 
-                    Maebe.join <| Maybe.map (\t -> 
-                        t.piece |> Maybe.map (always t)) <| target xy)
-
-        currentPlayer : Player
-        currentPlayer = fst players
-
-        nextPlayer : Player
-        nextPlayer = 
-            let makeNext : Maybe Square -> Maybe Piece -> Player
-                makeNext sq pc = 
-                { currentPlayer
-                | select = sq
-                , moving = pc
-                }
-            in 
+        action : Action
+        action = 
             case msg of
-                Click xy ->
-                    case selected of
-                        Just sel -> makeNext selected (updatePiecePos xy sel.piece)
-                        _ -> makeNext Nothing Nothing
-                Drag xy -> 
-                    { currentPlayer 
-                    | moving = updatePiecePos xy currentPlayer.moving 
-                    }
-                Drop xy -> makeNext Nothing Nothing
-                _ -> currentPlayer
+                Click ps -> 
+                    let selection = select board ps
+                        guardColor sel =
+                            if sel.piece.color == player.color
+                            then startMoving ps sel
+                            else Idle                        
+                    in Maybe.map guardColor selection ? Idle
+                Drag ps -> whenMoving (updateMoving ps) player.action
+                Drop ps -> whenMoving (endMove ps) player.action
+                _ -> Idle
 
-        nextMove : Maybe Move
-        nextMove =
-            case msg of
-                Drop xy -> 
-                    case currentPlayer.moving of
-                        Just mov -> 
-                            case nextPlayer.moving of
-                                Just mov2 -> Nothing
-                                _ -> 
-                                    case currentPlayer.select of
-                                        Just sel ->
-                                            case sel.piece of
-                                                Just pc -> Just <| Move mov sel.location sel.location Nothing
-                                                _ -> Nothing
-                                        _ -> Nothing
-                        _ -> Nothing                
-                _ -> Nothing
+        --TODO: move board functions to board model, refactor so board is first arg
+        board_ : Board
+        board_ = 
+            let pickup : Piece -> Board
+                pickup piece = 
+                    clear board 
+                    |> validate piece
+                    |> liftPiece piece
 
-        nextPlayers = 
-            case nextMove of
-                Just _ -> (snd players, nextPlayer)
-                _ -> (nextPlayer, snd players)
+                drop : Piece -> Board
+                drop piece = 
+                    board
+                    |> addPiece piece
+                    |> clear
 
-        -- calculate next board 
-        -- based on player move
-        nextBoard : Board
-        nextBoard = 
-            let clear = toggleValid False
-
-                default : Board
-                default = clear board
-
-                start : Piece -> Board
-                start piece = default 
-                        |> validate piece
-                        |> liftPiece piece
-
-                end : Piece -> Board
-                end piece = default
-                        |> validate piece
-                        |> addPiece piece
-                        |> clear
-
-                undoMove : Piece -> Board
-                undoMove piece = returnPiece piece board |> clear
-
+                undo : Piece -> Board
+                undo piece = 
+                    returnPiece piece board 
+                    |> clear
             in 
-            case nextMove of
-                Just mv -> end mv.piece
-                _ -> 
-                    case currentPlayer.moving of
-                        Just curMvg -> board
-                        _ ->
-                            case nextPlayer.moving of
-                                Just pc -> start pc
-                                _ -> board
+            case action of
+                Moving selected -> 
+                    case player.action of
+                        Moving _ -> board
+                        _ -> pickup selected.piece
+                End move -> drop move.piece
+                Undo moving -> undo moving.piece
+                _ -> board
 
-        -- update history based on next move
-        nextHistory : History
-        nextHistory = 
-            case nextMove of
-                Just mv -> mv::history
+        player_ : Player
+        player_ = 
+            case action of
+                Undo _ -> { player | action = Idle }
+                _ -> { player | action = action }
+
+        players_ = 
+            case action of
+                End mv -> (snd players, player_)
+                _ -> (player_, snd players)
+
+        hist_ : History
+        hist_ = 
+            case action of
+                End mv -> mv::history
                 _ -> history
 
-        nextUI : UI
-        nextUI = { ui | turn = toString currentPlayer.color ++ "'s turn" }
+        ui_ : UI
+        ui_ = { ui | turn = toString (fst players_).color ++ "'s turn" }
 
-        _ = log "log" selected
-    in case msg of
+        game mat_ =
+            Game mat_ players_ board_ hist_
+    in 
+    case msg of
         Mdl message -> 
-            let (nextMaterial, subMsg) = Material.update Mdl message nextUI
-            in Game nextMaterial nextPlayers board history ! [subMsg]                         
-        _ -> 
-            Game nextUI nextPlayers nextBoard nextHistory ! []
+            -- update Material UI 
+            let (mat_, sub_) = Material.update Mdl message ui_
+            in game mat_ ! [sub_]
+        _ -> game ui_ ! []

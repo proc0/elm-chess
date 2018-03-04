@@ -5,6 +5,9 @@ import Array exposing (..)
 import Mouse exposing (..)
 import Material
 
+--           ♔           --
+--=======================--
+
 type alias Game =
     { ui      : UI
     , players : Players
@@ -12,8 +15,9 @@ type alias Game =
     , history : History
     }
 
---        Pieces         --
+--         Chess         --
 --=======================--
+
 type Color = 
       White 
     | Black
@@ -31,12 +35,8 @@ type alias Piece =
     { position : Position
     , color : Color
     , role : Role
-    -- is not first move
     , moved : Bool
     }
-
---        Board          --
---=======================--
 
 type alias Square = 
     { location : Location
@@ -54,41 +54,52 @@ type alias Rank =
 type alias Board =
     Matrix Square
 
---        Player         --
+--     Interaction       --
+--=======================--
+
+type alias Selection =
+    { location : Location
+    , piece : Piece
+    }
+
+type alias Move =
+    { start : Location
+    , end : Location
+    , piece : Piece
+    , capture : Maybe Piece
+    }
+
+type Action =
+      Moving Selection
+    | Undo Selection
+    | End Move
+    | Idle
+
+type alias History 
+    = List Move
+
+--        Actors         --
 --=======================--
 
 type alias Player =
     { color  : Color
-    -- clicks on square
-    , select : Maybe Square
-    -- drags piece
-    , moving : Maybe Piece
-    -- has captured pieces
-    , captures : List Piece
+    -- performs actions
+    , action : Action
+    -- captures pieces
+    , pieces : List Piece
     }
 
 type alias Players = 
     (Player, Player)
 
-type alias Move =
-    { piece : Piece
-    -- todo: possible vector?
-    , start : Location
-    , end : Location
-    , capture : Maybe Piece
-    }
-
-type alias History 
-    = List Move
-
---          UI           --
+--      Interface        --
 --=======================--
 
-type Msg = 
+type Event = 
       Click Position
     | Drag Position
     | Drop Position
-    | Mdl (Material.Msg Msg)
+    | Mdl (Material.Msg Event)
 
 type alias UI =
     { mdl : Material.Model

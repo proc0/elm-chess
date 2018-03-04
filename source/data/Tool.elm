@@ -50,13 +50,13 @@ toBoardPosition location =
 px : Int -> String
 px value = (toString value) ++ "px"
 
-mapMsg : (Position -> Maybe a) -> Msg -> Maybe a
-mapMsg f msg =
-        case msg of
-            Click xy -> f xy
-            Drag xy -> f xy
-            Drop xy -> f xy
-            _ -> Nothing
+--mapMsg : (Position -> Maybe a) -> Msg -> Maybe a
+--mapMsg f msg =
+--        case msg of
+--            Click xy -> f xy
+--            --Drag xy -> f xy
+--            --Drop xy -> f xy
+--            _ -> Nothing
 
 zeroLoc : Location
 zeroLoc = loc 0 0
@@ -67,8 +67,9 @@ zeroPs = { x=0, y=0 }
 nullPiece : Piece
 nullPiece = Piece zeroPs Black Zebra False
 
-idleMove : Move 
-idleMove = Move nullPiece zeroLoc zeroLoc Nothing
-
 emptySquare : Square
 emptySquare = Square zeroLoc Nothing False False
+
+idlePlayer : Color -> Player 
+idlePlayer color =
+    Player color Idle []

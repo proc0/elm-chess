@@ -20,13 +20,13 @@ import Material.Options as Options
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.FEN exposing (..)
-import State.Move exposing (..)
+import Model.History exposing (..)
 import View.Asset exposing (..)
 
-onMouseDown : Attribute Msg
+onMouseDown : Attribute Event
 onMouseDown = on "mousedown" (Json.map Click Mouse.position)
 
-render : Game -> Html Msg
+render : Game -> Html Event
 render ({ ui, board, history } as game) =
     (Layout.render Mdl ui.mdl [Layout.fixedHeader]
             { header = [
@@ -51,7 +51,7 @@ render ({ ui, board, history } as game) =
             })
 
 -- render board and pieces
-r_game : Game -> Html Msg
+r_game : Game -> Html Event
 r_game { board, players } =
         node "chess" 
             [ onMouseDown 
@@ -63,37 +63,37 @@ r_game { board, players } =
 
 -- render player layer
 ----------------------
-r_player : Player -> Html Msg
-r_player {color, moving} =
-    let mv_piece =
-        case moving of
-            Just pc -> ([classList [("visible", True), (toString color, True)]], [r_dragSvg pc])
-            Nothing -> ([], [])        
+r_player : Player -> Html Event
+r_player {color, action} =
+    let mv_piece = 
+            case action of
+                Moving sel -> ([classList [("visible", True), (toString color, True)]], [r_dragSvg sel.piece])
+                _ -> ([], [])
     in (uncurry (node "player")) mv_piece
 
 -- render pieces
 ----------------
-r_pieces : Board -> Html Msg
+r_pieces : Board -> Html Event
 r_pieces board = 
     let pieces = map_board r_piece (Matrix.toList board)
     in node "pieces" [] pieces
 
-map_board : (Square -> Maybe (Html Msg)) -> List Rank -> List (Html Msg)
+map_board : (Square -> Maybe (Html Event)) -> List Rank -> List (Html Event)
 map_board f b = 
     List.map (\r -> filter_rank f r) b |> List.concat
 
 -- empty squares will be filtered
-filter_rank : (Square -> Maybe (Html Msg)) -> Rank -> List (Html Msg)
+filter_rank : (Square -> Maybe (Html Event)) -> Rank -> List (Html Event)
 filter_rank f r = List.filterMap (\s -> f s) r
 
 -- render piece from square
-r_piece : Square -> Maybe (Html Msg)
+r_piece : Square -> Maybe (Html Event)
 r_piece s = case s.piece of
                  Just pc -> Just (r_svg pc)
                  Nothing -> Nothing
 
 -- render svg piece
-r_svg : Piece -> Html Msg
+r_svg : Piece -> Html Event
 r_svg ({ position } as piece) = 
     let {x,y} = position
         --_ = log "coors" (x,y)
@@ -109,7 +109,7 @@ r_svg ({ position } as piece) =
         Ok svg -> node "piece" styles [svg]
 
 -- dragable svg markup
-r_dragSvg : Piece -> Html Msg
+r_dragSvg : Piece -> Html Event
 r_dragSvg ({ position } as piece) = 
     let x = position.x
         y = position.y
@@ -127,15 +127,15 @@ r_dragSvg ({ position } as piece) =
 
 -- render board
 ---------------
-r_board : Board -> Html Msg 
+r_board : Board -> Html Event 
 r_board board =
     let checker = List.map (r_rank r_square) (Matrix.toList board)
     in node "board" [] checker
 
-r_rank : (Square -> Html Msg) -> Rank -> Html Msg
+r_rank : (Square -> Html Event) -> Rank -> Html Event
 r_rank f r = node "rank" [] (List.map f r)
 
-r_square : Square -> Html Msg
+r_square : Square -> Html Event
 r_square sq = 
     let activeClass = 
             if sq.active
