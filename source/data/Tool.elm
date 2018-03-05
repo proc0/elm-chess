@@ -73,4 +73,8 @@ emptySquare =
 
 idlePlayer : Color -> Player 
 idlePlayer color =
-    Player color Idle []
+    Player color (toString color ++ " Player") Idle []
+
+noMove : Move 
+noMove =
+    Move zeroLoc zeroLoc nullPiece Nothing

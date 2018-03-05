@@ -76,6 +76,10 @@ rank:nth-of-type(even) > square:nth-of-type(odd) {
     overflow: scroll; 
 }
 
+.hud tr {
+    text-align: left;
+}
+
 table thead {
     position: fixed;
     top: 56px;

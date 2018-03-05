@@ -14,8 +14,9 @@ import Debug exposing (..)
 import Material.Layout as Layout
 import Material.Options as Options exposing (css, cs, when)
 import Material.Color as Color
-import Material.Typography as Typography
+import Material.Typography as Typo
 import Material.Table as Table
+import Material.List as MList
 import Material.Options as Options
 
 import Data.Type exposing (..)
@@ -29,24 +30,54 @@ onMouseDown = on "mousedown" (Json.map Click Mouse.position)
 
 render : Game -> Html Event
 render ({ ui, players, board, history } as game) =
+    let whitePlayer = getWhite history players
+        blackPlayer = getBlack history players
+    in 
     (Layout.render Mdl ui.mdl [Layout.fixedHeader]
             { header = [
                   Options.div 
-                    [ Typography.title
+                    [ Typo.subhead
                     , Color.text (Color.white)
                     ] 
-                    [ text ui.turn ]
+                    [ text "Demo Chess" ]
                 ]
             , drawer = []
             , tabs = ([], [])
             , main = [
                 r_game game
-                , Options.div [ cs "hud" ] [ 
-                    Table.table []
-                        (List.reverse history 
-                            |> List.map (\mv ->
-                                Table.tr [] [ Table.td [] [ text <| toSAN mv ]])
-                        )
+                , Options.div [ cs "hud" ]
+                    [ Options.div
+                        [ cs "player"
+                        ]
+                        [ text blackPlayer.name
+                        ]
+                    , Options.div 
+                        [ cs "history"
+                        ] 
+                        [ Options.div 
+                            [ Typo.subhead
+                            ] 
+                            [ text ui.turn
+                            ]
+                        , MList.ul 
+                            [ cs "moves" 
+                            ]
+                            (history 
+                                |> formatHistory
+                                |> List.map (\move ->
+                                    MList.li 
+                                        [ -- 
+                                        ] 
+                                        [ text move 
+                                        ]
+                                )
+                            )
+                        ]
+                    , Options.div
+                        [ cs "player"
+                        ]
+                        [ text whitePlayer.name
+                        ]
                     ]
                 ]
             })

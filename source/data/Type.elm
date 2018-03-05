@@ -83,6 +83,7 @@ type alias History
 
 type alias Player =
     { color  : Color
+    , name   : String
     -- performs actions
     , action : Action
     -- captures pieces
