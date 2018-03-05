@@ -5,7 +5,7 @@ import Array exposing (..)
 import Mouse exposing (..)
 import Material
 
---           ♔           --
+--         Chess         --
 --=======================--
 
 type alias Game =
@@ -15,7 +15,7 @@ type alias Game =
     , history : History
     }
 
---         Chess         --
+--           ♔           --
 --=======================--
 
 type Color = 

@@ -16,12 +16,13 @@ import State.Action exposing (..)
 
 select : Board -> Position -> Maybe Selection
 select board position = 
-    let locate xy = 
-            Matrix.get (toLocation <| fromMousePosition xy) board
-        check square = 
-            let selection piece = Selection square.location piece
+    let check square = 
+            let selection piece = 
+                Selection square.location piece
             in 
             Maybe.map selection square.piece
+        locate xy = 
+            Matrix.get (toBoardLocation xy) board
         selecting = 
             Maebe.join << Maybe.map check << locate
     in 
@@ -36,14 +37,13 @@ update event ({ ui, players, board, history } as game) =
         action = 
             case event of
                 Click ps -> 
-                    let selection = select board ps
-                        guardColor sel =
-                            if sel.piece.color == player.color
-                            then startMoving ps sel
-                            else Idle                        
-                    in Maybe.map guardColor selection ? Idle
+                    (select board ps 
+                        |> Maybe.map (\selection -> 
+                            -- current player starts dragging selection
+                            guardColor player selection (startMoving ps)
+                        )) ? Idle
                 Drag ps -> whenMoving (updateMoving ps) player.action
-                Drop ps -> whenMoving (endMove ps) player.action
+                Drop ps -> whenMoving (endMove board ps) player.action
                 _ -> Idle
 
         board_ : Board
@@ -59,9 +59,9 @@ update event ({ ui, players, board, history } as game) =
 
         player_ : Player
         player_ = 
-            case action of
-                Undo _ -> { player | action = Idle }
-                _ -> { player | action = action }
+            { player 
+            | action = action 
+            }
 
         players_ = 
             case action of
@@ -84,8 +84,8 @@ update event ({ ui, players, board, history } as game) =
             Game mat_ players_ board_ hist_
     in 
     case event of
+        -- Material UI 
         Mdl message -> 
-            -- update Material UI 
             let (mat_, sub_) = 
                 Material.update Mdl message ui_
             in game_ mat_ ! [sub_]

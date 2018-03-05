@@ -4,7 +4,7 @@
   "description": "elm chess",
   "main": "index.js",
   "scripts": {
-    "build": "elm make source/Main.elm --output elm.js",
+    "build": "elm make source/Chess.elm --output target/index.js",
     "serve": "elm reactor",
     "start": "yarn build && yarn serve"
   },

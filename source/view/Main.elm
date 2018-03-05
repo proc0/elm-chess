@@ -28,7 +28,7 @@ onMouseDown : Attribute Event
 onMouseDown = on "mousedown" (Json.map Click Mouse.position)
 
 render : Game -> Html Event
-render ({ ui, board, history } as game) =
+render ({ ui, players, board, history } as game) =
     (Layout.render Mdl ui.mdl [Layout.fixedHeader]
             { header = [
                   Options.div 

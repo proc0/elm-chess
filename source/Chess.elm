@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Chess exposing (..)
 
 import Html exposing (..)
 import Mouse exposing (..)

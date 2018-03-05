@@ -30,7 +30,7 @@ drop board piece =
 
 undo : Board -> Piece -> Board
 undo board piece = 
-    put piece board 
+    return piece board 
     |> clear
 
 clear : Board -> Board
@@ -39,27 +39,27 @@ clear board =
 
 remove : Piece -> Board -> Board
 remove pc bd = 
-    Matrix.update (toLocation <| fromMousePosition pc.position) (\s -> { s | piece = Nothing, active = True }) bd
+    Matrix.update (toBoardLocation pc.position) (\s -> { s | piece = Nothing, active = True }) bd
 
 add : Piece -> Board -> Board
 add pc bd = 
-    let lc = toLocation <| fromMousePosition pc.position
+    let lc = toBoardLocation pc.position
     in Matrix.update lc (\s -> 
         if s.valid 
-        then { s | piece = Just { pc | position = (toBoardPosition lc), moved = True }, valid = False, active = False } 
+        then { s | piece = Just { pc | position = (toBoardPosition lc), moved = True } } 
         else s) bd
 
-put : Piece -> Board -> Board
-put piece board = 
-    let undo lc sq = 
+return : Piece -> Board -> Board
+return piece board = 
+    let putBack lc sq = 
         if sq.active 
         then { sq | piece = Just { piece | position = toBoardPosition lc } }
         else sq
-    in Matrix.mapWithLocation undo board
+    in Matrix.mapWithLocation putBack board
 
 validate : Piece -> Board -> Board
 validate piece board =
-    let lc = toLocation <| fromMousePosition piece.position
+    let lc = toBoardLocation piece.position
         validMoves = pieceMoves piece board
         -- append input location as valid
         validLocations = lc::(List.map (\t -> t lc) validMoves)

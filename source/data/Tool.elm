@@ -49,6 +49,9 @@ toBoardPosition location =
         y = p.y * squareSize
     in Position x y
 
+toBoardLocation : Position -> Location
+toBoardLocation ps = toLocation <| fromMousePosition ps
+
 px : Int -> String
 px value = (toString value) ++ "px"
 
@@ -61,10 +64,12 @@ zeroPs : Position
 zeroPs = { x=0, y=0 }
 
 nullPiece : Piece
-nullPiece = Piece zeroPs Black Zebra False
+nullPiece = 
+    Piece zeroPs Black Zebra False
 
 emptySquare : Square
-emptySquare = Square zeroLoc Nothing False False
+emptySquare = 
+    Square zeroLoc Nothing False False
 
 idlePlayer : Color -> Player 
 idlePlayer color =
