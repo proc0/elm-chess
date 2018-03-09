@@ -27,8 +27,6 @@ toSAN move =
                     then toUpper c
                     else c
             in String.fromChar l
-        (y1,x1) = move.start
-        (x2,y2) = move.end
         rank x_ = String.fromChar <| fromCode (x_ + 97)
         file y_ = toString <| 8-y_
         translate pc (x,y) =

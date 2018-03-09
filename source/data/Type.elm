@@ -5,18 +5,21 @@ import Array exposing (..)
 import Mouse exposing (..)
 import Material
 
---         Chess         --
 --=======================--
 
 type alias Game =
     { ui      : UI
+    , chess   : Chess
     , players : Players
-    , board   : Board
-    , history : History
     }
 
 --           ♔           --
 --=======================--
+
+type alias Chess =
+    { board   : Board
+    , history : History
+    }
 
 type Color = 
       White 
@@ -35,7 +38,8 @@ type alias Piece =
     { position : Position
     , color : Color
     , role : Role
-    , moved : Bool
+    , ellapsed : Int
+    , path : List Location
     }
 
 type alias Square = 
@@ -67,7 +71,11 @@ type alias Move =
     , end : Location
     , piece : Piece
     , capture : Maybe Piece
+    , enPassant : Bool
     }
+
+type alias Translation = 
+    Location -> Location
 
 type Action =
       Moving Selection

@@ -9058,247 +9058,6 @@ var _elm_lang$html$Html_Attributes$classList = function (list) {
 };
 var _elm_lang$html$Html_Attributes$style = _elm_lang$virtual_dom$VirtualDom$style;
 
-var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
-var _elm_lang$html$Html_Events$targetChecked = A2(
-	_elm_lang$core$Json_Decode$at,
-	{
-		ctor: '::',
-		_0: 'target',
-		_1: {
-			ctor: '::',
-			_0: 'checked',
-			_1: {ctor: '[]'}
-		}
-	},
-	_elm_lang$core$Json_Decode$bool);
-var _elm_lang$html$Html_Events$targetValue = A2(
-	_elm_lang$core$Json_Decode$at,
-	{
-		ctor: '::',
-		_0: 'target',
-		_1: {
-			ctor: '::',
-			_0: 'value',
-			_1: {ctor: '[]'}
-		}
-	},
-	_elm_lang$core$Json_Decode$string);
-var _elm_lang$html$Html_Events$defaultOptions = _elm_lang$virtual_dom$VirtualDom$defaultOptions;
-var _elm_lang$html$Html_Events$onWithOptions = _elm_lang$virtual_dom$VirtualDom$onWithOptions;
-var _elm_lang$html$Html_Events$on = _elm_lang$virtual_dom$VirtualDom$on;
-var _elm_lang$html$Html_Events$onFocus = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'focus',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onBlur = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'blur',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onSubmitOptions = _elm_lang$core$Native_Utils.update(
-	_elm_lang$html$Html_Events$defaultOptions,
-	{preventDefault: true});
-var _elm_lang$html$Html_Events$onSubmit = function (msg) {
-	return A3(
-		_elm_lang$html$Html_Events$onWithOptions,
-		'submit',
-		_elm_lang$html$Html_Events$onSubmitOptions,
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onCheck = function (tagger) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'change',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetChecked));
-};
-var _elm_lang$html$Html_Events$onInput = function (tagger) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'input',
-		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
-};
-var _elm_lang$html$Html_Events$onMouseOut = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseout',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseOver = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseover',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseLeave = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseleave',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseEnter = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseenter',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseUp = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mouseup',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onMouseDown = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'mousedown',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onDoubleClick = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'dblclick',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$onClick = function (msg) {
-	return A2(
-		_elm_lang$html$Html_Events$on,
-		'click',
-		_elm_lang$core$Json_Decode$succeed(msg));
-};
-var _elm_lang$html$Html_Events$Options = F2(
-	function (a, b) {
-		return {stopPropagation: a, preventDefault: b};
-	});
-
-var _elm_lang$html$Html_Keyed$node = _elm_lang$virtual_dom$VirtualDom$keyedNode;
-var _elm_lang$html$Html_Keyed$ol = _elm_lang$html$Html_Keyed$node('ol');
-var _elm_lang$html$Html_Keyed$ul = _elm_lang$html$Html_Keyed$node('ul');
-
-var _elm_lang$window$Native_Window = function()
-{
-
-var size = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)	{
-	callback(_elm_lang$core$Native_Scheduler.succeed({
-		width: window.innerWidth,
-		height: window.innerHeight
-	}));
-});
-
-return {
-	size: size
-};
-
-}();
-var _elm_lang$window$Window_ops = _elm_lang$window$Window_ops || {};
-_elm_lang$window$Window_ops['&>'] = F2(
-	function (task1, task2) {
-		return A2(
-			_elm_lang$core$Task$andThen,
-			function (_p0) {
-				return task2;
-			},
-			task1);
-	});
-var _elm_lang$window$Window$onSelfMsg = F3(
-	function (router, dimensions, state) {
-		var _p1 = state;
-		if (_p1.ctor === 'Nothing') {
-			return _elm_lang$core$Task$succeed(state);
-		} else {
-			var send = function (_p2) {
-				var _p3 = _p2;
-				return A2(
-					_elm_lang$core$Platform$sendToApp,
-					router,
-					_p3._0(dimensions));
-			};
-			return A2(
-				_elm_lang$window$Window_ops['&>'],
-				_elm_lang$core$Task$sequence(
-					A2(_elm_lang$core$List$map, send, _p1._0.subs)),
-				_elm_lang$core$Task$succeed(state));
-		}
-	});
-var _elm_lang$window$Window$init = _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
-var _elm_lang$window$Window$size = _elm_lang$window$Native_Window.size;
-var _elm_lang$window$Window$width = A2(
-	_elm_lang$core$Task$map,
-	function (_) {
-		return _.width;
-	},
-	_elm_lang$window$Window$size);
-var _elm_lang$window$Window$height = A2(
-	_elm_lang$core$Task$map,
-	function (_) {
-		return _.height;
-	},
-	_elm_lang$window$Window$size);
-var _elm_lang$window$Window$onEffects = F3(
-	function (router, newSubs, oldState) {
-		var _p4 = {ctor: '_Tuple2', _0: oldState, _1: newSubs};
-		if (_p4._0.ctor === 'Nothing') {
-			if (_p4._1.ctor === '[]') {
-				return _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
-			} else {
-				return A2(
-					_elm_lang$core$Task$andThen,
-					function (pid) {
-						return _elm_lang$core$Task$succeed(
-							_elm_lang$core$Maybe$Just(
-								{subs: newSubs, pid: pid}));
-					},
-					_elm_lang$core$Process$spawn(
-						A3(
-							_elm_lang$dom$Dom_LowLevel$onWindow,
-							'resize',
-							_elm_lang$core$Json_Decode$succeed(
-								{ctor: '_Tuple0'}),
-							function (_p5) {
-								return A2(
-									_elm_lang$core$Task$andThen,
-									_elm_lang$core$Platform$sendToSelf(router),
-									_elm_lang$window$Window$size);
-							})));
-			}
-		} else {
-			if (_p4._1.ctor === '[]') {
-				return A2(
-					_elm_lang$window$Window_ops['&>'],
-					_elm_lang$core$Process$kill(_p4._0._0.pid),
-					_elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing));
-			} else {
-				return _elm_lang$core$Task$succeed(
-					_elm_lang$core$Maybe$Just(
-						{subs: newSubs, pid: _p4._0._0.pid}));
-			}
-		}
-	});
-var _elm_lang$window$Window$subscription = _elm_lang$core$Native_Platform.leaf('Window');
-var _elm_lang$window$Window$Size = F2(
-	function (a, b) {
-		return {width: a, height: b};
-	});
-var _elm_lang$window$Window$MySub = function (a) {
-	return {ctor: 'MySub', _0: a};
-};
-var _elm_lang$window$Window$resizes = function (tagger) {
-	return _elm_lang$window$Window$subscription(
-		_elm_lang$window$Window$MySub(tagger));
-};
-var _elm_lang$window$Window$subMap = F2(
-	function (func, _p6) {
-		var _p7 = _p6;
-		return _elm_lang$window$Window$MySub(
-			function (_p8) {
-				return func(
-					_p7._0(_p8));
-			});
-	});
-_elm_lang$core$Native_Platform.effectManagers['Window'] = {pkg: 'elm-lang/window', init: _elm_lang$window$Window$init, onEffects: _elm_lang$window$Window$onEffects, onSelfMsg: _elm_lang$window$Window$onSelfMsg, tag: 'sub', subMap: _elm_lang$window$Window$subMap};
-
 var _debois$elm_mdl$Material_Helpers$noAttr = A2(_elm_lang$html$Html_Attributes$attribute, 'data-elm-mdl-noop', '');
 var _debois$elm_mdl$Material_Helpers$aria = F2(
 	function (name, value) {
@@ -9529,6 +9288,121 @@ var _debois$elm_mdl$Material_Component$TextfieldMsg = F2(
 var _debois$elm_mdl$Material_Component$ButtonMsg = F2(
 	function (a, b) {
 		return {ctor: 'ButtonMsg', _0: a, _1: b};
+	});
+
+var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$html$Html_Events$targetChecked = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'checked',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$bool);
+var _elm_lang$html$Html_Events$targetValue = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'value',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$string);
+var _elm_lang$html$Html_Events$defaultOptions = _elm_lang$virtual_dom$VirtualDom$defaultOptions;
+var _elm_lang$html$Html_Events$onWithOptions = _elm_lang$virtual_dom$VirtualDom$onWithOptions;
+var _elm_lang$html$Html_Events$on = _elm_lang$virtual_dom$VirtualDom$on;
+var _elm_lang$html$Html_Events$onFocus = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'focus',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onBlur = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'blur',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onSubmitOptions = _elm_lang$core$Native_Utils.update(
+	_elm_lang$html$Html_Events$defaultOptions,
+	{preventDefault: true});
+var _elm_lang$html$Html_Events$onSubmit = function (msg) {
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'submit',
+		_elm_lang$html$Html_Events$onSubmitOptions,
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onCheck = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'change',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetChecked));
+};
+var _elm_lang$html$Html_Events$onInput = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'input',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
+};
+var _elm_lang$html$Html_Events$onMouseOut = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseout',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseOver = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseover',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseLeave = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseleave',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseEnter = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseenter',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseUp = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseup',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseDown = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mousedown',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onDoubleClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'dblclick',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'click',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$Options = F2(
+	function (a, b) {
+		return {stopPropagation: a, preventDefault: b};
 	});
 
 var _debois$elm_mdl$Material_Dispatch$split = F4(
@@ -10790,1110 +10664,6 @@ var _debois$elm_mdl$Material_Ripple$down = F2(
 				_debois$elm_mdl$Material_Ripple$geometryDecoder));
 	});
 
-var _debois$elm_mdl$Material_Icon$view = F2(
-	function (name, options) {
-		return A3(
-			_debois$elm_mdl$Material_Options$styled,
-			_elm_lang$html$Html$i,
-			{
-				ctor: '::',
-				_0: _debois$elm_mdl$Material_Options$cs('material-icons'),
-				_1: options
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(name),
-				_1: {ctor: '[]'}
-			});
-	});
-var _debois$elm_mdl$Material_Icon$i = function (name) {
-	return A2(
-		_debois$elm_mdl$Material_Icon$view,
-		name,
-		{ctor: '[]'});
-};
-var _debois$elm_mdl$Material_Icon$size48 = A2(_debois$elm_mdl$Material_Options$css, 'font-size', '48px');
-var _debois$elm_mdl$Material_Icon$size36 = A2(_debois$elm_mdl$Material_Options$css, 'font-size', '36px');
-var _debois$elm_mdl$Material_Icon$size24 = A2(_debois$elm_mdl$Material_Options$css, 'font-size', '24px');
-var _debois$elm_mdl$Material_Icon$size18 = A2(_debois$elm_mdl$Material_Options$css, 'font-size', '18px');
-var _debois$elm_mdl$Material_Icon$defaultConfig = {};
-var _debois$elm_mdl$Material_Icon$Config = {};
-
-var _debois$elm_mdl$Material_Layout$_p0 = {
-	ctor: '_Tuple2',
-	_0: function (_) {
-		return _.layout;
-	},
-	_1: F2(
-		function (x, s) {
-			return _elm_lang$core$Native_Utils.update(
-				s,
-				{layout: x});
-		})
-};
-var _debois$elm_mdl$Material_Layout$get = _debois$elm_mdl$Material_Layout$_p0._0;
-var _debois$elm_mdl$Material_Layout$set = _debois$elm_mdl$Material_Layout$_p0._1;
-var _debois$elm_mdl$Material_Layout$drawerView = F3(
-	function (lift, isVisible, elems) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$classList(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'mdl-layout__drawer', _1: true},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'is-visible', _1: isVisible},
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html_Attributes$attribute,
-						'aria-hidden',
-						isVisible ? 'false' : 'true'),
-					_1: {ctor: '[]'}
-				}
-			},
-			elems);
-	});
-var _debois$elm_mdl$Material_Layout$onKeypressFilterSpaceAndEnter = A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', '\n  (function (evt) {\n     if (evt && evt.type === \"keydown\" && (evt.keyCode === 32 || evt.keyCode === 13)) {\n       evt.preventDefault();\n     }\n   })(window.event);\n  ');
-var _debois$elm_mdl$Material_Layout$toList = function (x) {
-	var _p1 = x;
-	if (_p1.ctor === 'Nothing') {
-		return {ctor: '[]'};
-	} else {
-		return {
-			ctor: '::',
-			_0: _p1._0,
-			_1: {ctor: '[]'}
-		};
-	}
-};
-var _debois$elm_mdl$Material_Layout$isWaterfall = function (mode) {
-	var _p2 = mode;
-	if (_p2.ctor === 'Waterfall') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _debois$elm_mdl$Material_Layout$row = function (styles) {
-	return _debois$elm_mdl$Material_Options$div(
-		{
-			ctor: '::',
-			_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__header-row'),
-			_1: styles
-		});
-};
-var _debois$elm_mdl$Material_Layout$link = F2(
-	function (styles, contents) {
-		return A3(
-			_debois$elm_mdl$Material_Options$styled,
-			_elm_lang$html$Html$a,
-			{
-				ctor: '::',
-				_0: _debois$elm_mdl$Material_Options$cs('mdl-navigation__link'),
-				_1: {
-					ctor: '::',
-					_0: _debois$elm_mdl$Material_Options_Internal$attribute(
-						A2(_elm_lang$html$Html_Attributes$attribute, 'tabindex', '1')),
-					_1: styles
-				}
-			},
-			contents);
-	});
-var _debois$elm_mdl$Material_Layout$href = function (url) {
-	return _debois$elm_mdl$Material_Options$attribute(
-		_elm_lang$html$Html_Attributes$href(url));
-};
-var _debois$elm_mdl$Material_Layout$navigation = F2(
-	function (styles, contents) {
-		return A3(
-			_debois$elm_mdl$Material_Options$styled,
-			_elm_lang$html$Html$nav,
-			{
-				ctor: '::',
-				_0: _debois$elm_mdl$Material_Options$cs('mdl-navigation'),
-				_1: styles
-			},
-			contents);
-	});
-var _debois$elm_mdl$Material_Layout$title = function (styles) {
-	return _debois$elm_mdl$Material_Options$span(
-		{
-			ctor: '::',
-			_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__title'),
-			_1: styles
-		});
-};
-var _debois$elm_mdl$Material_Layout$spacer = A2(
-	_elm_lang$html$Html$div,
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$class('mdl-layout-spacer'),
-		_1: {ctor: '[]'}
-	},
-	{ctor: '[]'});
-var _debois$elm_mdl$Material_Layout$onSelectTab = function (_p3) {
-	return _debois$elm_mdl$Material_Options_Internal$option(
-		F2(
-			function (f, config) {
-				return _elm_lang$core$Native_Utils.update(
-					config,
-					{
-						onSelectTab: _elm_lang$core$Maybe$Just(
-							function (_p4) {
-								return _elm_lang$html$Html_Events$onClick(
-									f(_p4));
-							})
-					});
-			})(_p3));
-};
-var _debois$elm_mdl$Material_Layout$moreTabs = _debois$elm_mdl$Material_Options_Internal$option(
-	function (config) {
-		return _elm_lang$core$Native_Utils.update(
-			config,
-			{moreTabs: true});
-	});
-var _debois$elm_mdl$Material_Layout$selectedTab = function (_p5) {
-	return _debois$elm_mdl$Material_Options_Internal$option(
-		F2(
-			function (k, config) {
-				return _elm_lang$core$Native_Utils.update(
-					config,
-					{selectedTab: k});
-			})(_p5));
-};
-var _debois$elm_mdl$Material_Layout$transparentHeader = _debois$elm_mdl$Material_Options_Internal$option(
-	function (config) {
-		return _elm_lang$core$Native_Utils.update(
-			config,
-			{transparentHeader: true});
-	});
-var _debois$elm_mdl$Material_Layout$rippleTabs = _debois$elm_mdl$Material_Options_Internal$option(
-	function (config) {
-		return _elm_lang$core$Native_Utils.update(
-			config,
-			{rippleTabs: true});
-	});
-var _debois$elm_mdl$Material_Layout$fixedTabs = _debois$elm_mdl$Material_Options_Internal$option(
-	function (config) {
-		return _elm_lang$core$Native_Utils.update(
-			config,
-			{fixedTabs: true});
-	});
-var _debois$elm_mdl$Material_Layout$fixedDrawer = _debois$elm_mdl$Material_Options_Internal$option(
-	function (config) {
-		return _elm_lang$core$Native_Utils.update(
-			config,
-			{fixedDrawer: true});
-	});
-var _debois$elm_mdl$Material_Layout$fixedHeader = _debois$elm_mdl$Material_Options_Internal$option(
-	function (config) {
-		return _elm_lang$core$Native_Utils.update(
-			config,
-			{fixedHeader: true});
-	});
-var _debois$elm_mdl$Material_Layout$mainId = 'elm-mdl-layout-main';
-var _debois$elm_mdl$Material_Layout$setTabsWidth_ = F2(
-	function (width, model) {
-		var x = model.tabScrollState;
-		return _elm_lang$core$Native_Utils.update(
-			model,
-			{
-				tabScrollState: _elm_lang$core$Native_Utils.update(
-					x,
-					{
-						width: _elm_lang$core$Maybe$Just(width)
-					})
-			});
-	});
-var _debois$elm_mdl$Material_Layout$setTabsWidth = F2(
-	function (w, container) {
-		return _elm_lang$core$Native_Utils.update(
-			container,
-			{
-				layout: A2(_debois$elm_mdl$Material_Layout$setTabsWidth_, w, container.layout)
-			});
-	});
-var _debois$elm_mdl$Material_Layout$defaultTabScrollState = {canScrollRight: true, canScrollLeft: false, width: _elm_lang$core$Maybe$Nothing};
-var _debois$elm_mdl$Material_Layout$defaultModel = {ripples: _elm_lang$core$Dict$empty, isSmallScreen: false, isCompact: false, isAnimating: false, isScrolled: false, isDrawerOpen: false, tabScrollState: _debois$elm_mdl$Material_Layout$defaultTabScrollState};
-var _debois$elm_mdl$Material_Layout$TabScrollState = F3(
-	function (a, b, c) {
-		return {canScrollLeft: a, canScrollRight: b, width: c};
-	});
-var _debois$elm_mdl$Material_Layout$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {ripples: a, isSmallScreen: b, isCompact: c, isAnimating: d, isScrolled: e, isDrawerOpen: f, tabScrollState: g};
-	});
-var _debois$elm_mdl$Material_Layout$Config = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {fixedHeader: a, fixedDrawer: b, fixedTabs: c, rippleTabs: d, mode: e, selectedTab: f, onSelectTab: g, transparentHeader: h, moreTabs: i};
-	});
-var _debois$elm_mdl$Material_Layout$Contents = F4(
-	function (a, b, c, d) {
-		return {header: a, drawer: b, tabs: c, main: d};
-	});
-var _debois$elm_mdl$Material_Layout$Ripple = F2(
-	function (a, b) {
-		return {ctor: 'Ripple', _0: a, _1: b};
-	});
-var _debois$elm_mdl$Material_Layout$NOP = {ctor: 'NOP'};
-var _debois$elm_mdl$Material_Layout$TransitionEnd = {ctor: 'TransitionEnd'};
-var _debois$elm_mdl$Material_Layout$TransitionHeader = function (a) {
-	return {ctor: 'TransitionHeader', _0: a};
-};
-var _debois$elm_mdl$Material_Layout$update_ = F3(
-	function (f, action, model) {
-		update_:
-		while (true) {
-			var _p6 = action;
-			switch (_p6.ctor) {
-				case 'NOP':
-					return _elm_lang$core$Maybe$Nothing;
-				case 'Resize':
-					var _p7 = _p6._0;
-					var tabScrollState = A2(
-						_elm_lang$core$Maybe$withDefault,
-						model.tabScrollState,
-						A2(
-							_elm_lang$core$Maybe$map,
-							function (tabsWidth) {
-								var tabScrollState = model.tabScrollState;
-								return _elm_lang$core$Native_Utils.update(
-									tabScrollState,
-									{
-										canScrollRight: _elm_lang$core$Native_Utils.cmp(tabsWidth + (2 * 56), _p7) > 0
-									});
-							},
-							model.tabScrollState.width));
-					var isSmall = _elm_lang$core$Native_Utils.cmp(1024, _p7) > -1;
-					return (_elm_lang$core$Native_Utils.eq(isSmall, model.isSmallScreen) && _elm_lang$core$Native_Utils.eq(tabScrollState.canScrollRight, model.tabScrollState.canScrollRight)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
-						_debois$elm_mdl$Material_Helpers$pure(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{isSmallScreen: isSmall, isDrawerOpen: (!isSmall) && model.isDrawerOpen, tabScrollState: tabScrollState})));
-				case 'ToggleDrawer':
-					return _elm_lang$core$Maybe$Just(
-						_debois$elm_mdl$Material_Helpers$pure(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{isDrawerOpen: !model.isDrawerOpen})));
-				case 'Ripple':
-					var _p9 = _p6._0;
-					return _elm_lang$core$Maybe$Just(
-						A2(
-							_debois$elm_mdl$Material_Helpers$map2nd,
-							_elm_lang$core$Platform_Cmd$map(
-								function (_p8) {
-									return f(
-										A2(_debois$elm_mdl$Material_Layout$Ripple, _p9, _p8));
-								}),
-							A2(
-								_debois$elm_mdl$Material_Helpers$map1st,
-								function (ripple_) {
-									return _elm_lang$core$Native_Utils.update(
-										model,
-										{
-											ripples: A3(_elm_lang$core$Dict$insert, _p9, ripple_, model.ripples)
-										});
-								},
-								A2(
-									_debois$elm_mdl$Material_Ripple$update,
-									_p6._1,
-									A2(
-										_elm_lang$core$Maybe$withDefault,
-										_debois$elm_mdl$Material_Ripple$model,
-										A2(_elm_lang$core$Dict$get, _p9, model.ripples))))));
-				case 'ScrollTab':
-					var _p10 = _p6._0;
-					return (!_elm_lang$core$Native_Utils.eq(model.tabScrollState, _p10)) ? _elm_lang$core$Maybe$Just(
-						_debois$elm_mdl$Material_Helpers$pure(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{tabScrollState: _p10}))) : _elm_lang$core$Maybe$Nothing;
-				case 'ScrollPane':
-					var isScrolled = _elm_lang$core$Native_Utils.cmp(0.0, _p6._1) < 0;
-					if (!_elm_lang$core$Native_Utils.eq(isScrolled, model.isScrolled)) {
-						var _v3 = f,
-							_v4 = _debois$elm_mdl$Material_Layout$TransitionHeader(
-							{toCompact: isScrolled, fixedHeader: _p6._0}),
-							_v5 = _elm_lang$core$Native_Utils.update(
-							model,
-							{isScrolled: isScrolled});
-						f = _v3;
-						action = _v4;
-						model = _v5;
-						continue update_;
-					} else {
-						return _elm_lang$core$Maybe$Nothing;
-					}
-				case 'TransitionHeader':
-					return (!model.isAnimating) ? _elm_lang$core$Maybe$Just(
-						{
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{isCompact: _p6._0.toCompact, isAnimating: (!model.isSmallScreen) || _p6._0.fixedHeader}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						}) : _elm_lang$core$Maybe$Nothing;
-				default:
-					return _elm_lang$core$Maybe$Just(
-						_debois$elm_mdl$Material_Helpers$pure(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{isAnimating: false})));
-			}
-		}
-	});
-var _debois$elm_mdl$Material_Layout$update = F2(
-	function (msg, model) {
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			{ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none},
-			A3(_debois$elm_mdl$Material_Layout$update_, _elm_lang$core$Basics$identity, msg, model));
-	});
-var _debois$elm_mdl$Material_Layout$react = F3(
-	function (lift, msg, store) {
-		var _p11 = A3(
-			_debois$elm_mdl$Material_Layout$update_,
-			lift,
-			msg,
-			_debois$elm_mdl$Material_Layout$get(store));
-		if ((_p11.ctor === 'Just') && (_p11._0.ctor === '_Tuple2')) {
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Maybe$Just(
-					A2(_debois$elm_mdl$Material_Layout$set, _p11._0._0, store)),
-				_1: _p11._0._1
-			};
-		} else {
-			return {ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _elm_lang$core$Platform_Cmd$none};
-		}
-	});
-var _debois$elm_mdl$Material_Layout$ScrollPane = F2(
-	function (a, b) {
-		return {ctor: 'ScrollPane', _0: a, _1: b};
-	});
-var _debois$elm_mdl$Material_Layout$ScrollTab = function (a) {
-	return {ctor: 'ScrollTab', _0: a};
-};
-var _debois$elm_mdl$Material_Layout$Resize = function (a) {
-	return {ctor: 'Resize', _0: a};
-};
-var _debois$elm_mdl$Material_Layout$init = function () {
-	var measureScreenSize = A2(_elm_lang$core$Task$perform, _debois$elm_mdl$Material_Layout$Resize, _elm_lang$window$Window$width);
-	return {ctor: '_Tuple2', _0: _debois$elm_mdl$Material_Layout$defaultModel, _1: measureScreenSize};
-}();
-var _debois$elm_mdl$Material_Layout$sub0 = function (lift) {
-	return A2(
-		_elm_lang$core$Platform_Cmd$map,
-		function (_p12) {
-			return lift(
-				_debois$elm_mdl$Material_Component$LayoutMsg(_p12));
-		},
-		_elm_lang$core$Tuple$second(_debois$elm_mdl$Material_Layout$init));
-};
-var _debois$elm_mdl$Material_Layout$subscriptions = function (model) {
-	return _elm_lang$window$Window$resizes(
-		function (_p13) {
-			return _debois$elm_mdl$Material_Layout$Resize(
-				function (_) {
-					return _.width;
-				}(_p13));
-		});
-};
-var _debois$elm_mdl$Material_Layout$subs = function (lift) {
-	return function (_p14) {
-		return A2(
-			_elm_lang$core$Platform_Sub$map,
-			function (_p15) {
-				return lift(
-					_debois$elm_mdl$Material_Component$LayoutMsg(_p15));
-			},
-			_debois$elm_mdl$Material_Layout$subscriptions(
-				_debois$elm_mdl$Material_Layout$get(_p14)));
-	};
-};
-var _debois$elm_mdl$Material_Layout$ToggleDrawer = {ctor: 'ToggleDrawer'};
-var _debois$elm_mdl$Material_Layout$drawerButton = F2(
-	function (lift, isVisible) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$classList(
-							{
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'mdl-layout__drawer-button', _1: true},
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html_Attributes$attribute,
-								'aria-expanded',
-								isVisible ? 'true' : 'false'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$tabindex(1),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(
-										lift(_debois$elm_mdl$Material_Layout$ToggleDrawer)),
-									_1: {
-										ctor: '::',
-										_0: A3(
-											_elm_lang$html$Html_Events$onWithOptions,
-											'keydown',
-											{stopPropagation: false, preventDefault: false},
-											A2(
-												_elm_lang$core$Json_Decode$map,
-												function (_p16) {
-													return lift(
-														function (key) {
-															var _p17 = key;
-															switch (_p17) {
-																case 32:
-																	return _debois$elm_mdl$Material_Layout$ToggleDrawer;
-																case 13:
-																	return _debois$elm_mdl$Material_Layout$ToggleDrawer;
-																default:
-																	return _debois$elm_mdl$Material_Layout$NOP;
-															}
-														}(_p16));
-												},
-												_elm_lang$html$Html_Events$keyCode)),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					},
-					{
-						ctor: '::',
-						_0: _debois$elm_mdl$Material_Icon$i('menu'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			});
-	});
-var _debois$elm_mdl$Material_Layout$obfuscator = F2(
-	function (lift, isVisible) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$classList(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'mdl-layout__obfuscator', _1: true},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'is-visible', _1: isVisible},
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						lift(_debois$elm_mdl$Material_Layout$ToggleDrawer)),
-					_1: {ctor: '[]'}
-				}
-			},
-			{ctor: '[]'});
-	});
-var _debois$elm_mdl$Material_Layout$toggleDrawer = function (lift) {
-	return function (_p18) {
-		return lift(
-			_debois$elm_mdl$Material_Component$LayoutMsg(_p18));
-	}(_debois$elm_mdl$Material_Layout$ToggleDrawer);
-};
-var _debois$elm_mdl$Material_Layout$Waterfall = function (a) {
-	return {ctor: 'Waterfall', _0: a};
-};
-var _debois$elm_mdl$Material_Layout$waterfall = function (_p19) {
-	return _debois$elm_mdl$Material_Options_Internal$option(
-		F2(
-			function (b, config) {
-				return _elm_lang$core$Native_Utils.update(
-					config,
-					{
-						mode: _debois$elm_mdl$Material_Layout$Waterfall(b)
-					});
-			})(_p19));
-};
-var _debois$elm_mdl$Material_Layout$Scrolling = {ctor: 'Scrolling'};
-var _debois$elm_mdl$Material_Layout$scrolling = _debois$elm_mdl$Material_Options_Internal$option(
-	function (config) {
-		return _elm_lang$core$Native_Utils.update(
-			config,
-			{mode: _debois$elm_mdl$Material_Layout$Scrolling});
-	});
-var _debois$elm_mdl$Material_Layout$Seamed = {ctor: 'Seamed'};
-var _debois$elm_mdl$Material_Layout$seamed = _debois$elm_mdl$Material_Options_Internal$option(
-	function (config) {
-		return _elm_lang$core$Native_Utils.update(
-			config,
-			{mode: _debois$elm_mdl$Material_Layout$Seamed});
-	});
-var _debois$elm_mdl$Material_Layout$Standard = {ctor: 'Standard'};
-var _debois$elm_mdl$Material_Layout$defaultConfig = {fixedHeader: false, fixedDrawer: false, fixedTabs: false, rippleTabs: true, mode: _debois$elm_mdl$Material_Layout$Standard, onSelectTab: _elm_lang$core$Maybe$Nothing, selectedTab: -1, moreTabs: false, transparentHeader: false};
-var _debois$elm_mdl$Material_Layout$headerView = F4(
-	function (lift, config, model, _p20) {
-		var _p21 = _p20;
-		var mode = function () {
-			var _p22 = config.mode;
-			switch (_p22.ctor) {
-				case 'Standard':
-					return _debois$elm_mdl$Material_Options$nop;
-				case 'Scrolling':
-					return _debois$elm_mdl$Material_Options$cs('mdl-layout__header--scroll');
-				case 'Seamed':
-					return _debois$elm_mdl$Material_Options$cs('mdl-layout__header--seamed');
-				default:
-					if (_p22._0 === true) {
-						return _debois$elm_mdl$Material_Options$cs('mdl-layout__header--waterfall mdl-layout__header--waterfall-hide-top');
-					} else {
-						return _debois$elm_mdl$Material_Options$cs('mdl-layout__header--waterfall');
-					}
-			}
-		}();
-		return A3(
-			_debois$elm_mdl$Material_Options$styled,
-			_elm_lang$html$Html$header,
-			{
-				ctor: '::',
-				_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__header'),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_debois$elm_mdl$Material_Options$when,
-						_elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Standard) || (_debois$elm_mdl$Material_Layout$isWaterfall(config.mode) && model.isCompact),
-						_debois$elm_mdl$Material_Options$cs('is-casting-shadow')),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_debois$elm_mdl$Material_Options$when,
-							model.isAnimating,
-							_debois$elm_mdl$Material_Options$cs('is-animating')),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_debois$elm_mdl$Material_Options$when,
-								model.isCompact,
-								_debois$elm_mdl$Material_Options$cs('is-compact')),
-							_1: {
-								ctor: '::',
-								_0: mode,
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_debois$elm_mdl$Material_Options$when,
-										config.transparentHeader,
-										_debois$elm_mdl$Material_Options$cs('mdl-layout__header--transparent')),
-									_1: {
-										ctor: '::',
-										_0: _debois$elm_mdl$Material_Options$onClick(
-											lift(
-												_debois$elm_mdl$Material_Layout$TransitionHeader(
-													{toCompact: false, fixedHeader: config.fixedHeader}))),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_debois$elm_mdl$Material_Options$on,
-												'transitionend',
-												_elm_lang$core$Json_Decode$succeed(
-													lift(_debois$elm_mdl$Material_Layout$TransitionEnd))),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			A2(
-				_elm_lang$core$List$concatMap,
-				function (x) {
-					return x;
-				},
-				{
-					ctor: '::',
-					_0: _debois$elm_mdl$Material_Layout$toList(_p21._0),
-					_1: {
-						ctor: '::',
-						_0: _p21._1,
-						_1: {
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Layout$toList(_p21._2),
-							_1: {ctor: '[]'}
-						}
-					}
-				}));
-	});
-var _debois$elm_mdl$Material_Layout$Right = {ctor: 'Right'};
-var _debois$elm_mdl$Material_Layout$Left = {ctor: 'Left'};
-var _debois$elm_mdl$Material_Layout$tabsView = F4(
-	function (lift, config, model, _p23) {
-		var _p24 = _p23;
-		var _p27 = _p24._1;
-		var chevron = F2(
-			function (direction, offset) {
-				var dir = function () {
-					var _p25 = direction;
-					if (_p25.ctor === 'Left') {
-						return 'left';
-					} else {
-						return 'right';
-					}
-				}();
-				return A3(
-					_debois$elm_mdl$Material_Options$styled,
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__tab-bar-button'),
-						_1: {
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Options$cs(
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									'mdl-layout__tab-bar-',
-									A2(_elm_lang$core$Basics_ops['++'], dir, '-button'))),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_debois$elm_mdl$Material_Options$when,
-									(_elm_lang$core$Native_Utils.eq(direction, _debois$elm_mdl$Material_Layout$Left) && model.tabScrollState.canScrollLeft) || (_elm_lang$core$Native_Utils.eq(direction, _debois$elm_mdl$Material_Layout$Right) && model.tabScrollState.canScrollRight),
-									_debois$elm_mdl$Material_Options$cs('is-active')),
-								_1: {
-									ctor: '::',
-									_0: _debois$elm_mdl$Material_Options$many(_p27),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_debois$elm_mdl$Material_Icon$view,
-							A2(_elm_lang$core$Basics_ops['++'], 'chevron_', dir),
-							{
-								ctor: '::',
-								_0: _debois$elm_mdl$Material_Icon$size24,
-								_1: {
-									ctor: '::',
-									_0: _debois$elm_mdl$Material_Options_Internal$attribute(
-										A2(
-											_elm_lang$html$Html_Attributes$attribute,
-											'onclick',
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												'document.getElementsByClassName(\'mdl-layout__tab-bar\')[0].scrollLeft += ',
-												_elm_lang$core$Basics$toString(offset)))),
-									_1: {ctor: '[]'}
-								}
-							}),
-						_1: {ctor: '[]'}
-					});
-			});
-		return A2(
-			_debois$elm_mdl$Material_Options$div,
-			{
-				ctor: '::',
-				_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__tab-bar-container'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(chevron, _debois$elm_mdl$Material_Layout$Left, -100),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_debois$elm_mdl$Material_Options$div,
-						{
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__tab-bar'),
-							_1: {
-								ctor: '::',
-								_0: A2(_debois$elm_mdl$Material_Options$css, 'position', 'relative'),
-								_1: {
-									ctor: '::',
-									_0: A2(_debois$elm_mdl$Material_Options$css, 'scroll-behavior', 'smooth'),
-									_1: {
-										ctor: '::',
-										_0: config.rippleTabs ? _debois$elm_mdl$Material_Options$many(
-											{
-												ctor: '::',
-												_0: _debois$elm_mdl$Material_Options$cs('mdl-js-ripple-effect'),
-												_1: {
-													ctor: '::',
-													_0: _debois$elm_mdl$Material_Options$cs('mds-js-ripple-effect--ignore-events'),
-													_1: {ctor: '[]'}
-												}
-											}) : _debois$elm_mdl$Material_Options$nop,
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Standard) ? _debois$elm_mdl$Material_Options$cs('is-casting-shadow') : _debois$elm_mdl$Material_Options$nop,
-											_1: {
-												ctor: '::',
-												_0: _debois$elm_mdl$Material_Options$many(_p27),
-												_1: {
-													ctor: '::',
-													_0: _debois$elm_mdl$Material_Options_Internal$attribute(
-														A2(
-															_elm_lang$html$Html_Events$on,
-															'scroll',
-															_debois$elm_dom$DOM$target(
-																A4(
-																	_elm_lang$core$Json_Decode$map3,
-																	F3(
-																		function (scrollWidth, clientWidth, scrollLeft) {
-																			return lift(
-																				_debois$elm_mdl$Material_Layout$ScrollTab(
-																					{
-																						canScrollLeft: _elm_lang$core$Native_Utils.cmp(scrollLeft, 0) > 0,
-																						canScrollRight: _elm_lang$core$Native_Utils.cmp(scrollWidth - clientWidth, scrollLeft + 1) > 0,
-																						width: _elm_lang$core$Maybe$Just(scrollWidth)
-																					}));
-																		}),
-																	A2(_elm_lang$core$Json_Decode$field, 'scrollWidth', _elm_lang$core$Json_Decode$float),
-																	A2(_elm_lang$core$Json_Decode$field, 'clientWidth', _elm_lang$core$Json_Decode$float),
-																	A2(_elm_lang$core$Json_Decode$field, 'scrollLeft', _elm_lang$core$Json_Decode$float))))),
-													_1: {ctor: '[]'}
-												}
-											}
-										}
-									}
-								}
-							}
-						},
-						A2(
-							_elm_lang$core$List$indexedMap,
-							F2(
-								function (tabIndex, tab) {
-									return A3(
-										_debois$elm_mdl$Material_Helpers$filter,
-										_elm_lang$html$Html$a,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$classList(
-												{
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'mdl-layout__tab', _1: true},
-													_1: {
-														ctor: '::',
-														_0: {
-															ctor: '_Tuple2',
-															_0: 'is-active',
-															_1: _elm_lang$core$Native_Utils.eq(tabIndex, config.selectedTab)
-														},
-														_1: {ctor: '[]'}
-													}
-												}),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$core$Maybe$withDefault,
-													_debois$elm_mdl$Material_Helpers$noAttr,
-													A2(
-														_elm_lang$core$Maybe$map,
-														F2(
-															function (x, y) {
-																return y(x);
-															})(tabIndex),
-														config.onSelectTab)),
-												_1: {ctor: '[]'}
-											}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$core$Maybe$Just(tab),
-											_1: {
-												ctor: '::',
-												_0: config.rippleTabs ? _elm_lang$core$Maybe$Just(
-													A2(
-														_elm_lang$html$Html$map,
-														function (_p26) {
-															return lift(
-																A2(_debois$elm_mdl$Material_Layout$Ripple, tabIndex, _p26));
-														},
-														A2(
-															_debois$elm_mdl$Material_Ripple$view,
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$class('mdl-layout__tab-ripple-container'),
-																_1: {ctor: '[]'}
-															},
-															A2(
-																_elm_lang$core$Maybe$withDefault,
-																_debois$elm_mdl$Material_Ripple$model,
-																A2(_elm_lang$core$Dict$get, tabIndex, model.ripples))))) : _elm_lang$core$Maybe$Nothing,
-												_1: {ctor: '[]'}
-											}
-										});
-								}),
-							_p24._0)),
-					_1: {
-						ctor: '::',
-						_0: A2(chevron, _debois$elm_mdl$Material_Layout$Right, 100),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	});
-var _debois$elm_mdl$Material_Layout$view = F4(
-	function (lift, model, options, _p28) {
-		var _p29 = _p28;
-		var _p37 = _p29.tabs;
-		var _p36 = _p29.header;
-		var _p35 = _p29.drawer;
-		var hasDrawer = !_elm_lang$core$Native_Utils.eq(
-			_p35,
-			{ctor: '[]'});
-		var hasTabs = !_elm_lang$core$List$isEmpty(
-			_elm_lang$core$Tuple$first(_p37));
-		var hasHeader = hasTabs || (!_elm_lang$core$List$isEmpty(_p36));
-		var summary = A2(_debois$elm_mdl$Material_Options_Internal$collect, _debois$elm_mdl$Material_Layout$defaultConfig, options);
-		var config = summary.config;
-		var drawerIsFixed = config.fixedDrawer && (!model.isSmallScreen);
-		var drawerIsVisible = model.isDrawerOpen && (!drawerIsFixed);
-		var _p30 = function () {
-			var _p31 = {ctor: '_Tuple3', _0: _p35, _1: _p36, _2: config.fixedHeader};
-			if ((_p31.ctor === '_Tuple3') && (_p31._0.ctor === '::')) {
-				if ((_p31._1.ctor === '::') && (_p31._2 === true)) {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Maybe$Nothing,
-						_1: _elm_lang$core$Maybe$Just(
-							A2(_debois$elm_mdl$Material_Layout$drawerButton, lift, drawerIsVisible))
-					};
-				} else {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Maybe$Just(
-							A2(_debois$elm_mdl$Material_Layout$drawerButton, lift, drawerIsVisible)),
-						_1: _elm_lang$core$Maybe$Nothing
-					};
-				}
-			} else {
-				return {ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _elm_lang$core$Maybe$Nothing};
-			}
-		}();
-		var contentDrawerButton = _p30._0;
-		var headerDrawerButton = _p30._1;
-		var tabsElems = (!hasTabs) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
-			A4(_debois$elm_mdl$Material_Layout$tabsView, lift, config, model, _p37));
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$classList(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'mdl-layout__container', _1: true},
-						_1: {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'has-scrolling-header',
-								_1: _elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Scrolling)
-							},
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A3(
-					_debois$elm_mdl$Material_Helpers$filter,
-					_elm_lang$html$Html_Keyed$node('div'),
-					A2(
-						_elm_lang$core$List$filterMap,
-						_elm_lang$core$Basics$identity,
-						{
-							ctor: '::',
-							_0: _elm_lang$core$Maybe$Just(
-								_elm_lang$html$Html_Attributes$classList(
-									{
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'mdl-layout ', _1: true},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'is-upgraded', _1: true},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'is-small-screen', _1: model.isSmallScreen},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'has-drawer', _1: hasDrawer},
-													_1: {
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'has-tabs', _1: hasTabs},
-														_1: {
-															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: 'mdl-js-layout', _1: true},
-															_1: {
-																ctor: '::',
-																_0: {ctor: '_Tuple2', _0: 'mdl-layout--fixed-drawer', _1: config.fixedDrawer && hasDrawer},
-																_1: {
-																	ctor: '::',
-																	_0: {ctor: '_Tuple2', _0: 'mdl-layout--fixed-header', _1: config.fixedHeader && hasHeader},
-																	_1: {
-																		ctor: '::',
-																		_0: {ctor: '_Tuple2', _0: 'mdl-layout--fixed-tabs', _1: config.fixedTabs && hasTabs},
-																		_1: {ctor: '[]'}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									})),
-							_1: {
-								ctor: '::',
-								_0: drawerIsVisible ? _elm_lang$core$Maybe$Just(
-									A2(
-										_elm_lang$html$Html_Events$on,
-										'keydown',
-										A2(
-											_elm_lang$core$Json_Decode$map,
-											function (_p32) {
-												return lift(
-													function (key) {
-														return _elm_lang$core$Native_Utils.eq(key, 27) ? _debois$elm_mdl$Material_Layout$ToggleDrawer : _debois$elm_mdl$Material_Layout$NOP;
-													}(_p32));
-											},
-											_elm_lang$html$Html_Events$keyCode))) : _elm_lang$core$Maybe$Nothing,
-								_1: {ctor: '[]'}
-							}
-						}),
-					{
-						ctor: '::',
-						_0: hasHeader ? _elm_lang$core$Maybe$Just(
-							A2(
-								F2(
-									function (v0, v1) {
-										return {ctor: '_Tuple2', _0: v0, _1: v1};
-									}),
-								'elm-mdl-header',
-								A4(
-									_debois$elm_mdl$Material_Layout$headerView,
-									lift,
-									config,
-									model,
-									{ctor: '_Tuple3', _0: headerDrawerButton, _1: _p36, _2: tabsElems}))) : _elm_lang$core$Maybe$Nothing,
-						_1: {
-							ctor: '::',
-							_0: (!hasDrawer) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
-								{
-									ctor: '_Tuple2',
-									_0: 'elm-mdl-drawer',
-									_1: A3(_debois$elm_mdl$Material_Layout$drawerView, lift, drawerIsVisible, _p35)
-								}),
-							_1: {
-								ctor: '::',
-								_0: (!hasDrawer) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
-									{
-										ctor: '_Tuple2',
-										_0: 'elm-mdl-obfuscator',
-										_1: A2(_debois$elm_mdl$Material_Layout$obfuscator, lift, drawerIsVisible)
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$core$Maybe$map,
-										F2(
-											function (v0, v1) {
-												return {ctor: '_Tuple2', _0: v0, _1: v1};
-											})('elm-drawer-button'),
-										contentDrawerButton),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$core$Maybe$Just(
-											A2(
-												F2(
-													function (v0, v1) {
-														return {ctor: '_Tuple2', _0: v0, _1: v1};
-													}),
-												_elm_lang$core$Basics$toString(config.selectedTab),
-												A3(
-													_debois$elm_mdl$Material_Options$styled,
-													_elm_lang$html$Html$main_,
-													{
-														ctor: '::',
-														_0: _debois$elm_mdl$Material_Options$id(_debois$elm_mdl$Material_Layout$mainId),
-														_1: {
-															ctor: '::',
-															_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__content'),
-															_1: {
-																ctor: '::',
-																_0: A2(
-																	_debois$elm_mdl$Material_Options$when,
-																	_elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Scrolling) && config.fixedHeader,
-																	A2(_debois$elm_mdl$Material_Options$css, 'overflow-y', 'visible')),
-																_1: {
-																	ctor: '::',
-																	_0: A2(
-																		_debois$elm_mdl$Material_Options$when,
-																		_elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Scrolling) && config.fixedHeader,
-																		A2(_debois$elm_mdl$Material_Options$css, 'overflow-x', 'visible')),
-																	_1: {
-																		ctor: '::',
-																		_0: A2(
-																			_debois$elm_mdl$Material_Options$when,
-																			_elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Scrolling) && config.fixedHeader,
-																			A2(_debois$elm_mdl$Material_Options$css, 'overflow', 'visible')),
-																		_1: {
-																			ctor: '::',
-																			_0: A2(
-																				_debois$elm_mdl$Material_Options$when,
-																				_debois$elm_mdl$Material_Layout$isWaterfall(config.mode),
-																				function (_p33) {
-																					return _debois$elm_mdl$Material_Options_Internal$attribute(
-																						A2(_elm_lang$html$Html_Events$on, 'scroll', _p33));
-																				}(
-																					A2(
-																						_elm_lang$core$Json_Decode$map,
-																						function (_p34) {
-																							return lift(
-																								A2(_debois$elm_mdl$Material_Layout$ScrollPane, config.fixedHeader, _p34));
-																						},
-																						_debois$elm_dom$DOM$target(_debois$elm_dom$DOM$scrollTop)))),
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																}
-															}
-														}
-													},
-													_p29.main))),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}),
-				_1: {ctor: '[]'}
-			});
-	});
-var _debois$elm_mdl$Material_Layout$render = A3(_debois$elm_mdl$Material_Component$render1, _debois$elm_mdl$Material_Layout$get, _debois$elm_mdl$Material_Layout$view, _debois$elm_mdl$Material_Component$LayoutMsg);
-
 var _debois$elm_mdl$Material_Button$_p0 = A3(
 	_debois$elm_mdl$Material_Component$indexed,
 	function (_) {
@@ -12060,6 +10830,35 @@ var _debois$elm_mdl$Material_Button$Config = F2(
 	function (a, b) {
 		return {ripple: a, link: b};
 	});
+
+var _debois$elm_mdl$Material_Icon$view = F2(
+	function (name, options) {
+		return A3(
+			_debois$elm_mdl$Material_Options$styled,
+			_elm_lang$html$Html$i,
+			{
+				ctor: '::',
+				_0: _debois$elm_mdl$Material_Options$cs('material-icons'),
+				_1: options
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(name),
+				_1: {ctor: '[]'}
+			});
+	});
+var _debois$elm_mdl$Material_Icon$i = function (name) {
+	return A2(
+		_debois$elm_mdl$Material_Icon$view,
+		name,
+		{ctor: '[]'});
+};
+var _debois$elm_mdl$Material_Icon$size48 = A2(_debois$elm_mdl$Material_Options$css, 'font-size', '48px');
+var _debois$elm_mdl$Material_Icon$size36 = A2(_debois$elm_mdl$Material_Options$css, 'font-size', '36px');
+var _debois$elm_mdl$Material_Icon$size24 = A2(_debois$elm_mdl$Material_Options$css, 'font-size', '24px');
+var _debois$elm_mdl$Material_Icon$size18 = A2(_debois$elm_mdl$Material_Options$css, 'font-size', '18px');
+var _debois$elm_mdl$Material_Icon$defaultConfig = {};
+var _debois$elm_mdl$Material_Icon$Config = {};
 
 var _debois$elm_mdl$Material_Textfield$update = F3(
 	function (_p0, action, model) {
@@ -13917,6 +12716,1207 @@ var _debois$elm_mdl$Material_Snackbar$add = F2(
 			A2(_debois$elm_mdl$Material_Snackbar$enqueue, contents, model));
 	});
 
+var _elm_lang$html$Html_Keyed$node = _elm_lang$virtual_dom$VirtualDom$keyedNode;
+var _elm_lang$html$Html_Keyed$ol = _elm_lang$html$Html_Keyed$node('ol');
+var _elm_lang$html$Html_Keyed$ul = _elm_lang$html$Html_Keyed$node('ul');
+
+var _elm_lang$window$Native_Window = function()
+{
+
+var size = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)	{
+	callback(_elm_lang$core$Native_Scheduler.succeed({
+		width: window.innerWidth,
+		height: window.innerHeight
+	}));
+});
+
+return {
+	size: size
+};
+
+}();
+var _elm_lang$window$Window_ops = _elm_lang$window$Window_ops || {};
+_elm_lang$window$Window_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p0) {
+				return task2;
+			},
+			task1);
+	});
+var _elm_lang$window$Window$onSelfMsg = F3(
+	function (router, dimensions, state) {
+		var _p1 = state;
+		if (_p1.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (_p2) {
+				var _p3 = _p2;
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					_p3._0(dimensions));
+			};
+			return A2(
+				_elm_lang$window$Window_ops['&>'],
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p1._0.subs)),
+				_elm_lang$core$Task$succeed(state));
+		}
+	});
+var _elm_lang$window$Window$init = _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
+var _elm_lang$window$Window$size = _elm_lang$window$Native_Window.size;
+var _elm_lang$window$Window$width = A2(
+	_elm_lang$core$Task$map,
+	function (_) {
+		return _.width;
+	},
+	_elm_lang$window$Window$size);
+var _elm_lang$window$Window$height = A2(
+	_elm_lang$core$Task$map,
+	function (_) {
+		return _.height;
+	},
+	_elm_lang$window$Window$size);
+var _elm_lang$window$Window$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var _p4 = {ctor: '_Tuple2', _0: oldState, _1: newSubs};
+		if (_p4._0.ctor === 'Nothing') {
+			if (_p4._1.ctor === '[]') {
+				return _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
+			} else {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (pid) {
+						return _elm_lang$core$Task$succeed(
+							_elm_lang$core$Maybe$Just(
+								{subs: newSubs, pid: pid}));
+					},
+					_elm_lang$core$Process$spawn(
+						A3(
+							_elm_lang$dom$Dom_LowLevel$onWindow,
+							'resize',
+							_elm_lang$core$Json_Decode$succeed(
+								{ctor: '_Tuple0'}),
+							function (_p5) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									_elm_lang$core$Platform$sendToSelf(router),
+									_elm_lang$window$Window$size);
+							})));
+			}
+		} else {
+			if (_p4._1.ctor === '[]') {
+				return A2(
+					_elm_lang$window$Window_ops['&>'],
+					_elm_lang$core$Process$kill(_p4._0._0.pid),
+					_elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing));
+			} else {
+				return _elm_lang$core$Task$succeed(
+					_elm_lang$core$Maybe$Just(
+						{subs: newSubs, pid: _p4._0._0.pid}));
+			}
+		}
+	});
+var _elm_lang$window$Window$subscription = _elm_lang$core$Native_Platform.leaf('Window');
+var _elm_lang$window$Window$Size = F2(
+	function (a, b) {
+		return {width: a, height: b};
+	});
+var _elm_lang$window$Window$MySub = function (a) {
+	return {ctor: 'MySub', _0: a};
+};
+var _elm_lang$window$Window$resizes = function (tagger) {
+	return _elm_lang$window$Window$subscription(
+		_elm_lang$window$Window$MySub(tagger));
+};
+var _elm_lang$window$Window$subMap = F2(
+	function (func, _p6) {
+		var _p7 = _p6;
+		return _elm_lang$window$Window$MySub(
+			function (_p8) {
+				return func(
+					_p7._0(_p8));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Window'] = {pkg: 'elm-lang/window', init: _elm_lang$window$Window$init, onEffects: _elm_lang$window$Window$onEffects, onSelfMsg: _elm_lang$window$Window$onSelfMsg, tag: 'sub', subMap: _elm_lang$window$Window$subMap};
+
+var _debois$elm_mdl$Material_Layout$_p0 = {
+	ctor: '_Tuple2',
+	_0: function (_) {
+		return _.layout;
+	},
+	_1: F2(
+		function (x, s) {
+			return _elm_lang$core$Native_Utils.update(
+				s,
+				{layout: x});
+		})
+};
+var _debois$elm_mdl$Material_Layout$get = _debois$elm_mdl$Material_Layout$_p0._0;
+var _debois$elm_mdl$Material_Layout$set = _debois$elm_mdl$Material_Layout$_p0._1;
+var _debois$elm_mdl$Material_Layout$drawerView = F3(
+	function (lift, isVisible, elems) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'mdl-layout__drawer', _1: true},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'is-visible', _1: isVisible},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html_Attributes$attribute,
+						'aria-hidden',
+						isVisible ? 'false' : 'true'),
+					_1: {ctor: '[]'}
+				}
+			},
+			elems);
+	});
+var _debois$elm_mdl$Material_Layout$onKeypressFilterSpaceAndEnter = A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', '\n  (function (evt) {\n     if (evt && evt.type === \"keydown\" && (evt.keyCode === 32 || evt.keyCode === 13)) {\n       evt.preventDefault();\n     }\n   })(window.event);\n  ');
+var _debois$elm_mdl$Material_Layout$toList = function (x) {
+	var _p1 = x;
+	if (_p1.ctor === 'Nothing') {
+		return {ctor: '[]'};
+	} else {
+		return {
+			ctor: '::',
+			_0: _p1._0,
+			_1: {ctor: '[]'}
+		};
+	}
+};
+var _debois$elm_mdl$Material_Layout$isWaterfall = function (mode) {
+	var _p2 = mode;
+	if (_p2.ctor === 'Waterfall') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _debois$elm_mdl$Material_Layout$row = function (styles) {
+	return _debois$elm_mdl$Material_Options$div(
+		{
+			ctor: '::',
+			_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__header-row'),
+			_1: styles
+		});
+};
+var _debois$elm_mdl$Material_Layout$link = F2(
+	function (styles, contents) {
+		return A3(
+			_debois$elm_mdl$Material_Options$styled,
+			_elm_lang$html$Html$a,
+			{
+				ctor: '::',
+				_0: _debois$elm_mdl$Material_Options$cs('mdl-navigation__link'),
+				_1: {
+					ctor: '::',
+					_0: _debois$elm_mdl$Material_Options_Internal$attribute(
+						A2(_elm_lang$html$Html_Attributes$attribute, 'tabindex', '1')),
+					_1: styles
+				}
+			},
+			contents);
+	});
+var _debois$elm_mdl$Material_Layout$href = function (url) {
+	return _debois$elm_mdl$Material_Options$attribute(
+		_elm_lang$html$Html_Attributes$href(url));
+};
+var _debois$elm_mdl$Material_Layout$navigation = F2(
+	function (styles, contents) {
+		return A3(
+			_debois$elm_mdl$Material_Options$styled,
+			_elm_lang$html$Html$nav,
+			{
+				ctor: '::',
+				_0: _debois$elm_mdl$Material_Options$cs('mdl-navigation'),
+				_1: styles
+			},
+			contents);
+	});
+var _debois$elm_mdl$Material_Layout$title = function (styles) {
+	return _debois$elm_mdl$Material_Options$span(
+		{
+			ctor: '::',
+			_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__title'),
+			_1: styles
+		});
+};
+var _debois$elm_mdl$Material_Layout$spacer = A2(
+	_elm_lang$html$Html$div,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('mdl-layout-spacer'),
+		_1: {ctor: '[]'}
+	},
+	{ctor: '[]'});
+var _debois$elm_mdl$Material_Layout$onSelectTab = function (_p3) {
+	return _debois$elm_mdl$Material_Options_Internal$option(
+		F2(
+			function (f, config) {
+				return _elm_lang$core$Native_Utils.update(
+					config,
+					{
+						onSelectTab: _elm_lang$core$Maybe$Just(
+							function (_p4) {
+								return _elm_lang$html$Html_Events$onClick(
+									f(_p4));
+							})
+					});
+			})(_p3));
+};
+var _debois$elm_mdl$Material_Layout$moreTabs = _debois$elm_mdl$Material_Options_Internal$option(
+	function (config) {
+		return _elm_lang$core$Native_Utils.update(
+			config,
+			{moreTabs: true});
+	});
+var _debois$elm_mdl$Material_Layout$selectedTab = function (_p5) {
+	return _debois$elm_mdl$Material_Options_Internal$option(
+		F2(
+			function (k, config) {
+				return _elm_lang$core$Native_Utils.update(
+					config,
+					{selectedTab: k});
+			})(_p5));
+};
+var _debois$elm_mdl$Material_Layout$transparentHeader = _debois$elm_mdl$Material_Options_Internal$option(
+	function (config) {
+		return _elm_lang$core$Native_Utils.update(
+			config,
+			{transparentHeader: true});
+	});
+var _debois$elm_mdl$Material_Layout$rippleTabs = _debois$elm_mdl$Material_Options_Internal$option(
+	function (config) {
+		return _elm_lang$core$Native_Utils.update(
+			config,
+			{rippleTabs: true});
+	});
+var _debois$elm_mdl$Material_Layout$fixedTabs = _debois$elm_mdl$Material_Options_Internal$option(
+	function (config) {
+		return _elm_lang$core$Native_Utils.update(
+			config,
+			{fixedTabs: true});
+	});
+var _debois$elm_mdl$Material_Layout$fixedDrawer = _debois$elm_mdl$Material_Options_Internal$option(
+	function (config) {
+		return _elm_lang$core$Native_Utils.update(
+			config,
+			{fixedDrawer: true});
+	});
+var _debois$elm_mdl$Material_Layout$fixedHeader = _debois$elm_mdl$Material_Options_Internal$option(
+	function (config) {
+		return _elm_lang$core$Native_Utils.update(
+			config,
+			{fixedHeader: true});
+	});
+var _debois$elm_mdl$Material_Layout$mainId = 'elm-mdl-layout-main';
+var _debois$elm_mdl$Material_Layout$setTabsWidth_ = F2(
+	function (width, model) {
+		var x = model.tabScrollState;
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{
+				tabScrollState: _elm_lang$core$Native_Utils.update(
+					x,
+					{
+						width: _elm_lang$core$Maybe$Just(width)
+					})
+			});
+	});
+var _debois$elm_mdl$Material_Layout$setTabsWidth = F2(
+	function (w, container) {
+		return _elm_lang$core$Native_Utils.update(
+			container,
+			{
+				layout: A2(_debois$elm_mdl$Material_Layout$setTabsWidth_, w, container.layout)
+			});
+	});
+var _debois$elm_mdl$Material_Layout$defaultTabScrollState = {canScrollRight: true, canScrollLeft: false, width: _elm_lang$core$Maybe$Nothing};
+var _debois$elm_mdl$Material_Layout$defaultModel = {ripples: _elm_lang$core$Dict$empty, isSmallScreen: false, isCompact: false, isAnimating: false, isScrolled: false, isDrawerOpen: false, tabScrollState: _debois$elm_mdl$Material_Layout$defaultTabScrollState};
+var _debois$elm_mdl$Material_Layout$TabScrollState = F3(
+	function (a, b, c) {
+		return {canScrollLeft: a, canScrollRight: b, width: c};
+	});
+var _debois$elm_mdl$Material_Layout$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {ripples: a, isSmallScreen: b, isCompact: c, isAnimating: d, isScrolled: e, isDrawerOpen: f, tabScrollState: g};
+	});
+var _debois$elm_mdl$Material_Layout$Config = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {fixedHeader: a, fixedDrawer: b, fixedTabs: c, rippleTabs: d, mode: e, selectedTab: f, onSelectTab: g, transparentHeader: h, moreTabs: i};
+	});
+var _debois$elm_mdl$Material_Layout$Contents = F4(
+	function (a, b, c, d) {
+		return {header: a, drawer: b, tabs: c, main: d};
+	});
+var _debois$elm_mdl$Material_Layout$Ripple = F2(
+	function (a, b) {
+		return {ctor: 'Ripple', _0: a, _1: b};
+	});
+var _debois$elm_mdl$Material_Layout$NOP = {ctor: 'NOP'};
+var _debois$elm_mdl$Material_Layout$TransitionEnd = {ctor: 'TransitionEnd'};
+var _debois$elm_mdl$Material_Layout$TransitionHeader = function (a) {
+	return {ctor: 'TransitionHeader', _0: a};
+};
+var _debois$elm_mdl$Material_Layout$update_ = F3(
+	function (f, action, model) {
+		update_:
+		while (true) {
+			var _p6 = action;
+			switch (_p6.ctor) {
+				case 'NOP':
+					return _elm_lang$core$Maybe$Nothing;
+				case 'Resize':
+					var _p7 = _p6._0;
+					var tabScrollState = A2(
+						_elm_lang$core$Maybe$withDefault,
+						model.tabScrollState,
+						A2(
+							_elm_lang$core$Maybe$map,
+							function (tabsWidth) {
+								var tabScrollState = model.tabScrollState;
+								return _elm_lang$core$Native_Utils.update(
+									tabScrollState,
+									{
+										canScrollRight: _elm_lang$core$Native_Utils.cmp(tabsWidth + (2 * 56), _p7) > 0
+									});
+							},
+							model.tabScrollState.width));
+					var isSmall = _elm_lang$core$Native_Utils.cmp(1024, _p7) > -1;
+					return (_elm_lang$core$Native_Utils.eq(isSmall, model.isSmallScreen) && _elm_lang$core$Native_Utils.eq(tabScrollState.canScrollRight, model.tabScrollState.canScrollRight)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+						_debois$elm_mdl$Material_Helpers$pure(
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{isSmallScreen: isSmall, isDrawerOpen: (!isSmall) && model.isDrawerOpen, tabScrollState: tabScrollState})));
+				case 'ToggleDrawer':
+					return _elm_lang$core$Maybe$Just(
+						_debois$elm_mdl$Material_Helpers$pure(
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{isDrawerOpen: !model.isDrawerOpen})));
+				case 'Ripple':
+					var _p9 = _p6._0;
+					return _elm_lang$core$Maybe$Just(
+						A2(
+							_debois$elm_mdl$Material_Helpers$map2nd,
+							_elm_lang$core$Platform_Cmd$map(
+								function (_p8) {
+									return f(
+										A2(_debois$elm_mdl$Material_Layout$Ripple, _p9, _p8));
+								}),
+							A2(
+								_debois$elm_mdl$Material_Helpers$map1st,
+								function (ripple_) {
+									return _elm_lang$core$Native_Utils.update(
+										model,
+										{
+											ripples: A3(_elm_lang$core$Dict$insert, _p9, ripple_, model.ripples)
+										});
+								},
+								A2(
+									_debois$elm_mdl$Material_Ripple$update,
+									_p6._1,
+									A2(
+										_elm_lang$core$Maybe$withDefault,
+										_debois$elm_mdl$Material_Ripple$model,
+										A2(_elm_lang$core$Dict$get, _p9, model.ripples))))));
+				case 'ScrollTab':
+					var _p10 = _p6._0;
+					return (!_elm_lang$core$Native_Utils.eq(model.tabScrollState, _p10)) ? _elm_lang$core$Maybe$Just(
+						_debois$elm_mdl$Material_Helpers$pure(
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{tabScrollState: _p10}))) : _elm_lang$core$Maybe$Nothing;
+				case 'ScrollPane':
+					var isScrolled = _elm_lang$core$Native_Utils.cmp(0.0, _p6._1) < 0;
+					if (!_elm_lang$core$Native_Utils.eq(isScrolled, model.isScrolled)) {
+						var _v3 = f,
+							_v4 = _debois$elm_mdl$Material_Layout$TransitionHeader(
+							{toCompact: isScrolled, fixedHeader: _p6._0}),
+							_v5 = _elm_lang$core$Native_Utils.update(
+							model,
+							{isScrolled: isScrolled});
+						f = _v3;
+						action = _v4;
+						model = _v5;
+						continue update_;
+					} else {
+						return _elm_lang$core$Maybe$Nothing;
+					}
+				case 'TransitionHeader':
+					return (!model.isAnimating) ? _elm_lang$core$Maybe$Just(
+						{
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{isCompact: _p6._0.toCompact, isAnimating: (!model.isSmallScreen) || _p6._0.fixedHeader}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						}) : _elm_lang$core$Maybe$Nothing;
+				default:
+					return _elm_lang$core$Maybe$Just(
+						_debois$elm_mdl$Material_Helpers$pure(
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{isAnimating: false})));
+			}
+		}
+	});
+var _debois$elm_mdl$Material_Layout$update = F2(
+	function (msg, model) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			{ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none},
+			A3(_debois$elm_mdl$Material_Layout$update_, _elm_lang$core$Basics$identity, msg, model));
+	});
+var _debois$elm_mdl$Material_Layout$react = F3(
+	function (lift, msg, store) {
+		var _p11 = A3(
+			_debois$elm_mdl$Material_Layout$update_,
+			lift,
+			msg,
+			_debois$elm_mdl$Material_Layout$get(store));
+		if ((_p11.ctor === 'Just') && (_p11._0.ctor === '_Tuple2')) {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Maybe$Just(
+					A2(_debois$elm_mdl$Material_Layout$set, _p11._0._0, store)),
+				_1: _p11._0._1
+			};
+		} else {
+			return {ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _elm_lang$core$Platform_Cmd$none};
+		}
+	});
+var _debois$elm_mdl$Material_Layout$ScrollPane = F2(
+	function (a, b) {
+		return {ctor: 'ScrollPane', _0: a, _1: b};
+	});
+var _debois$elm_mdl$Material_Layout$ScrollTab = function (a) {
+	return {ctor: 'ScrollTab', _0: a};
+};
+var _debois$elm_mdl$Material_Layout$Resize = function (a) {
+	return {ctor: 'Resize', _0: a};
+};
+var _debois$elm_mdl$Material_Layout$init = function () {
+	var measureScreenSize = A2(_elm_lang$core$Task$perform, _debois$elm_mdl$Material_Layout$Resize, _elm_lang$window$Window$width);
+	return {ctor: '_Tuple2', _0: _debois$elm_mdl$Material_Layout$defaultModel, _1: measureScreenSize};
+}();
+var _debois$elm_mdl$Material_Layout$sub0 = function (lift) {
+	return A2(
+		_elm_lang$core$Platform_Cmd$map,
+		function (_p12) {
+			return lift(
+				_debois$elm_mdl$Material_Component$LayoutMsg(_p12));
+		},
+		_elm_lang$core$Tuple$second(_debois$elm_mdl$Material_Layout$init));
+};
+var _debois$elm_mdl$Material_Layout$subscriptions = function (model) {
+	return _elm_lang$window$Window$resizes(
+		function (_p13) {
+			return _debois$elm_mdl$Material_Layout$Resize(
+				function (_) {
+					return _.width;
+				}(_p13));
+		});
+};
+var _debois$elm_mdl$Material_Layout$subs = function (lift) {
+	return function (_p14) {
+		return A2(
+			_elm_lang$core$Platform_Sub$map,
+			function (_p15) {
+				return lift(
+					_debois$elm_mdl$Material_Component$LayoutMsg(_p15));
+			},
+			_debois$elm_mdl$Material_Layout$subscriptions(
+				_debois$elm_mdl$Material_Layout$get(_p14)));
+	};
+};
+var _debois$elm_mdl$Material_Layout$ToggleDrawer = {ctor: 'ToggleDrawer'};
+var _debois$elm_mdl$Material_Layout$drawerButton = F2(
+	function (lift, isVisible) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$classList(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'mdl-layout__drawer-button', _1: true},
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html_Attributes$attribute,
+								'aria-expanded',
+								isVisible ? 'true' : 'false'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$tabindex(1),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(
+										lift(_debois$elm_mdl$Material_Layout$ToggleDrawer)),
+									_1: {
+										ctor: '::',
+										_0: A3(
+											_elm_lang$html$Html_Events$onWithOptions,
+											'keydown',
+											{stopPropagation: false, preventDefault: false},
+											A2(
+												_elm_lang$core$Json_Decode$map,
+												function (_p16) {
+													return lift(
+														function (key) {
+															var _p17 = key;
+															switch (_p17) {
+																case 32:
+																	return _debois$elm_mdl$Material_Layout$ToggleDrawer;
+																case 13:
+																	return _debois$elm_mdl$Material_Layout$ToggleDrawer;
+																default:
+																	return _debois$elm_mdl$Material_Layout$NOP;
+															}
+														}(_p16));
+												},
+												_elm_lang$html$Html_Events$keyCode)),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Icon$i('menu'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _debois$elm_mdl$Material_Layout$obfuscator = F2(
+	function (lift, isVisible) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'mdl-layout__obfuscator', _1: true},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'is-visible', _1: isVisible},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						lift(_debois$elm_mdl$Material_Layout$ToggleDrawer)),
+					_1: {ctor: '[]'}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _debois$elm_mdl$Material_Layout$toggleDrawer = function (lift) {
+	return function (_p18) {
+		return lift(
+			_debois$elm_mdl$Material_Component$LayoutMsg(_p18));
+	}(_debois$elm_mdl$Material_Layout$ToggleDrawer);
+};
+var _debois$elm_mdl$Material_Layout$Waterfall = function (a) {
+	return {ctor: 'Waterfall', _0: a};
+};
+var _debois$elm_mdl$Material_Layout$waterfall = function (_p19) {
+	return _debois$elm_mdl$Material_Options_Internal$option(
+		F2(
+			function (b, config) {
+				return _elm_lang$core$Native_Utils.update(
+					config,
+					{
+						mode: _debois$elm_mdl$Material_Layout$Waterfall(b)
+					});
+			})(_p19));
+};
+var _debois$elm_mdl$Material_Layout$Scrolling = {ctor: 'Scrolling'};
+var _debois$elm_mdl$Material_Layout$scrolling = _debois$elm_mdl$Material_Options_Internal$option(
+	function (config) {
+		return _elm_lang$core$Native_Utils.update(
+			config,
+			{mode: _debois$elm_mdl$Material_Layout$Scrolling});
+	});
+var _debois$elm_mdl$Material_Layout$Seamed = {ctor: 'Seamed'};
+var _debois$elm_mdl$Material_Layout$seamed = _debois$elm_mdl$Material_Options_Internal$option(
+	function (config) {
+		return _elm_lang$core$Native_Utils.update(
+			config,
+			{mode: _debois$elm_mdl$Material_Layout$Seamed});
+	});
+var _debois$elm_mdl$Material_Layout$Standard = {ctor: 'Standard'};
+var _debois$elm_mdl$Material_Layout$defaultConfig = {fixedHeader: false, fixedDrawer: false, fixedTabs: false, rippleTabs: true, mode: _debois$elm_mdl$Material_Layout$Standard, onSelectTab: _elm_lang$core$Maybe$Nothing, selectedTab: -1, moreTabs: false, transparentHeader: false};
+var _debois$elm_mdl$Material_Layout$headerView = F4(
+	function (lift, config, model, _p20) {
+		var _p21 = _p20;
+		var mode = function () {
+			var _p22 = config.mode;
+			switch (_p22.ctor) {
+				case 'Standard':
+					return _debois$elm_mdl$Material_Options$nop;
+				case 'Scrolling':
+					return _debois$elm_mdl$Material_Options$cs('mdl-layout__header--scroll');
+				case 'Seamed':
+					return _debois$elm_mdl$Material_Options$cs('mdl-layout__header--seamed');
+				default:
+					if (_p22._0 === true) {
+						return _debois$elm_mdl$Material_Options$cs('mdl-layout__header--waterfall mdl-layout__header--waterfall-hide-top');
+					} else {
+						return _debois$elm_mdl$Material_Options$cs('mdl-layout__header--waterfall');
+					}
+			}
+		}();
+		return A3(
+			_debois$elm_mdl$Material_Options$styled,
+			_elm_lang$html$Html$header,
+			{
+				ctor: '::',
+				_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__header'),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_debois$elm_mdl$Material_Options$when,
+						_elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Standard) || (_debois$elm_mdl$Material_Layout$isWaterfall(config.mode) && model.isCompact),
+						_debois$elm_mdl$Material_Options$cs('is-casting-shadow')),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_debois$elm_mdl$Material_Options$when,
+							model.isAnimating,
+							_debois$elm_mdl$Material_Options$cs('is-animating')),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_debois$elm_mdl$Material_Options$when,
+								model.isCompact,
+								_debois$elm_mdl$Material_Options$cs('is-compact')),
+							_1: {
+								ctor: '::',
+								_0: mode,
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_debois$elm_mdl$Material_Options$when,
+										config.transparentHeader,
+										_debois$elm_mdl$Material_Options$cs('mdl-layout__header--transparent')),
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Options$onClick(
+											lift(
+												_debois$elm_mdl$Material_Layout$TransitionHeader(
+													{toCompact: false, fixedHeader: config.fixedHeader}))),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_debois$elm_mdl$Material_Options$on,
+												'transitionend',
+												_elm_lang$core$Json_Decode$succeed(
+													lift(_debois$elm_mdl$Material_Layout$TransitionEnd))),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			A2(
+				_elm_lang$core$List$concatMap,
+				function (x) {
+					return x;
+				},
+				{
+					ctor: '::',
+					_0: _debois$elm_mdl$Material_Layout$toList(_p21._0),
+					_1: {
+						ctor: '::',
+						_0: _p21._1,
+						_1: {
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Layout$toList(_p21._2),
+							_1: {ctor: '[]'}
+						}
+					}
+				}));
+	});
+var _debois$elm_mdl$Material_Layout$Right = {ctor: 'Right'};
+var _debois$elm_mdl$Material_Layout$Left = {ctor: 'Left'};
+var _debois$elm_mdl$Material_Layout$tabsView = F4(
+	function (lift, config, model, _p23) {
+		var _p24 = _p23;
+		var _p27 = _p24._1;
+		var chevron = F2(
+			function (direction, offset) {
+				var dir = function () {
+					var _p25 = direction;
+					if (_p25.ctor === 'Left') {
+						return 'left';
+					} else {
+						return 'right';
+					}
+				}();
+				return A3(
+					_debois$elm_mdl$Material_Options$styled,
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__tab-bar-button'),
+						_1: {
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Options$cs(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'mdl-layout__tab-bar-',
+									A2(_elm_lang$core$Basics_ops['++'], dir, '-button'))),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_debois$elm_mdl$Material_Options$when,
+									(_elm_lang$core$Native_Utils.eq(direction, _debois$elm_mdl$Material_Layout$Left) && model.tabScrollState.canScrollLeft) || (_elm_lang$core$Native_Utils.eq(direction, _debois$elm_mdl$Material_Layout$Right) && model.tabScrollState.canScrollRight),
+									_debois$elm_mdl$Material_Options$cs('is-active')),
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Options$many(_p27),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_debois$elm_mdl$Material_Icon$view,
+							A2(_elm_lang$core$Basics_ops['++'], 'chevron_', dir),
+							{
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Icon$size24,
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Options_Internal$attribute(
+										A2(
+											_elm_lang$html$Html_Attributes$attribute,
+											'onclick',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												'document.getElementsByClassName(\'mdl-layout__tab-bar\')[0].scrollLeft += ',
+												_elm_lang$core$Basics$toString(offset)))),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					});
+			});
+		return A2(
+			_debois$elm_mdl$Material_Options$div,
+			{
+				ctor: '::',
+				_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__tab-bar-container'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(chevron, _debois$elm_mdl$Material_Layout$Left, -100),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_debois$elm_mdl$Material_Options$div,
+						{
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__tab-bar'),
+							_1: {
+								ctor: '::',
+								_0: A2(_debois$elm_mdl$Material_Options$css, 'position', 'relative'),
+								_1: {
+									ctor: '::',
+									_0: A2(_debois$elm_mdl$Material_Options$css, 'scroll-behavior', 'smooth'),
+									_1: {
+										ctor: '::',
+										_0: config.rippleTabs ? _debois$elm_mdl$Material_Options$many(
+											{
+												ctor: '::',
+												_0: _debois$elm_mdl$Material_Options$cs('mdl-js-ripple-effect'),
+												_1: {
+													ctor: '::',
+													_0: _debois$elm_mdl$Material_Options$cs('mds-js-ripple-effect--ignore-events'),
+													_1: {ctor: '[]'}
+												}
+											}) : _debois$elm_mdl$Material_Options$nop,
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Standard) ? _debois$elm_mdl$Material_Options$cs('is-casting-shadow') : _debois$elm_mdl$Material_Options$nop,
+											_1: {
+												ctor: '::',
+												_0: _debois$elm_mdl$Material_Options$many(_p27),
+												_1: {
+													ctor: '::',
+													_0: _debois$elm_mdl$Material_Options_Internal$attribute(
+														A2(
+															_elm_lang$html$Html_Events$on,
+															'scroll',
+															_debois$elm_dom$DOM$target(
+																A4(
+																	_elm_lang$core$Json_Decode$map3,
+																	F3(
+																		function (scrollWidth, clientWidth, scrollLeft) {
+																			return lift(
+																				_debois$elm_mdl$Material_Layout$ScrollTab(
+																					{
+																						canScrollLeft: _elm_lang$core$Native_Utils.cmp(scrollLeft, 0) > 0,
+																						canScrollRight: _elm_lang$core$Native_Utils.cmp(scrollWidth - clientWidth, scrollLeft + 1) > 0,
+																						width: _elm_lang$core$Maybe$Just(scrollWidth)
+																					}));
+																		}),
+																	A2(_elm_lang$core$Json_Decode$field, 'scrollWidth', _elm_lang$core$Json_Decode$float),
+																	A2(_elm_lang$core$Json_Decode$field, 'clientWidth', _elm_lang$core$Json_Decode$float),
+																	A2(_elm_lang$core$Json_Decode$field, 'scrollLeft', _elm_lang$core$Json_Decode$float))))),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						},
+						A2(
+							_elm_lang$core$List$indexedMap,
+							F2(
+								function (tabIndex, tab) {
+									return A3(
+										_debois$elm_mdl$Material_Helpers$filter,
+										_elm_lang$html$Html$a,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$classList(
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'mdl-layout__tab', _1: true},
+													_1: {
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'is-active',
+															_1: _elm_lang$core$Native_Utils.eq(tabIndex, config.selectedTab)
+														},
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$core$Maybe$withDefault,
+													_debois$elm_mdl$Material_Helpers$noAttr,
+													A2(
+														_elm_lang$core$Maybe$map,
+														F2(
+															function (x, y) {
+																return y(x);
+															})(tabIndex),
+														config.onSelectTab)),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$core$Maybe$Just(tab),
+											_1: {
+												ctor: '::',
+												_0: config.rippleTabs ? _elm_lang$core$Maybe$Just(
+													A2(
+														_elm_lang$html$Html$map,
+														function (_p26) {
+															return lift(
+																A2(_debois$elm_mdl$Material_Layout$Ripple, tabIndex, _p26));
+														},
+														A2(
+															_debois$elm_mdl$Material_Ripple$view,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('mdl-layout__tab-ripple-container'),
+																_1: {ctor: '[]'}
+															},
+															A2(
+																_elm_lang$core$Maybe$withDefault,
+																_debois$elm_mdl$Material_Ripple$model,
+																A2(_elm_lang$core$Dict$get, tabIndex, model.ripples))))) : _elm_lang$core$Maybe$Nothing,
+												_1: {ctor: '[]'}
+											}
+										});
+								}),
+							_p24._0)),
+					_1: {
+						ctor: '::',
+						_0: A2(chevron, _debois$elm_mdl$Material_Layout$Right, 100),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _debois$elm_mdl$Material_Layout$view = F4(
+	function (lift, model, options, _p28) {
+		var _p29 = _p28;
+		var _p37 = _p29.tabs;
+		var _p36 = _p29.header;
+		var _p35 = _p29.drawer;
+		var hasDrawer = !_elm_lang$core$Native_Utils.eq(
+			_p35,
+			{ctor: '[]'});
+		var hasTabs = !_elm_lang$core$List$isEmpty(
+			_elm_lang$core$Tuple$first(_p37));
+		var hasHeader = hasTabs || (!_elm_lang$core$List$isEmpty(_p36));
+		var summary = A2(_debois$elm_mdl$Material_Options_Internal$collect, _debois$elm_mdl$Material_Layout$defaultConfig, options);
+		var config = summary.config;
+		var drawerIsFixed = config.fixedDrawer && (!model.isSmallScreen);
+		var drawerIsVisible = model.isDrawerOpen && (!drawerIsFixed);
+		var _p30 = function () {
+			var _p31 = {ctor: '_Tuple3', _0: _p35, _1: _p36, _2: config.fixedHeader};
+			if ((_p31.ctor === '_Tuple3') && (_p31._0.ctor === '::')) {
+				if ((_p31._1.ctor === '::') && (_p31._2 === true)) {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Maybe$Nothing,
+						_1: _elm_lang$core$Maybe$Just(
+							A2(_debois$elm_mdl$Material_Layout$drawerButton, lift, drawerIsVisible))
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Maybe$Just(
+							A2(_debois$elm_mdl$Material_Layout$drawerButton, lift, drawerIsVisible)),
+						_1: _elm_lang$core$Maybe$Nothing
+					};
+				}
+			} else {
+				return {ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _elm_lang$core$Maybe$Nothing};
+			}
+		}();
+		var contentDrawerButton = _p30._0;
+		var headerDrawerButton = _p30._1;
+		var tabsElems = (!hasTabs) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+			A4(_debois$elm_mdl$Material_Layout$tabsView, lift, config, model, _p37));
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'mdl-layout__container', _1: true},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'has-scrolling-header',
+								_1: _elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Scrolling)
+							},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A3(
+					_debois$elm_mdl$Material_Helpers$filter,
+					_elm_lang$html$Html_Keyed$node('div'),
+					A2(
+						_elm_lang$core$List$filterMap,
+						_elm_lang$core$Basics$identity,
+						{
+							ctor: '::',
+							_0: _elm_lang$core$Maybe$Just(
+								_elm_lang$html$Html_Attributes$classList(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'mdl-layout ', _1: true},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'is-upgraded', _1: true},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'is-small-screen', _1: model.isSmallScreen},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'has-drawer', _1: hasDrawer},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'has-tabs', _1: hasTabs},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'mdl-js-layout', _1: true},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'mdl-layout--fixed-drawer', _1: config.fixedDrawer && hasDrawer},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'mdl-layout--fixed-header', _1: config.fixedHeader && hasHeader},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: 'mdl-layout--fixed-tabs', _1: config.fixedTabs && hasTabs},
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									})),
+							_1: {
+								ctor: '::',
+								_0: drawerIsVisible ? _elm_lang$core$Maybe$Just(
+									A2(
+										_elm_lang$html$Html_Events$on,
+										'keydown',
+										A2(
+											_elm_lang$core$Json_Decode$map,
+											function (_p32) {
+												return lift(
+													function (key) {
+														return _elm_lang$core$Native_Utils.eq(key, 27) ? _debois$elm_mdl$Material_Layout$ToggleDrawer : _debois$elm_mdl$Material_Layout$NOP;
+													}(_p32));
+											},
+											_elm_lang$html$Html_Events$keyCode))) : _elm_lang$core$Maybe$Nothing,
+								_1: {ctor: '[]'}
+							}
+						}),
+					{
+						ctor: '::',
+						_0: hasHeader ? _elm_lang$core$Maybe$Just(
+							A2(
+								F2(
+									function (v0, v1) {
+										return {ctor: '_Tuple2', _0: v0, _1: v1};
+									}),
+								'elm-mdl-header',
+								A4(
+									_debois$elm_mdl$Material_Layout$headerView,
+									lift,
+									config,
+									model,
+									{ctor: '_Tuple3', _0: headerDrawerButton, _1: _p36, _2: tabsElems}))) : _elm_lang$core$Maybe$Nothing,
+						_1: {
+							ctor: '::',
+							_0: (!hasDrawer) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+								{
+									ctor: '_Tuple2',
+									_0: 'elm-mdl-drawer',
+									_1: A3(_debois$elm_mdl$Material_Layout$drawerView, lift, drawerIsVisible, _p35)
+								}),
+							_1: {
+								ctor: '::',
+								_0: (!hasDrawer) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+									{
+										ctor: '_Tuple2',
+										_0: 'elm-mdl-obfuscator',
+										_1: A2(_debois$elm_mdl$Material_Layout$obfuscator, lift, drawerIsVisible)
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$core$Maybe$map,
+										F2(
+											function (v0, v1) {
+												return {ctor: '_Tuple2', _0: v0, _1: v1};
+											})('elm-drawer-button'),
+										contentDrawerButton),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$core$Maybe$Just(
+											A2(
+												F2(
+													function (v0, v1) {
+														return {ctor: '_Tuple2', _0: v0, _1: v1};
+													}),
+												_elm_lang$core$Basics$toString(config.selectedTab),
+												A3(
+													_debois$elm_mdl$Material_Options$styled,
+													_elm_lang$html$Html$main_,
+													{
+														ctor: '::',
+														_0: _debois$elm_mdl$Material_Options$id(_debois$elm_mdl$Material_Layout$mainId),
+														_1: {
+															ctor: '::',
+															_0: _debois$elm_mdl$Material_Options$cs('mdl-layout__content'),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_debois$elm_mdl$Material_Options$when,
+																	_elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Scrolling) && config.fixedHeader,
+																	A2(_debois$elm_mdl$Material_Options$css, 'overflow-y', 'visible')),
+																_1: {
+																	ctor: '::',
+																	_0: A2(
+																		_debois$elm_mdl$Material_Options$when,
+																		_elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Scrolling) && config.fixedHeader,
+																		A2(_debois$elm_mdl$Material_Options$css, 'overflow-x', 'visible')),
+																	_1: {
+																		ctor: '::',
+																		_0: A2(
+																			_debois$elm_mdl$Material_Options$when,
+																			_elm_lang$core$Native_Utils.eq(config.mode, _debois$elm_mdl$Material_Layout$Scrolling) && config.fixedHeader,
+																			A2(_debois$elm_mdl$Material_Options$css, 'overflow', 'visible')),
+																		_1: {
+																			ctor: '::',
+																			_0: A2(
+																				_debois$elm_mdl$Material_Options$when,
+																				_debois$elm_mdl$Material_Layout$isWaterfall(config.mode),
+																				function (_p33) {
+																					return _debois$elm_mdl$Material_Options_Internal$attribute(
+																						A2(_elm_lang$html$Html_Events$on, 'scroll', _p33));
+																				}(
+																					A2(
+																						_elm_lang$core$Json_Decode$map,
+																						function (_p34) {
+																							return lift(
+																								A2(_debois$elm_mdl$Material_Layout$ScrollPane, config.fixedHeader, _p34));
+																						},
+																						_debois$elm_dom$DOM$target(_debois$elm_dom$DOM$scrollTop)))),
+																			_1: {ctor: '[]'}
+																		}
+																	}
+																}
+															}
+														}
+													},
+													_p29.main))),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _debois$elm_mdl$Material_Layout$render = A3(_debois$elm_mdl$Material_Component$render1, _debois$elm_mdl$Material_Layout$get, _debois$elm_mdl$Material_Layout$view, _debois$elm_mdl$Material_Component$LayoutMsg);
+
 var _debois$elm_mdl$Material_Toggles$group = function (_p0) {
 	return _debois$elm_mdl$Material_Options$attribute(
 		_elm_lang$html$Html_Attributes$name(_p0));
@@ -15011,13 +15011,17 @@ var _debois$elm_mdl$Material$Model = F8(
 		return {button: a, textfield: b, menu: c, snackbar: d, layout: e, toggles: f, tooltip: g, tabs: h};
 	});
 
-var _darrensiegel$elm_chess_client$Data_Type$Game = F4(
-	function (a, b, c, d) {
-		return {ui: a, players: b, board: c, history: d};
+var _darrensiegel$elm_chess_client$Data_Type$Game = F3(
+	function (a, b, c) {
+		return {ui: a, chess: b, players: c};
 	});
-var _darrensiegel$elm_chess_client$Data_Type$Piece = F4(
-	function (a, b, c, d) {
-		return {position: a, color: b, role: c, moved: d};
+var _darrensiegel$elm_chess_client$Data_Type$Chess = F2(
+	function (a, b) {
+		return {board: a, history: b};
+	});
+var _darrensiegel$elm_chess_client$Data_Type$Piece = F5(
+	function (a, b, c, d, e) {
+		return {position: a, color: b, role: c, ellapsed: d, path: e};
 	});
 var _darrensiegel$elm_chess_client$Data_Type$Square = F4(
 	function (a, b, c, d) {
@@ -15027,9 +15031,9 @@ var _darrensiegel$elm_chess_client$Data_Type$Selection = F2(
 	function (a, b) {
 		return {location: a, piece: b};
 	});
-var _darrensiegel$elm_chess_client$Data_Type$Move = F4(
-	function (a, b, c, d) {
-		return {start: a, end: b, piece: c, capture: d};
+var _darrensiegel$elm_chess_client$Data_Type$Move = F5(
+	function (a, b, c, d, e) {
+		return {start: a, end: b, piece: c, capture: d, enPassant: e};
 	});
 var _darrensiegel$elm_chess_client$Data_Type$Player = F4(
 	function (a, b, c, d) {
@@ -15071,6 +15075,185 @@ var _darrensiegel$elm_chess_client$Data_Type$Click = function (a) {
 	return {ctor: 'Click', _0: a};
 };
 
+var _elm_community$maybe_extra$Maybe_Extra$foldrValues = F2(
+	function (item, list) {
+		var _p0 = item;
+		if (_p0.ctor === 'Nothing') {
+			return list;
+		} else {
+			return {ctor: '::', _0: _p0._0, _1: list};
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$values = A2(
+	_elm_lang$core$List$foldr,
+	_elm_community$maybe_extra$Maybe_Extra$foldrValues,
+	{ctor: '[]'});
+var _elm_community$maybe_extra$Maybe_Extra$filter = F2(
+	function (f, m) {
+		var _p1 = A2(_elm_lang$core$Maybe$map, f, m);
+		if ((_p1.ctor === 'Just') && (_p1._0 === true)) {
+			return m;
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$traverseArray = function (f) {
+	var step = F2(
+		function (e, acc) {
+			var _p2 = f(e);
+			if (_p2.ctor === 'Nothing') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				return A2(
+					_elm_lang$core$Maybe$map,
+					_elm_lang$core$Array$push(_p2._0),
+					acc);
+			}
+		});
+	return A2(
+		_elm_lang$core$Array$foldl,
+		step,
+		_elm_lang$core$Maybe$Just(_elm_lang$core$Array$empty));
+};
+var _elm_community$maybe_extra$Maybe_Extra$combineArray = _elm_community$maybe_extra$Maybe_Extra$traverseArray(_elm_lang$core$Basics$identity);
+var _elm_community$maybe_extra$Maybe_Extra$traverse = function (f) {
+	var step = F2(
+		function (e, acc) {
+			var _p3 = f(e);
+			if (_p3.ctor === 'Nothing') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				return A2(
+					_elm_lang$core$Maybe$map,
+					F2(
+						function (x, y) {
+							return {ctor: '::', _0: x, _1: y};
+						})(_p3._0),
+					acc);
+			}
+		});
+	return A2(
+		_elm_lang$core$List$foldr,
+		step,
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}));
+};
+var _elm_community$maybe_extra$Maybe_Extra$combine = _elm_community$maybe_extra$Maybe_Extra$traverse(_elm_lang$core$Basics$identity);
+var _elm_community$maybe_extra$Maybe_Extra$toArray = function (m) {
+	var _p4 = m;
+	if (_p4.ctor === 'Nothing') {
+		return _elm_lang$core$Array$empty;
+	} else {
+		return A2(_elm_lang$core$Array$repeat, 1, _p4._0);
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$toList = function (m) {
+	var _p5 = m;
+	if (_p5.ctor === 'Nothing') {
+		return {ctor: '[]'};
+	} else {
+		return {
+			ctor: '::',
+			_0: _p5._0,
+			_1: {ctor: '[]'}
+		};
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$orElse = F2(
+	function (ma, mb) {
+		var _p6 = mb;
+		if (_p6.ctor === 'Nothing') {
+			return ma;
+		} else {
+			return mb;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$orElseLazy = F2(
+	function (fma, mb) {
+		var _p7 = mb;
+		if (_p7.ctor === 'Nothing') {
+			return fma(
+				{ctor: '_Tuple0'});
+		} else {
+			return mb;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$orLazy = F2(
+	function (ma, fmb) {
+		var _p8 = ma;
+		if (_p8.ctor === 'Nothing') {
+			return fmb(
+				{ctor: '_Tuple0'});
+		} else {
+			return ma;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$or = F2(
+	function (ma, mb) {
+		var _p9 = ma;
+		if (_p9.ctor === 'Nothing') {
+			return mb;
+		} else {
+			return ma;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$prev = _elm_lang$core$Maybe$map2(_elm_lang$core$Basics$always);
+var _elm_community$maybe_extra$Maybe_Extra$next = _elm_lang$core$Maybe$map2(
+	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
+var _elm_community$maybe_extra$Maybe_Extra$andMap = _elm_lang$core$Maybe$map2(
+	F2(
+		function (x, y) {
+			return y(x);
+		}));
+var _elm_community$maybe_extra$Maybe_Extra$unpack = F3(
+	function (d, f, m) {
+		var _p10 = m;
+		if (_p10.ctor === 'Nothing') {
+			return d(
+				{ctor: '_Tuple0'});
+		} else {
+			return f(_p10._0);
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$unwrap = F3(
+	function (d, f, m) {
+		var _p11 = m;
+		if (_p11.ctor === 'Nothing') {
+			return d;
+		} else {
+			return f(_p11._0);
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$isJust = function (m) {
+	var _p12 = m;
+	if (_p12.ctor === 'Nothing') {
+		return false;
+	} else {
+		return true;
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$isNothing = function (m) {
+	var _p13 = m;
+	if (_p13.ctor === 'Nothing') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$join = function (mx) {
+	var _p14 = mx;
+	if (_p14.ctor === 'Just') {
+		return _p14._0;
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra_ops = _elm_community$maybe_extra$Maybe_Extra_ops || {};
+_elm_community$maybe_extra$Maybe_Extra_ops['?'] = F2(
+	function (mx, x) {
+		return A2(_elm_lang$core$Maybe$withDefault, x, mx);
+	});
+
 var _darrensiegel$elm_chess_client$Data_Tool$idlePlayer = function (color) {
 	return A4(
 		_darrensiegel$elm_chess_client$Data_Type$Player,
@@ -15083,10 +15266,16 @@ var _darrensiegel$elm_chess_client$Data_Tool$idlePlayer = function (color) {
 		{ctor: '[]'});
 };
 var _darrensiegel$elm_chess_client$Data_Tool$zeroPs = {x: 0, y: 0};
-var _darrensiegel$elm_chess_client$Data_Tool$nullPiece = A4(_darrensiegel$elm_chess_client$Data_Type$Piece, _darrensiegel$elm_chess_client$Data_Tool$zeroPs, _darrensiegel$elm_chess_client$Data_Type$Black, _darrensiegel$elm_chess_client$Data_Type$Zebra, false);
+var _darrensiegel$elm_chess_client$Data_Tool$nullPiece = A5(
+	_darrensiegel$elm_chess_client$Data_Type$Piece,
+	_darrensiegel$elm_chess_client$Data_Tool$zeroPs,
+	_darrensiegel$elm_chess_client$Data_Type$Black,
+	_darrensiegel$elm_chess_client$Data_Type$Zebra,
+	0,
+	{ctor: '[]'});
 var _darrensiegel$elm_chess_client$Data_Tool$zeroLoc = A2(_chendrix$elm_matrix$Matrix$loc, 0, 0);
 var _darrensiegel$elm_chess_client$Data_Tool$emptySquare = A4(_darrensiegel$elm_chess_client$Data_Type$Square, _darrensiegel$elm_chess_client$Data_Tool$zeroLoc, _elm_lang$core$Maybe$Nothing, false, false);
-var _darrensiegel$elm_chess_client$Data_Tool$noMove = A4(_darrensiegel$elm_chess_client$Data_Type$Move, _darrensiegel$elm_chess_client$Data_Tool$zeroLoc, _darrensiegel$elm_chess_client$Data_Tool$zeroLoc, _darrensiegel$elm_chess_client$Data_Tool$nullPiece, _elm_lang$core$Maybe$Nothing);
+var _darrensiegel$elm_chess_client$Data_Tool$noMove = A5(_darrensiegel$elm_chess_client$Data_Type$Move, _darrensiegel$elm_chess_client$Data_Tool$zeroLoc, _darrensiegel$elm_chess_client$Data_Tool$zeroLoc, _darrensiegel$elm_chess_client$Data_Tool$nullPiece, _elm_lang$core$Maybe$Nothing, false);
 var _darrensiegel$elm_chess_client$Data_Tool$px = function (value) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -15104,9 +15293,27 @@ var _darrensiegel$elm_chess_client$Data_Tool$pos = F2(
 	function (x_, y_) {
 		return {x: x_, y: y_};
 	});
-var _darrensiegel$elm_chess_client$Data_Tool$swap = function (_p2) {
-	var _p3 = _p2;
-	return {ctor: '_Tuple2', _0: _p3._1, _1: _p3._0};
+var _darrensiegel$elm_chess_client$Data_Tool$foldl1 = F2(
+	function (f, xs) {
+		var mf = F2(
+			function (x, m) {
+				return _elm_lang$core$Maybe$Just(
+					function () {
+						var _p2 = m;
+						if (_p2.ctor === 'Nothing') {
+							return x;
+						} else {
+							return A2(f, _p2._0, x);
+						}
+					}());
+			});
+		return A3(_elm_lang$core$List$foldl, mf, _elm_lang$core$Maybe$Nothing, xs);
+	});
+var _darrensiegel$elm_chess_client$Data_Tool$last = _darrensiegel$elm_chess_client$Data_Tool$foldl1(
+	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
+var _darrensiegel$elm_chess_client$Data_Tool$swap = function (_p3) {
+	var _p4 = _p3;
+	return {ctor: '_Tuple2', _0: _p4._1, _1: _p4._0};
 };
 var _darrensiegel$elm_chess_client$Data_Tool$snd = _elm_lang$core$Tuple$second;
 var _darrensiegel$elm_chess_client$Data_Tool$fst = _elm_lang$core$Tuple$first;
@@ -15312,20 +15519,30 @@ var _darrensiegel$elm_chess_client$Model_FEN$toPiece = F2(
 	function (ch, lc) {
 		var role = _darrensiegel$elm_chess_client$Model_FEN$charFigMap(ch);
 		var black = function (rl) {
-			return A4(
+			return A5(
 				_darrensiegel$elm_chess_client$Data_Type$Piece,
 				_darrensiegel$elm_chess_client$Data_Tool$toBoardPosition(lc),
 				_darrensiegel$elm_chess_client$Data_Type$Black,
 				rl,
-				false);
+				0,
+				{
+					ctor: '::',
+					_0: lc,
+					_1: {ctor: '[]'}
+				});
 		};
 		var white = function (rl) {
-			return A4(
+			return A5(
 				_darrensiegel$elm_chess_client$Data_Type$Piece,
 				_darrensiegel$elm_chess_client$Data_Tool$toBoardPosition(lc),
 				_darrensiegel$elm_chess_client$Data_Type$White,
 				rl,
-				false);
+				0,
+				{
+					ctor: '::',
+					_0: lc,
+					_1: {ctor: '[]'}
+				});
 		};
 		return _elm_lang$core$Char$isUpper(ch) ? white(role) : black(role);
 	});
@@ -15389,8 +15606,9 @@ var _darrensiegel$elm_chess_client$Model_FEN$parsePieces = function (s) {
 			_darrensiegel$elm_chess_client$Data_Tool$boardside,
 			A2(_elm_lang$core$String$split, '/', s)));
 };
+var _darrensiegel$elm_chess_client$Model_FEN$enPassantBoard = 'rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/RNBQKBNR w KQkq a6 0 1';
+var _darrensiegel$elm_chess_client$Model_FEN$initialBoard = A2(_elm_lang$core$Basics_ops['++'], _darrensiegel$elm_chess_client$Model_FEN$enPassantBoard, ' w KQkq - 0 1');
 var _darrensiegel$elm_chess_client$Model_FEN$initialPieces = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
-var _darrensiegel$elm_chess_client$Model_FEN$initialBoard = A2(_elm_lang$core$Basics_ops['++'], _darrensiegel$elm_chess_client$Model_FEN$initialPieces, ' w KQkq - 0 1');
 var _darrensiegel$elm_chess_client$Model_FEN$fromFEN = function (fen) {
 	var parts = _elm_lang$core$Array$fromList(
 		A2(_elm_lang$core$String$split, ' ', fen));
@@ -15401,196 +15619,57 @@ var _darrensiegel$elm_chess_client$Model_FEN$fromFEN = function (fen) {
 			A2(_elm_lang$core$Array$get, 0, parts)));
 };
 
-var _elm_community$maybe_extra$Maybe_Extra$foldrValues = F2(
-	function (item, list) {
-		var _p0 = item;
-		if (_p0.ctor === 'Nothing') {
-			return list;
-		} else {
-			return {ctor: '::', _0: _p0._0, _1: list};
-		}
+var _darrensiegel$elm_chess_client$Model_Rules$applyRule2 = F4(
+	function (board, location, _p0, moves) {
+		var _p1 = _p0;
+		var _p2 = _p1._0;
+		var target = A2(
+			_chendrix$elm_matrix$Matrix$get,
+			_p2(location),
+			board);
+		return A2(
+			_elm_community$maybe_extra$Maybe_Extra_ops['?'],
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (square) {
+					return _p1._1(square) ? {ctor: '::', _0: _p2, _1: moves} : moves;
+				},
+				target),
+			moves);
 	});
-var _elm_community$maybe_extra$Maybe_Extra$values = A2(
-	_elm_lang$core$List$foldr,
-	_elm_community$maybe_extra$Maybe_Extra$foldrValues,
-	{ctor: '[]'});
-var _elm_community$maybe_extra$Maybe_Extra$filter = F2(
-	function (f, m) {
-		var _p1 = A2(_elm_lang$core$Maybe$map, f, m);
-		if ((_p1.ctor === 'Just') && (_p1._0 === true)) {
-			return m;
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
+var _darrensiegel$elm_chess_client$Model_Rules$applyRule = F4(
+	function (board, piece, _p3, moves) {
+		var _p4 = _p3;
+		var _p6 = _p4._0;
+		var _p5 = _darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(piece.position);
+		var location = _p5;
+		var y = _p5._0;
+		var x = _p5._1;
+		var target = A2(
+			_chendrix$elm_matrix$Matrix$get,
+			_p6(location),
+			board);
+		return A2(
+			_elm_community$maybe_extra$Maybe_Extra_ops['?'],
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (square) {
+					return _p4._1(square) ? {ctor: '::', _0: _p6, _1: moves} : moves;
+				},
+				target),
+			moves);
 	});
-var _elm_community$maybe_extra$Maybe_Extra$traverseArray = function (f) {
-	var step = F2(
-		function (e, acc) {
-			var _p2 = f(e);
-			if (_p2.ctor === 'Nothing') {
-				return _elm_lang$core$Maybe$Nothing;
-			} else {
-				return A2(
-					_elm_lang$core$Maybe$map,
-					_elm_lang$core$Array$push(_p2._0),
-					acc);
-			}
-		});
-	return A2(
-		_elm_lang$core$Array$foldl,
-		step,
-		_elm_lang$core$Maybe$Just(_elm_lang$core$Array$empty));
-};
-var _elm_community$maybe_extra$Maybe_Extra$combineArray = _elm_community$maybe_extra$Maybe_Extra$traverseArray(_elm_lang$core$Basics$identity);
-var _elm_community$maybe_extra$Maybe_Extra$traverse = function (f) {
-	var step = F2(
-		function (e, acc) {
-			var _p3 = f(e);
-			if (_p3.ctor === 'Nothing') {
-				return _elm_lang$core$Maybe$Nothing;
-			} else {
-				return A2(
-					_elm_lang$core$Maybe$map,
-					F2(
-						function (x, y) {
-							return {ctor: '::', _0: x, _1: y};
-						})(_p3._0),
-					acc);
-			}
-		});
-	return A2(
-		_elm_lang$core$List$foldr,
-		step,
-		_elm_lang$core$Maybe$Just(
-			{ctor: '[]'}));
-};
-var _elm_community$maybe_extra$Maybe_Extra$combine = _elm_community$maybe_extra$Maybe_Extra$traverse(_elm_lang$core$Basics$identity);
-var _elm_community$maybe_extra$Maybe_Extra$toArray = function (m) {
-	var _p4 = m;
-	if (_p4.ctor === 'Nothing') {
-		return _elm_lang$core$Array$empty;
-	} else {
-		return A2(_elm_lang$core$Array$repeat, 1, _p4._0);
-	}
-};
-var _elm_community$maybe_extra$Maybe_Extra$toList = function (m) {
-	var _p5 = m;
-	if (_p5.ctor === 'Nothing') {
-		return {ctor: '[]'};
-	} else {
-		return {
-			ctor: '::',
-			_0: _p5._0,
-			_1: {ctor: '[]'}
-		};
-	}
-};
-var _elm_community$maybe_extra$Maybe_Extra$orElse = F2(
-	function (ma, mb) {
-		var _p6 = mb;
-		if (_p6.ctor === 'Nothing') {
-			return ma;
-		} else {
-			return mb;
-		}
-	});
-var _elm_community$maybe_extra$Maybe_Extra$orElseLazy = F2(
-	function (fma, mb) {
-		var _p7 = mb;
-		if (_p7.ctor === 'Nothing') {
-			return fma(
-				{ctor: '_Tuple0'});
-		} else {
-			return mb;
-		}
-	});
-var _elm_community$maybe_extra$Maybe_Extra$orLazy = F2(
-	function (ma, fmb) {
-		var _p8 = ma;
-		if (_p8.ctor === 'Nothing') {
-			return fmb(
-				{ctor: '_Tuple0'});
-		} else {
-			return ma;
-		}
-	});
-var _elm_community$maybe_extra$Maybe_Extra$or = F2(
-	function (ma, mb) {
-		var _p9 = ma;
-		if (_p9.ctor === 'Nothing') {
-			return mb;
-		} else {
-			return ma;
-		}
-	});
-var _elm_community$maybe_extra$Maybe_Extra$prev = _elm_lang$core$Maybe$map2(_elm_lang$core$Basics$always);
-var _elm_community$maybe_extra$Maybe_Extra$next = _elm_lang$core$Maybe$map2(
-	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
-var _elm_community$maybe_extra$Maybe_Extra$andMap = _elm_lang$core$Maybe$map2(
-	F2(
-		function (x, y) {
-			return y(x);
-		}));
-var _elm_community$maybe_extra$Maybe_Extra$unpack = F3(
-	function (d, f, m) {
-		var _p10 = m;
-		if (_p10.ctor === 'Nothing') {
-			return d(
-				{ctor: '_Tuple0'});
-		} else {
-			return f(_p10._0);
-		}
-	});
-var _elm_community$maybe_extra$Maybe_Extra$unwrap = F3(
-	function (d, f, m) {
-		var _p11 = m;
-		if (_p11.ctor === 'Nothing') {
-			return d;
-		} else {
-			return f(_p11._0);
-		}
-	});
-var _elm_community$maybe_extra$Maybe_Extra$isJust = function (m) {
-	var _p12 = m;
-	if (_p12.ctor === 'Nothing') {
-		return false;
-	} else {
-		return true;
-	}
-};
-var _elm_community$maybe_extra$Maybe_Extra$isNothing = function (m) {
-	var _p13 = m;
-	if (_p13.ctor === 'Nothing') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _elm_community$maybe_extra$Maybe_Extra$join = function (mx) {
-	var _p14 = mx;
-	if (_p14.ctor === 'Just') {
-		return _p14._0;
-	} else {
-		return _elm_lang$core$Maybe$Nothing;
-	}
-};
-var _elm_community$maybe_extra$Maybe_Extra_ops = _elm_community$maybe_extra$Maybe_Extra_ops || {};
-_elm_community$maybe_extra$Maybe_Extra_ops['?'] = F2(
-	function (mx, x) {
-		return A2(_elm_lang$core$Maybe$withDefault, x, mx);
-	});
-
 var _darrensiegel$elm_chess_client$Model_Rules$findSquare = F2(
 	function (lc, board) {
 		var sq = A2(_chendrix$elm_matrix$Matrix$get, lc, board);
-		var _p0 = sq;
-		if (_p0.ctor === 'Just') {
-			return _p0._0;
+		var _p7 = sq;
+		if (_p7.ctor === 'Just') {
+			return _p7._0;
 		} else {
 			return _darrensiegel$elm_chess_client$Data_Tool$emptySquare;
 		}
 	});
-var _darrensiegel$elm_chess_client$Model_Rules$filterSameColor = F3(
+var _darrensiegel$elm_chess_client$Model_Rules$distinct = F3(
 	function (piece, board, locations) {
 		return A2(
 			_elm_lang$core$List$filterMap,
@@ -15600,9 +15679,9 @@ var _darrensiegel$elm_chess_client$Model_Rules$filterSameColor = F3(
 					move(
 						_darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(piece.position)),
 					board);
-				var _p1 = sq.piece;
-				if (_p1.ctor === 'Just') {
-					return _elm_lang$core$Native_Utils.eq(_p1._0.color, piece.color) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(move);
+				var _p8 = sq.piece;
+				if (_p8.ctor === 'Just') {
+					return _elm_lang$core$Native_Utils.eq(_p8._0.color, piece.color) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(move);
 				} else {
 					return _elm_lang$core$Maybe$Just(move);
 				}
@@ -15610,63 +15689,155 @@ var _darrensiegel$elm_chess_client$Model_Rules$filterSameColor = F3(
 			locations);
 	});
 var _darrensiegel$elm_chess_client$Model_Rules$right = F2(
-	function (n, _p2) {
-		var _p3 = _p2;
-		return A2(_chendrix$elm_matrix$Matrix$loc, _p3._0, _p3._1 + n);
+	function (n, _p9) {
+		var _p10 = _p9;
+		return A2(_chendrix$elm_matrix$Matrix$loc, _p10._0, _p10._1 + n);
 	});
 var _darrensiegel$elm_chess_client$Model_Rules$left = F2(
-	function (n, _p4) {
-		var _p5 = _p4;
-		return A2(_chendrix$elm_matrix$Matrix$loc, _p5._0, _p5._1 - n);
+	function (n, _p11) {
+		var _p12 = _p11;
+		return A2(_chendrix$elm_matrix$Matrix$loc, _p12._0, _p12._1 - n);
 	});
 var _darrensiegel$elm_chess_client$Model_Rules$down = F2(
-	function (n, _p6) {
-		var _p7 = _p6;
-		return A2(_chendrix$elm_matrix$Matrix$loc, _p7._0 + n, _p7._1);
+	function (n, _p13) {
+		var _p14 = _p13;
+		return A2(_chendrix$elm_matrix$Matrix$loc, _p14._0 + n, _p14._1);
 	});
 var _darrensiegel$elm_chess_client$Model_Rules$up = F2(
-	function (n, _p8) {
-		var _p9 = _p8;
-		return A2(_chendrix$elm_matrix$Matrix$loc, _p9._0 - n, _p9._1);
+	function (n, _p15) {
+		var _p16 = _p15;
+		return A2(_chendrix$elm_matrix$Matrix$loc, _p16._0 - n, _p16._1);
 	});
-var _darrensiegel$elm_chess_client$Model_Rules$movePawn = F2(
-	function (piece, board) {
+var _darrensiegel$elm_chess_client$Model_Rules$enPassant = F2(
+	function (board, piece) {
+		var if_pawn = function (sq) {
+			var _p17 = sq.piece;
+			if (_p17.ctor === 'Just') {
+				var _p19 = _p17._0;
+				var _p18 = _p19.role;
+				if (_p18.ctor === 'Pawn') {
+					return _elm_lang$core$Native_Utils.eq(_p19.ellapsed, 1);
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		};
+		var enPassantLocation = function () {
+			var _p20 = piece.color;
+			if (_p20.ctor === 'White') {
+				return 3;
+			} else {
+				return 4;
+			}
+		}();
+		var step = function () {
+			var _p21 = piece.color;
+			if (_p21.ctor === 'White') {
+				return _darrensiegel$elm_chess_client$Model_Rules$up;
+			} else {
+				return _darrensiegel$elm_chess_client$Model_Rules$down;
+			}
+		}();
+		var _p22 = A2(
+			_elm_community$maybe_extra$Maybe_Extra_ops['?'],
+			_darrensiegel$elm_chess_client$Data_Tool$last(piece.path),
+			A2(_chendrix$elm_matrix$Matrix$loc, 0, 0));
+		var location = _p22;
+		var y = _p22._0;
+		var x = _p22._1;
+		var checkRule = A2(_darrensiegel$elm_chess_client$Model_Rules$applyRule2, board, location);
+		var if_enPassant = F2(
+			function (dir, sq) {
+				var _p23 = sq.piece;
+				if (_p23.ctor === 'Just') {
+					return false;
+				} else {
+					return _elm_community$maybe_extra$Maybe_Extra$isJust(
+						_elm_lang$core$List$head(
+							A2(
+								checkRule,
+								{
+									ctor: '_Tuple2',
+									_0: dir(1),
+									_1: if_pawn
+								},
+								{ctor: '[]'})));
+				}
+			});
+		var possibleMoves = {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: function (_p24) {
+					return A2(
+						_darrensiegel$elm_chess_client$Model_Rules$left,
+						1,
+						A2(step, 1, _p24));
+				},
+				_1: if_enPassant(_darrensiegel$elm_chess_client$Model_Rules$left)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: function (_p25) {
+						return A2(
+							_darrensiegel$elm_chess_client$Model_Rules$right,
+							1,
+							A2(step, 1, _p25));
+					},
+					_1: if_enPassant(_darrensiegel$elm_chess_client$Model_Rules$right)
+				},
+				_1: {ctor: '[]'}
+			}
+		};
+		return _elm_lang$core$Native_Utils.eq(y, enPassantLocation) ? A3(
+			_elm_lang$core$List$foldl,
+			checkRule,
+			{ctor: '[]'},
+			possibleMoves) : {ctor: '[]'};
+	});
+var _darrensiegel$elm_chess_client$Model_Rules$pawnMoves = F2(
+	function (board, piece) {
 		var if_empty = function (sq) {
-			var _p10 = sq.piece;
-			if (_p10.ctor === 'Just') {
+			var _p26 = sq.piece;
+			if (_p26.ctor === 'Just') {
 				return false;
 			} else {
 				return true;
 			}
 		};
 		var if_occupied = function (sq) {
-			var _p11 = sq.piece;
-			if (_p11.ctor === 'Just') {
+			var _p27 = sq.piece;
+			if (_p27.ctor === 'Just') {
 				return true;
 			} else {
 				return false;
 			}
 		};
 		var startLocation = function () {
-			var _p12 = piece.color;
-			if (_p12.ctor === 'White') {
+			var _p28 = piece.color;
+			if (_p28.ctor === 'White') {
 				return 6;
 			} else {
 				return 1;
 			}
 		}();
 		var step = function () {
-			var _p13 = piece.color;
-			if (_p13.ctor === 'White') {
+			var _p29 = piece.color;
+			if (_p29.ctor === 'White') {
 				return _darrensiegel$elm_chess_client$Model_Rules$up;
 			} else {
 				return _darrensiegel$elm_chess_client$Model_Rules$down;
 			}
 		}();
-		var _p14 = _darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(piece.position);
-		var location = _p14;
-		var y = _p14._0;
-		var x = _p14._1;
+		var checkRule = A2(_darrensiegel$elm_chess_client$Model_Rules$applyRule, board, piece);
+		var _p30 = _darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(piece.position);
+		var location = _p30;
+		var y = _p30._0;
+		var x = _p30._1;
 		var possibleMoves = A2(
 			_elm_lang$core$Basics_ops['++'],
 			_elm_lang$core$Native_Utils.eq(y, startLocation) ? {
@@ -15689,11 +15860,11 @@ var _darrensiegel$elm_chess_client$Model_Rules$movePawn = F2(
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: function (_p15) {
+						_0: function (_p31) {
 							return A2(
 								_darrensiegel$elm_chess_client$Model_Rules$left,
 								1,
-								A2(step, 1, _p15));
+								A2(step, 1, _p31));
 						},
 						_1: if_occupied
 					},
@@ -15701,11 +15872,11 @@ var _darrensiegel$elm_chess_client$Model_Rules$movePawn = F2(
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: function (_p16) {
+							_0: function (_p32) {
 								return A2(
 									_darrensiegel$elm_chess_client$Model_Rules$right,
 									1,
-									A2(step, 1, _p16));
+									A2(step, 1, _p32));
 							},
 							_1: if_occupied
 						},
@@ -15713,29 +15884,17 @@ var _darrensiegel$elm_chess_client$Model_Rules$movePawn = F2(
 					}
 				}
 			});
-		var applyRule = F2(
-			function (_p17, moves) {
-				var _p18 = _p17;
-				var _p19 = _p18._0;
-				var target = A2(
-					_chendrix$elm_matrix$Matrix$get,
-					_p19(location),
-					board);
-				return A2(
-					_elm_community$maybe_extra$Maybe_Extra_ops['?'],
-					A2(
-						_elm_lang$core$Maybe$map,
-						function (square) {
-							return _p18._1(square) ? {ctor: '::', _0: _p19, _1: moves} : moves;
-						},
-						target),
-					moves);
-			});
 		return A3(
 			_elm_lang$core$List$foldl,
-			applyRule,
-			{ctor: '[]'},
+			checkRule,
+			A2(_darrensiegel$elm_chess_client$Model_Rules$enPassant, board, piece),
 			possibleMoves);
+	});
+var _darrensiegel$elm_chess_client$Model_Rules$checkPassant = F2(
+	function (board, piece) {
+		var passante = A2(_darrensiegel$elm_chess_client$Model_Rules$enPassant, board, piece);
+		return _elm_community$maybe_extra$Maybe_Extra$isJust(
+			_elm_lang$core$List$head(passante));
 	});
 var _darrensiegel$elm_chess_client$Model_Rules$diagonals = F2(
 	function (board, point) {
@@ -15753,45 +15912,45 @@ var _darrensiegel$elm_chess_client$Model_Rules$diagonals = F2(
 		var step = A2(
 			_elm_lang$core$List$foldl,
 			F2(
-				function (_p21, _p20) {
-					var _p22 = _p21;
-					var _p23 = _p20;
+				function (_p34, _p33) {
+					var _p35 = _p34;
+					var _p36 = _p33;
 					return A3(
 						_elm_lang$core$List$foldl,
 						F2(
-							function (i, _p24) {
-								var _p25 = _p24;
-								var _p28 = _p25._0;
-								var nextStep = function (_p26) {
+							function (i, _p37) {
+								var _p38 = _p37;
+								var _p41 = _p38._0;
+								var nextStep = function (_p39) {
 									return A2(
-										_p22._1,
+										_p35._1,
 										i,
-										A2(_p22._0, i, _p26));
+										A2(_p35._0, i, _p39));
 								};
-								if (_p25._1) {
+								if (_p38._1) {
 									var blocking = A2(
 										_darrensiegel$elm_chess_client$Model_Rules$findSquare,
 										nextStep(point),
 										board);
-									var _p27 = blocking.piece;
-									if (_p27.ctor === 'Just') {
-										return (!_elm_lang$core$Native_Utils.eq(_p27._0.color, curPiece.color)) ? {
+									var _p40 = blocking.piece;
+									if (_p40.ctor === 'Just') {
+										return (!_elm_lang$core$Native_Utils.eq(_p40._0.color, curPiece.color)) ? {
 											ctor: '_Tuple2',
-											_0: {ctor: '::', _0: nextStep, _1: _p28},
+											_0: {ctor: '::', _0: nextStep, _1: _p41},
 											_1: false
-										} : {ctor: '_Tuple2', _0: _p28, _1: false};
+										} : {ctor: '_Tuple2', _0: _p41, _1: false};
 									} else {
 										return {
 											ctor: '_Tuple2',
-											_0: {ctor: '::', _0: nextStep, _1: _p28},
+											_0: {ctor: '::', _0: nextStep, _1: _p41},
 											_1: true
 										};
 									}
 								} else {
-									return {ctor: '_Tuple2', _0: _p28, _1: false};
+									return {ctor: '_Tuple2', _0: _p41, _1: false};
 								}
 							}),
-						{ctor: '_Tuple2', _0: _p23._0, _1: true},
+						{ctor: '_Tuple2', _0: _p36._0, _1: true},
 						stepRange);
 				}),
 			{
@@ -15835,46 +15994,46 @@ var _darrensiegel$elm_chess_client$Model_Rules$parallels = F2(
 		var step = A2(
 			_elm_lang$core$List$foldl,
 			F2(
-				function (d, _p29) {
-					var _p30 = _p29;
+				function (d, _p42) {
+					var _p43 = _p42;
 					return A3(
 						_elm_lang$core$List$foldl,
 						F2(
-							function (i, _p31) {
-								var _p32 = _p31;
-								var _p34 = _p32._0;
-								if (_p32._1) {
+							function (i, _p44) {
+								var _p45 = _p44;
+								var _p47 = _p45._0;
+								if (_p45._1) {
 									var blocking = A2(
 										_darrensiegel$elm_chess_client$Model_Rules$findSquare,
 										A2(d, i, point),
 										board);
-									var _p33 = blocking.piece;
-									if (_p33.ctor === 'Just') {
-										return (!_elm_lang$core$Native_Utils.eq(_p33._0.color, curPiece.color)) ? {
+									var _p46 = blocking.piece;
+									if (_p46.ctor === 'Just') {
+										return (!_elm_lang$core$Native_Utils.eq(_p46._0.color, curPiece.color)) ? {
 											ctor: '_Tuple2',
 											_0: {
 												ctor: '::',
 												_0: d(i),
-												_1: _p34
+												_1: _p47
 											},
 											_1: false
-										} : {ctor: '_Tuple2', _0: _p34, _1: false};
+										} : {ctor: '_Tuple2', _0: _p47, _1: false};
 									} else {
 										return {
 											ctor: '_Tuple2',
 											_0: {
 												ctor: '::',
 												_0: d(i),
-												_1: _p34
+												_1: _p47
 											},
 											_1: true
 										};
 									}
 								} else {
-									return {ctor: '_Tuple2', _0: _p34, _1: false};
+									return {ctor: '_Tuple2', _0: _p47, _1: false};
 								}
 							}),
-						{ctor: '_Tuple2', _0: _p30._0, _1: true},
+						{ctor: '_Tuple2', _0: _p43._0, _1: true},
 						stepRange);
 				}),
 			{
@@ -15904,15 +16063,21 @@ var _darrensiegel$elm_chess_client$Model_Rules$parallels = F2(
 	});
 var _darrensiegel$elm_chess_client$Model_Rules$pieceMoves = F2(
 	function (piece, board) {
-		var location = _darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(piece.position);
+		var calc = function (f) {
+			return A2(f, board, piece);
+		};
+		var _p48 = _darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(piece.position);
+		var location = _p48;
+		var x = _p48._0;
+		var y = _p48._1;
 		var find = function (f) {
 			return A2(f, board, location);
 		};
-		var getMove = function (role) {
-			var _p35 = role;
-			switch (_p35.ctor) {
+		var moves = function (role) {
+			var _p49 = role;
+			switch (_p49.ctor) {
 				case 'Pawn':
-					return A2(_darrensiegel$elm_chess_client$Model_Rules$movePawn, piece, board);
+					return calc(_darrensiegel$elm_chess_client$Model_Rules$pawnMoves);
 				case 'Bishop':
 					return find(_darrensiegel$elm_chess_client$Model_Rules$diagonals);
 				case 'Rook':
@@ -15925,67 +16090,67 @@ var _darrensiegel$elm_chess_client$Model_Rules$pieceMoves = F2(
 				case 'Knight':
 					return {
 						ctor: '::',
-						_0: function (_p36) {
+						_0: function (_p50) {
 							return A2(
 								_darrensiegel$elm_chess_client$Model_Rules$right,
 								1,
-								A2(_darrensiegel$elm_chess_client$Model_Rules$up, 2, _p36));
+								A2(_darrensiegel$elm_chess_client$Model_Rules$up, 2, _p50));
 						},
 						_1: {
 							ctor: '::',
-							_0: function (_p37) {
+							_0: function (_p51) {
 								return A2(
 									_darrensiegel$elm_chess_client$Model_Rules$left,
 									1,
-									A2(_darrensiegel$elm_chess_client$Model_Rules$up, 2, _p37));
+									A2(_darrensiegel$elm_chess_client$Model_Rules$up, 2, _p51));
 							},
 							_1: {
 								ctor: '::',
-								_0: function (_p38) {
+								_0: function (_p52) {
 									return A2(
 										_darrensiegel$elm_chess_client$Model_Rules$left,
 										1,
-										A2(_darrensiegel$elm_chess_client$Model_Rules$down, 2, _p38));
+										A2(_darrensiegel$elm_chess_client$Model_Rules$down, 2, _p52));
 								},
 								_1: {
 									ctor: '::',
-									_0: function (_p39) {
+									_0: function (_p53) {
 										return A2(
 											_darrensiegel$elm_chess_client$Model_Rules$right,
 											1,
-											A2(_darrensiegel$elm_chess_client$Model_Rules$down, 2, _p39));
+											A2(_darrensiegel$elm_chess_client$Model_Rules$down, 2, _p53));
 									},
 									_1: {
 										ctor: '::',
-										_0: function (_p40) {
+										_0: function (_p54) {
 											return A2(
 												_darrensiegel$elm_chess_client$Model_Rules$up,
 												1,
-												A2(_darrensiegel$elm_chess_client$Model_Rules$left, 2, _p40));
+												A2(_darrensiegel$elm_chess_client$Model_Rules$left, 2, _p54));
 										},
 										_1: {
 											ctor: '::',
-											_0: function (_p41) {
+											_0: function (_p55) {
 												return A2(
 													_darrensiegel$elm_chess_client$Model_Rules$down,
 													1,
-													A2(_darrensiegel$elm_chess_client$Model_Rules$left, 2, _p41));
+													A2(_darrensiegel$elm_chess_client$Model_Rules$left, 2, _p55));
 											},
 											_1: {
 												ctor: '::',
-												_0: function (_p42) {
+												_0: function (_p56) {
 													return A2(
 														_darrensiegel$elm_chess_client$Model_Rules$up,
 														1,
-														A2(_darrensiegel$elm_chess_client$Model_Rules$right, 2, _p42));
+														A2(_darrensiegel$elm_chess_client$Model_Rules$right, 2, _p56));
 												},
 												_1: {
 													ctor: '::',
-													_0: function (_p43) {
+													_0: function (_p57) {
 														return A2(
 															_darrensiegel$elm_chess_client$Model_Rules$down,
 															1,
-															A2(_darrensiegel$elm_chess_client$Model_Rules$right, 2, _p43));
+															A2(_darrensiegel$elm_chess_client$Model_Rules$right, 2, _p57));
 													},
 													_1: {ctor: '[]'}
 												}
@@ -16011,35 +16176,35 @@ var _darrensiegel$elm_chess_client$Model_Rules$pieceMoves = F2(
 									_0: _darrensiegel$elm_chess_client$Model_Rules$right(1),
 									_1: {
 										ctor: '::',
-										_0: function (_p44) {
+										_0: function (_p58) {
 											return A2(
 												_darrensiegel$elm_chess_client$Model_Rules$left,
 												1,
-												A2(_darrensiegel$elm_chess_client$Model_Rules$up, 1, _p44));
+												A2(_darrensiegel$elm_chess_client$Model_Rules$up, 1, _p58));
 										},
 										_1: {
 											ctor: '::',
-											_0: function (_p45) {
+											_0: function (_p59) {
 												return A2(
 													_darrensiegel$elm_chess_client$Model_Rules$right,
 													1,
-													A2(_darrensiegel$elm_chess_client$Model_Rules$up, 1, _p45));
+													A2(_darrensiegel$elm_chess_client$Model_Rules$up, 1, _p59));
 											},
 											_1: {
 												ctor: '::',
-												_0: function (_p46) {
+												_0: function (_p60) {
 													return A2(
 														_darrensiegel$elm_chess_client$Model_Rules$left,
 														1,
-														A2(_darrensiegel$elm_chess_client$Model_Rules$down, 1, _p46));
+														A2(_darrensiegel$elm_chess_client$Model_Rules$down, 1, _p60));
 												},
 												_1: {
 													ctor: '::',
-													_0: function (_p47) {
+													_0: function (_p61) {
 														return A2(
 															_darrensiegel$elm_chess_client$Model_Rules$right,
 															1,
-															A2(_darrensiegel$elm_chess_client$Model_Rules$down, 1, _p47));
+															A2(_darrensiegel$elm_chess_client$Model_Rules$down, 1, _p61));
 													},
 													_1: {ctor: '[]'}
 												}
@@ -16055,10 +16220,10 @@ var _darrensiegel$elm_chess_client$Model_Rules$pieceMoves = F2(
 			}
 		};
 		return A3(
-			_darrensiegel$elm_chess_client$Model_Rules$filterSameColor,
+			_darrensiegel$elm_chess_client$Model_Rules$distinct,
 			piece,
 			board,
-			getMove(piece.role));
+			moves(piece.role));
 	});
 var _darrensiegel$elm_chess_client$Model_Rules$stay = function (l) {
 	return l;
@@ -16113,32 +16278,71 @@ var _darrensiegel$elm_chess_client$Model_Board$add = F2(
 			_chendrix$elm_matrix$Matrix$update,
 			lc,
 			function (s) {
-				return s.valid ? _elm_lang$core$Native_Utils.update(
+				var newPiece = _elm_lang$core$Native_Utils.update(
+					pc,
+					{
+						position: _darrensiegel$elm_chess_client$Data_Tool$toBoardPosition(lc),
+						path: A2(
+							_elm_lang$core$Basics_ops['++'],
+							pc.path,
+							{
+								ctor: '::',
+								_0: lc,
+								_1: {ctor: '[]'}
+							})
+					});
+				var newSquare = _elm_lang$core$Native_Utils.update(
 					s,
 					{
-						piece: _elm_lang$core$Maybe$Just(
-							_elm_lang$core$Native_Utils.update(
-								pc,
-								{
-									position: _darrensiegel$elm_chess_client$Data_Tool$toBoardPosition(lc),
-									moved: true
-								}))
-					}) : s;
+						piece: _elm_lang$core$Maybe$Just(newPiece)
+					});
+				var _p0 = A2(_elm_lang$core$Debug$log, 'adding piece', newPiece);
+				return s.valid ? newSquare : s;
 			},
 			bd);
 	});
 var _darrensiegel$elm_chess_client$Model_Board$remove = F2(
 	function (pc, bd) {
-		return A3(
-			_chendrix$elm_matrix$Matrix$update,
-			_darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(pc.position),
-			function (s) {
-				return _elm_lang$core$Native_Utils.update(
-					s,
-					{piece: _elm_lang$core$Maybe$Nothing, active: true});
-			},
-			bd);
+		var _p1 = A2(_elm_lang$core$Debug$log, 'removing piece', pc);
+		var removePiece = function (s) {
+			return _elm_lang$core$Native_Utils.update(
+				s,
+				{piece: _elm_lang$core$Maybe$Nothing, active: true});
+		};
+		var lastLocation = A2(
+			_elm_community$maybe_extra$Maybe_Extra_ops['?'],
+			_darrensiegel$elm_chess_client$Data_Tool$last(pc.path),
+			_darrensiegel$elm_chess_client$Data_Tool$toLocation(pc.position));
+		return A3(_chendrix$elm_matrix$Matrix$update, lastLocation, removePiece, bd);
 	});
+var _darrensiegel$elm_chess_client$Model_Board$ellapse = function (board) {
+	var calcEllaps = function (p) {
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$List$length(p.path),
+			1) > 0) ? (p.ellapsed + 1) : p.ellapsed;
+	};
+	return A2(
+		_chendrix$elm_matrix$Matrix$map,
+		function (sq) {
+			var _p2 = sq.piece;
+			if (_p2.ctor === 'Just') {
+				var _p3 = _p2._0;
+				return _elm_lang$core$Native_Utils.update(
+					sq,
+					{
+						piece: _elm_lang$core$Maybe$Just(
+							_elm_lang$core$Native_Utils.update(
+								_p3,
+								{
+									ellapsed: calcEllaps(_p3)
+								}))
+					});
+			} else {
+				return sq;
+			}
+		},
+		board);
+};
 var _darrensiegel$elm_chess_client$Model_Board$clear = function (board) {
 	return A2(
 		_chendrix$elm_matrix$Matrix$map,
@@ -16157,7 +16361,8 @@ var _darrensiegel$elm_chess_client$Model_Board$undo = F2(
 var _darrensiegel$elm_chess_client$Model_Board$drop = F2(
 	function (board, piece) {
 		return _darrensiegel$elm_chess_client$Model_Board$clear(
-			A2(_darrensiegel$elm_chess_client$Model_Board$add, piece, board));
+			_darrensiegel$elm_chess_client$Model_Board$ellapse(
+				A2(_darrensiegel$elm_chess_client$Model_Board$add, piece, board)));
 	});
 var _darrensiegel$elm_chess_client$Model_Board$pickup = F2(
 	function (board, piece) {
@@ -16171,12 +16376,233 @@ var _darrensiegel$elm_chess_client$Model_Board$pickup = F2(
 	});
 var _darrensiegel$elm_chess_client$Model_Board$initBoard = _darrensiegel$elm_chess_client$Model_FEN$fromFEN(_darrensiegel$elm_chess_client$Model_FEN$initialBoard);
 
-var _darrensiegel$elm_chess_client$Model_Game$subscriptions = function (_p0) {
-	var _p1 = _p0;
-	var layout = A2(_debois$elm_mdl$Material_Layout$subs, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p1.ui.mdl);
-	var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p1.players);
-	var _p2 = player.action;
-	if (_p2.ctor === 'Moving') {
+var _darrensiegel$elm_chess_client$State_Action$whenMoving = F2(
+	function (change, action) {
+		var _p0 = action;
+		if (_p0.ctor === 'Moving') {
+			return change(_p0._0);
+		} else {
+			return _darrensiegel$elm_chess_client$Data_Type$Idle;
+		}
+	});
+var _darrensiegel$elm_chess_client$State_Action$endMove = F3(
+	function (board, ps, select) {
+		var passante = A2(_darrensiegel$elm_chess_client$Model_Rules$enPassant, board, select.piece);
+		var isPassant = A2(_darrensiegel$elm_chess_client$Model_Rules$checkPassant, board, select.piece);
+		var sourcePiece = function (s) {
+			return _elm_lang$core$Native_Utils.update(
+				s,
+				{position: ps});
+		}(select.piece);
+		var step = function () {
+			var _p1 = select.piece.color;
+			if (_p1.ctor === 'White') {
+				return _darrensiegel$elm_chess_client$Model_Rules$down;
+			} else {
+				return _darrensiegel$elm_chess_client$Model_Rules$up;
+			}
+		}();
+		var destination = _darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(ps);
+		var targetLoc = isPassant ? A2(
+			_elm_community$maybe_extra$Maybe_Extra_ops['?'],
+			_elm_lang$core$List$head(passante),
+			_elm_lang$core$Basics$identity)(select.location) : destination;
+		var target = A2(
+			_elm_community$maybe_extra$Maybe_Extra_ops['?'],
+			A2(_chendrix$elm_matrix$Matrix$get, targetLoc, board),
+			_darrensiegel$elm_chess_client$Data_Tool$emptySquare);
+		var targetPiece = isPassant ? A2(
+			_elm_community$maybe_extra$Maybe_Extra_ops['?'],
+			A2(
+				_chendrix$elm_matrix$Matrix$get,
+				A2(step, 1, targetLoc),
+				board),
+			_darrensiegel$elm_chess_client$Data_Tool$emptySquare).piece : target.piece;
+		return (((!_elm_lang$core$Native_Utils.eq(destination, select.location)) && target.valid) || isPassant) ? _darrensiegel$elm_chess_client$Data_Type$End(
+			A5(_darrensiegel$elm_chess_client$Data_Type$Move, select.location, destination, sourcePiece, targetPiece, isPassant)) : _darrensiegel$elm_chess_client$Data_Type$Undo(select);
+	});
+var _darrensiegel$elm_chess_client$State_Action$updateMoving = F2(
+	function (ps, _p2) {
+		var _p3 = _p2;
+		return _darrensiegel$elm_chess_client$Data_Type$Moving(
+			A2(
+				_darrensiegel$elm_chess_client$Data_Type$Selection,
+				_p3.location,
+				_elm_lang$core$Native_Utils.update(
+					_p3.piece,
+					{position: ps})));
+	});
+var _darrensiegel$elm_chess_client$State_Action$startMoving = F2(
+	function (ps, _p4) {
+		var _p5 = _p4;
+		return _darrensiegel$elm_chess_client$Data_Type$Moving(
+			A2(
+				_darrensiegel$elm_chess_client$Data_Type$Selection,
+				_p5.location,
+				_elm_lang$core$Native_Utils.update(
+					_p5.piece,
+					{position: ps})));
+	});
+var _darrensiegel$elm_chess_client$State_Action$guard = F3(
+	function (player, selection, fn) {
+		return _elm_lang$core$Native_Utils.eq(selection.piece.color, player.color) ? fn(selection) : _darrensiegel$elm_chess_client$Data_Type$Idle;
+	});
+var _darrensiegel$elm_chess_client$State_Action$select = F2(
+	function (board, position) {
+		var locate = function (xy) {
+			return A2(
+				_chendrix$elm_matrix$Matrix$get,
+				_darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(xy),
+				board);
+		};
+		var check = function (square) {
+			var selection = function (piece) {
+				return A2(_darrensiegel$elm_chess_client$Data_Type$Selection, square.location, piece);
+			};
+			return A2(_elm_lang$core$Maybe$map, selection, square.piece);
+		};
+		var selecting = function (_p6) {
+			return _elm_community$maybe_extra$Maybe_Extra$join(
+				A2(
+					_elm_lang$core$Maybe$map,
+					check,
+					locate(_p6)));
+		};
+		return selecting(position);
+	});
+
+var _darrensiegel$elm_chess_client$State_Game$update = F2(
+	function (event, _p0) {
+		var _p1 = _p0;
+		var _p13 = _p1.players;
+		var _p12 = _p1.chess;
+		var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p13);
+		var action = function () {
+			var _p2 = event;
+			switch (_p2.ctor) {
+				case 'Click':
+					var _p3 = _p2._0;
+					return A2(
+						_elm_community$maybe_extra$Maybe_Extra_ops['?'],
+						A2(
+							_elm_lang$core$Maybe$map,
+							function (selection) {
+								return A3(
+									_darrensiegel$elm_chess_client$State_Action$guard,
+									player,
+									selection,
+									_darrensiegel$elm_chess_client$State_Action$startMoving(_p3));
+							},
+							A2(_darrensiegel$elm_chess_client$State_Action$select, _p12.board, _p3)),
+						_darrensiegel$elm_chess_client$Data_Type$Idle);
+				case 'Drag':
+					return A2(
+						_darrensiegel$elm_chess_client$State_Action$whenMoving,
+						_darrensiegel$elm_chess_client$State_Action$updateMoving(_p2._0),
+						player.action);
+				case 'Drop':
+					return A2(
+						_darrensiegel$elm_chess_client$State_Action$whenMoving,
+						A2(_darrensiegel$elm_chess_client$State_Action$endMove, _p12.board, _p2._0),
+						player.action);
+				default:
+					return _darrensiegel$elm_chess_client$Data_Type$Idle;
+			}
+		}();
+		var history = function () {
+			var _p4 = action;
+			if (_p4.ctor === 'End') {
+				return {ctor: '::', _0: _p4._0, _1: _p12.history};
+			} else {
+				return _p12.history;
+			}
+		}();
+		var player_ = _elm_lang$core$Native_Utils.update(
+			player,
+			{action: action});
+		var players_ = function () {
+			var _p5 = action;
+			if (_p5.ctor === 'End') {
+				return {
+					ctor: '_Tuple2',
+					_0: _darrensiegel$elm_chess_client$Data_Tool$snd(_p13),
+					_1: player_
+				};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: player_,
+					_1: _darrensiegel$elm_chess_client$Data_Tool$snd(_p13)
+				};
+			}
+		}();
+		var ui_ = _elm_lang$core$Native_Utils.update(
+			_p1.ui,
+			{
+				turn: A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(
+						_darrensiegel$elm_chess_client$Data_Tool$fst(players_).color),
+					'\'s turn')
+			});
+		var board = function () {
+			var _p6 = action;
+			switch (_p6.ctor) {
+				case 'Moving':
+					var _p7 = player.action;
+					if (_p7.ctor === 'Moving') {
+						return _p12.board;
+					} else {
+						return A2(_darrensiegel$elm_chess_client$Model_Board$pickup, _p12.board, _p6._0.piece);
+					}
+				case 'End':
+					var _p9 = _p6._0;
+					var _p8 = _p9.capture;
+					if (_p8.ctor === 'Just') {
+						var nextMove = A2(_darrensiegel$elm_chess_client$Model_Board$drop, _p12.board, _p9.piece);
+						return _p9.enPassant ? A2(_darrensiegel$elm_chess_client$Model_Board$remove, _p8._0, nextMove) : nextMove;
+					} else {
+						return A2(_darrensiegel$elm_chess_client$Model_Board$drop, _p12.board, _p9.piece);
+					}
+				case 'Undo':
+					return A2(_darrensiegel$elm_chess_client$Model_Board$undo, _p12.board, _p6._0.piece);
+				default:
+					return _p12.board;
+			}
+		}();
+		var game = function (mat_) {
+			return A3(
+				_darrensiegel$elm_chess_client$Data_Type$Game,
+				mat_,
+				A2(_darrensiegel$elm_chess_client$Data_Type$Chess, board, history),
+				players_);
+		};
+		var _p10 = event;
+		if (_p10.ctor === 'Mdl') {
+			var _p11 = A3(_debois$elm_mdl$Material$update, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p10._0, ui_);
+			var mat_ = _p11._0;
+			var sub_ = _p11._1;
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				game(mat_),
+				{
+					ctor: '::',
+					_0: sub_,
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				game(ui_),
+				{ctor: '[]'});
+		}
+	});
+var _darrensiegel$elm_chess_client$State_Game$subs = function (_p14) {
+	var _p15 = _p14;
+	var layout = A2(_debois$elm_mdl$Material_Layout$subs, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p15.ui.mdl);
+	var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p15.players);
+	var _p16 = player.action;
+	if (_p16.ctor === 'Moving') {
 		return _elm_lang$core$Platform_Sub$batch(
 			{
 				ctor: '::',
@@ -16195,204 +16621,31 @@ var _darrensiegel$elm_chess_client$Model_Game$subscriptions = function (_p0) {
 		return layout;
 	}
 };
-var _darrensiegel$elm_chess_client$Model_Game$init = function () {
-	var history = {ctor: '[]'};
+var _darrensiegel$elm_chess_client$State_Game$newGame = function () {
+	var player = _darrensiegel$elm_chess_client$Data_Tool$idlePlayer;
+	var chess = A2(
+		_darrensiegel$elm_chess_client$Data_Type$Chess,
+		_darrensiegel$elm_chess_client$Model_Board$initBoard,
+		{ctor: '[]'});
 	var ui = A2(_darrensiegel$elm_chess_client$Data_Type$UI, _debois$elm_mdl$Material$model, '');
-	var p2 = _darrensiegel$elm_chess_client$Data_Tool$idlePlayer(_darrensiegel$elm_chess_client$Data_Type$Black);
-	var p1 = _darrensiegel$elm_chess_client$Data_Tool$idlePlayer(_darrensiegel$elm_chess_client$Data_Type$White);
-	return A4(
+	var game = A3(
 		_darrensiegel$elm_chess_client$Data_Type$Game,
 		ui,
-		{ctor: '_Tuple2', _0: p1, _1: p2},
-		_darrensiegel$elm_chess_client$Model_Board$initBoard,
-		history);
+		chess,
+		{
+			ctor: '_Tuple2',
+			_0: player(_darrensiegel$elm_chess_client$Data_Type$White),
+			_1: player(_darrensiegel$elm_chess_client$Data_Type$Black)
+		});
+	return A2(
+		_elm_lang$core$Platform_Cmd_ops['!'],
+		game,
+		{
+			ctor: '::',
+			_0: _debois$elm_mdl$Material_Layout$sub0(_darrensiegel$elm_chess_client$Data_Type$Mdl),
+			_1: {ctor: '[]'}
+		});
 }();
-
-var _darrensiegel$elm_chess_client$State_Action$whenMoving = F2(
-	function (change, action) {
-		var _p0 = action;
-		if (_p0.ctor === 'Moving') {
-			return change(_p0._0);
-		} else {
-			return _darrensiegel$elm_chess_client$Data_Type$Idle;
-		}
-	});
-var _darrensiegel$elm_chess_client$State_Action$endMove = F3(
-	function (board, ps, select) {
-		var destination = _darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(ps);
-		var target = A2(
-			_elm_community$maybe_extra$Maybe_Extra_ops['?'],
-			A2(_chendrix$elm_matrix$Matrix$get, destination, board),
-			_darrensiegel$elm_chess_client$Data_Tool$emptySquare);
-		return ((!_elm_lang$core$Native_Utils.eq(destination, select.location)) && target.valid) ? _darrensiegel$elm_chess_client$Data_Type$End(
-			A4(_darrensiegel$elm_chess_client$Data_Type$Move, select.location, destination, select.piece, target.piece)) : _darrensiegel$elm_chess_client$Data_Type$Undo(select);
-	});
-var _darrensiegel$elm_chess_client$State_Action$updateMoving = F2(
-	function (ps, _p1) {
-		var _p2 = _p1;
-		return _darrensiegel$elm_chess_client$Data_Type$Moving(
-			A2(
-				_darrensiegel$elm_chess_client$Data_Type$Selection,
-				_p2.location,
-				_elm_lang$core$Native_Utils.update(
-					_p2.piece,
-					{position: ps})));
-	});
-var _darrensiegel$elm_chess_client$State_Action$startMoving = F2(
-	function (ps, _p3) {
-		var _p4 = _p3;
-		return _darrensiegel$elm_chess_client$Data_Type$Moving(
-			A2(
-				_darrensiegel$elm_chess_client$Data_Type$Selection,
-				_p4.location,
-				_elm_lang$core$Native_Utils.update(
-					_p4.piece,
-					{position: ps})));
-	});
-var _darrensiegel$elm_chess_client$State_Action$guardColor = F3(
-	function (player, selection, doAction) {
-		return _elm_lang$core$Native_Utils.eq(selection.piece.color, player.color) ? doAction(selection) : _darrensiegel$elm_chess_client$Data_Type$Idle;
-	});
-
-var _darrensiegel$elm_chess_client$State_Event$select = F2(
-	function (board, position) {
-		var locate = function (xy) {
-			return A2(
-				_chendrix$elm_matrix$Matrix$get,
-				_darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(xy),
-				board);
-		};
-		var check = function (square) {
-			var selection = function (piece) {
-				return A2(_darrensiegel$elm_chess_client$Data_Type$Selection, square.location, piece);
-			};
-			return A2(_elm_lang$core$Maybe$map, selection, square.piece);
-		};
-		var selecting = function (_p0) {
-			return _elm_community$maybe_extra$Maybe_Extra$join(
-				A2(
-					_elm_lang$core$Maybe$map,
-					check,
-					locate(_p0)));
-		};
-		return selecting(position);
-	});
-var _darrensiegel$elm_chess_client$State_Event$update = F2(
-	function (event, _p1) {
-		var _p2 = _p1;
-		var _p13 = _p2.players;
-		var _p12 = _p2.history;
-		var _p11 = _p2.board;
-		var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p13);
-		var action = function () {
-			var _p3 = event;
-			switch (_p3.ctor) {
-				case 'Click':
-					var _p4 = _p3._0;
-					return A2(
-						_elm_community$maybe_extra$Maybe_Extra_ops['?'],
-						A2(
-							_elm_lang$core$Maybe$map,
-							function (selection) {
-								return A3(
-									_darrensiegel$elm_chess_client$State_Action$guardColor,
-									player,
-									selection,
-									_darrensiegel$elm_chess_client$State_Action$startMoving(_p4));
-							},
-							A2(_darrensiegel$elm_chess_client$State_Event$select, _p11, _p4)),
-						_darrensiegel$elm_chess_client$Data_Type$Idle);
-				case 'Drag':
-					return A2(
-						_darrensiegel$elm_chess_client$State_Action$whenMoving,
-						_darrensiegel$elm_chess_client$State_Action$updateMoving(_p3._0),
-						player.action);
-				case 'Drop':
-					return A2(
-						_darrensiegel$elm_chess_client$State_Action$whenMoving,
-						A2(_darrensiegel$elm_chess_client$State_Action$endMove, _p11, _p3._0),
-						player.action);
-				default:
-					return _darrensiegel$elm_chess_client$Data_Type$Idle;
-			}
-		}();
-		var hist_ = function () {
-			var _p5 = action;
-			if (_p5.ctor === 'End') {
-				return {ctor: '::', _0: _p5._0, _1: _p12};
-			} else {
-				return _p12;
-			}
-		}();
-		var board_ = function () {
-			var _p6 = action;
-			switch (_p6.ctor) {
-				case 'Moving':
-					var _p7 = player.action;
-					if (_p7.ctor === 'Moving') {
-						return _p11;
-					} else {
-						return A2(_darrensiegel$elm_chess_client$Model_Board$pickup, _p11, _p6._0.piece);
-					}
-				case 'End':
-					return A2(_darrensiegel$elm_chess_client$Model_Board$drop, _p11, _p6._0.piece);
-				case 'Undo':
-					return A2(_darrensiegel$elm_chess_client$Model_Board$undo, _p11, _p6._0.piece);
-				default:
-					return _p11;
-			}
-		}();
-		var player_ = _elm_lang$core$Native_Utils.update(
-			player,
-			{action: action});
-		var players_ = function () {
-			var _p8 = action;
-			if (_p8.ctor === 'End') {
-				return {
-					ctor: '_Tuple2',
-					_0: _darrensiegel$elm_chess_client$Data_Tool$snd(_p13),
-					_1: player_
-				};
-			} else {
-				return {
-					ctor: '_Tuple2',
-					_0: player_,
-					_1: _darrensiegel$elm_chess_client$Data_Tool$snd(_p13)
-				};
-			}
-		}();
-		var ui_ = _elm_lang$core$Native_Utils.update(
-			_p2.ui,
-			{
-				turn: A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(
-						_darrensiegel$elm_chess_client$Data_Tool$fst(players_).color),
-					'\'s turn')
-			});
-		var game_ = function (mat_) {
-			return A4(_darrensiegel$elm_chess_client$Data_Type$Game, mat_, players_, board_, hist_);
-		};
-		var _p9 = event;
-		if (_p9.ctor === 'Mdl') {
-			var _p10 = A3(_debois$elm_mdl$Material$update, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p9._0, ui_);
-			var mat_ = _p10._0;
-			var sub_ = _p10._1;
-			return A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				game_(mat_),
-				{
-					ctor: '::',
-					_0: sub_,
-					_1: {ctor: '[]'}
-				});
-		} else {
-			return A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				game_(ui_),
-				{ctor: '[]'});
-		}
-	});
 
 var _elm_lang$lazy$Native_Lazy = function() {
 
@@ -18617,47 +18870,41 @@ var _darrensiegel$elm_chess_client$Model_History$toSAN = function (move) {
 		return _elm_lang$core$String$fromChar(
 			_elm_lang$core$Char$fromCode(x_ + 97));
 	};
-	var _p17 = move.end;
-	var x2 = _p17._0;
-	var y2 = _p17._1;
-	var _p18 = move.start;
-	var y1 = _p18._0;
-	var x1 = _p18._1;
 	var letter = function (p) {
 		var c = _darrensiegel$elm_chess_client$Model_FEN$figCharMap(p.role);
 		var l = _elm_lang$core$Native_Utils.eq(p.color, _darrensiegel$elm_chess_client$Data_Type$White) ? _elm_lang$core$Char$toUpper(c) : c;
 		return _elm_lang$core$String$fromChar(l);
 	};
 	var translate = F2(
-		function (pc, _p19) {
-			var _p20 = _p19;
-			var _p22 = _p20._1;
-			var _p21 = _p20._0;
+		function (pc, _p17) {
+			var _p18 = _p17;
+			var _p20 = _p18._1;
+			var _p19 = _p18._0;
 			return (!_elm_lang$core$Native_Utils.eq(pc.role, _darrensiegel$elm_chess_client$Data_Type$Pawn)) ? A2(
 				_elm_lang$core$Basics_ops['++'],
 				letter(pc),
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					rank(_p21),
-					file(_p22))) : A2(
+					rank(_p19),
+					file(_p20))) : A2(
 				_elm_lang$core$Basics_ops['++'],
-				rank(_p21),
-				file(_p22));
+				rank(_p19),
+				file(_p20));
 		});
-	var _p23 = move.capture;
-	if (_p23.ctor === 'Just') {
+	var _p21 = move.capture;
+	if (_p21.ctor === 'Just') {
 		return A2(
 			_elm_lang$core$Basics_ops['++'],
 			A2(translate, move.piece, move.start),
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				'x',
-				A2(translate, _p23._0, move.end)));
+				A2(translate, _p21._0, move.end)));
 	} else {
 		return A2(translate, move.piece, move.end);
 	}
 };
-var _darrensiegel$elm_chess_client$Model_History$formatHistory = function (_p24) {
+var _darrensiegel$elm_chess_client$Model_History$formatHistory = function (_p22) {
 	return A2(
 		_elm_lang$core$List$map,
 		_elm_lang$core$Basics$uncurry(_darrensiegel$elm_chess_client$Model_History$fullMove),
@@ -18669,14 +18916,14 @@ var _darrensiegel$elm_chess_client$Model_History$formatHistory = function (_p24)
 				}),
 			A2(
 				_elm_lang$core$List$map,
-				function (_p25) {
+				function (_p23) {
 					return A2(
 						_elm_lang$core$Tuple$mapSecond,
 						_darrensiegel$elm_chess_client$Model_History$toSAN,
-						A2(_elm_lang$core$Tuple$mapFirst, _darrensiegel$elm_chess_client$Model_History$toSAN, _p25));
+						A2(_elm_lang$core$Tuple$mapFirst, _darrensiegel$elm_chess_client$Model_History$toSAN, _p23));
 				},
 				_darrensiegel$elm_chess_client$Model_History$toTuples(
-					_elm_lang$core$List$reverse(_p24)))));
+					_elm_lang$core$List$reverse(_p22)))));
 };
 
 var _darrensiegel$elm_chess_client$View_Asset$svgTag = function (s) {
@@ -19002,7 +19249,7 @@ var _darrensiegel$elm_chess_client$View_Main$onMouseDown = A2(
 var _darrensiegel$elm_chess_client$View_Main$r_game = function (_p16) {
 	var _p17 = _p16;
 	var _p19 = _p17.players;
-	var _p18 = _p17.board;
+	var _p18 = _p17.chess;
 	return A3(
 		_elm_lang$html$Html$node,
 		'chess',
@@ -19024,10 +19271,10 @@ var _darrensiegel$elm_chess_client$View_Main$r_game = function (_p16) {
 				_darrensiegel$elm_chess_client$Data_Tool$fst(_p19)),
 			_1: {
 				ctor: '::',
-				_0: _darrensiegel$elm_chess_client$View_Main$r_pieces(_p18),
+				_0: _darrensiegel$elm_chess_client$View_Main$r_pieces(_p18.board),
 				_1: {
 					ctor: '::',
-					_0: _darrensiegel$elm_chess_client$View_Main$r_board(_p18),
+					_0: _darrensiegel$elm_chess_client$View_Main$r_board(_p18.board),
 					_1: {ctor: '[]'}
 				}
 			}
@@ -19037,9 +19284,9 @@ var _darrensiegel$elm_chess_client$View_Main$render = function (_p20) {
 	var _p21 = _p20;
 	var _p24 = _p21.ui;
 	var _p23 = _p21.players;
-	var _p22 = _p21.history;
-	var blackPlayer = A2(_darrensiegel$elm_chess_client$Model_History$getBlack, _p22, _p23);
-	var whitePlayer = A2(_darrensiegel$elm_chess_client$Model_History$getWhite, _p22, _p23);
+	var _p22 = _p21.chess;
+	var blackPlayer = A2(_darrensiegel$elm_chess_client$Model_History$getBlack, _p22.history, _p23);
+	var whitePlayer = A2(_darrensiegel$elm_chess_client$Model_History$getWhite, _p22.history, _p23);
 	return A4(
 		_debois$elm_mdl$Material_Layout$render,
 		_darrensiegel$elm_chess_client$Data_Type$Mdl,
@@ -19146,7 +19393,7 @@ var _darrensiegel$elm_chess_client$View_Main$render = function (_p20) {
 																_1: {ctor: '[]'}
 															});
 													},
-													_darrensiegel$elm_chess_client$Model_History$formatHistory(_p22))),
+													_darrensiegel$elm_chess_client$Model_History$formatHistory(_p22.history))),
 											_1: {ctor: '[]'}
 										}
 									}),
@@ -19175,19 +19422,7 @@ var _darrensiegel$elm_chess_client$View_Main$render = function (_p20) {
 };
 
 var _darrensiegel$elm_chess_client$Chess$main = _elm_lang$html$Html$program(
-	{
-		init: A2(
-			_elm_lang$core$Platform_Cmd_ops['!'],
-			_darrensiegel$elm_chess_client$Model_Game$init,
-			{
-				ctor: '::',
-				_0: _debois$elm_mdl$Material_Layout$sub0(_darrensiegel$elm_chess_client$Data_Type$Mdl),
-				_1: {ctor: '[]'}
-			}),
-		view: _darrensiegel$elm_chess_client$View_Main$render,
-		update: _darrensiegel$elm_chess_client$State_Event$update,
-		subscriptions: _darrensiegel$elm_chess_client$Model_Game$subscriptions
-	})();
+	{init: _darrensiegel$elm_chess_client$State_Game$newGame, view: _darrensiegel$elm_chess_client$View_Main$render, update: _darrensiegel$elm_chess_client$State_Game$update, subscriptions: _darrensiegel$elm_chess_client$State_Game$subs})();
 
 var Elm = {};
 Elm['Chess'] = Elm['Chess'] || {};

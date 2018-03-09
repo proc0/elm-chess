@@ -2,6 +2,7 @@ module Model.Board exposing (..)
 
 import Array exposing (..)
 import Matrix exposing (..)
+import Maybe.Extra as Maebe exposing (..)
 import Debug exposing (..)
 
 import Mouse exposing (..)
@@ -26,6 +27,7 @@ drop : Board -> Piece -> Board
 drop board piece = 
     board
     |> add piece
+    |> ellapse
     |> clear
 
 undo : Board -> Piece -> Board
@@ -33,20 +35,58 @@ undo board piece =
     return piece board 
     |> clear
 
+--logPiece : Piece -> Board -> Board
+--logPiece pc bd =
+--    let _ = log "piece" pc
+--    in bd
+
 clear : Board -> Board
 clear board =
         Matrix.map (\sq -> { sq | valid = False, active = False }) board
 
+ellapse : Board -> Board
+ellapse board =
+    let calcEllaps p =
+            -- if piece has more 
+            -- than initial location
+            if List.length p.path > 1
+            then p.ellapsed + 1 
+            else p.ellapsed         
+    in 
+    board 
+    |> Matrix.map (\sq -> 
+        case sq.piece of
+            Just pc -> 
+                { sq 
+                | piece = Just ({ pc | ellapsed = calcEllaps pc }) 
+                }
+            _ -> sq)
+
 remove : Piece -> Board -> Board
 remove pc bd = 
-    Matrix.update (toBoardLocation pc.position) (\s -> { s | piece = Nothing, active = True }) bd
+    let lastLocation = last pc.path ? toLocation pc.position
+        removePiece s = 
+            { s 
+            | piece = Nothing
+            , active = True 
+            }
+        _ = log "removing piece" pc
+    in Matrix.update lastLocation removePiece bd
 
 add : Piece -> Board -> Board
 add pc bd = 
     let lc = toBoardLocation pc.position
     in Matrix.update lc (\s -> 
+        let newPiece =  
+                { pc 
+                | position = toBoardPosition lc
+                , path = pc.path ++ [lc]
+                }
+            newSquare = { s | piece = Just newPiece }
+            _ = log "adding piece" newPiece
+        in
         if s.valid 
-        then { s | piece = Just { pc | position = (toBoardPosition lc), moved = True } } 
+        then newSquare
         else s) bd
 
 return : Piece -> Board -> Board

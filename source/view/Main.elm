@@ -1,14 +1,14 @@
 module View.Main exposing (..)
 
-import Matrix exposing (..)
 import Char exposing (..)
+import Matrix exposing (..)
+import Maybe.Extra as Maebe exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Mouse exposing (..)
 import SvgParser exposing (parse)
 import Json.Decode as Json exposing (..)
-import Maybe.Extra as Maebe exposing (..)
 import Debug exposing (..)
 
 import Material.Layout as Layout
@@ -29,9 +29,9 @@ onMouseDown : Attribute Event
 onMouseDown = on "mousedown" (Json.map Click Mouse.position)
 
 render : Game -> Html Event
-render ({ ui, players, board, history } as game) =
-    let whitePlayer = getWhite history players
-        blackPlayer = getBlack history players
+render ({ ui, chess, players } as game) =
+    let whitePlayer = getWhite chess.history players
+        blackPlayer = getBlack chess.history players
     in 
     (Layout.render Mdl ui.mdl [Layout.fixedHeader]
             { header = [
@@ -62,7 +62,7 @@ render ({ ui, players, board, history } as game) =
                         , MList.ul 
                             [ cs "moves" 
                             ]
-                            (history 
+                            (chess.history 
                                 |> formatHistory
                                 |> List.map (\move ->
                                     MList.li 
@@ -84,14 +84,14 @@ render ({ ui, players, board, history } as game) =
 
 -- render board and pieces
 r_game : Game -> Html Event
-r_game { board, players } =
+r_game { chess, players } =
         node "chess" 
             [ onMouseDown,
               class <| String.toLower <| toString (fst players).color
             ]
             [ r_player (fst players)
-            , r_pieces board
-            , r_board board 
+            , r_pieces chess.board
+            , r_board chess.board 
             ]
 
 -- render player layer

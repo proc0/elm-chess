@@ -24,6 +24,18 @@ snd = Tuple.second
 swap : (a,b) -> (b,a)
 swap (a,b) = (b,a)
 
+foldl1 : (a -> a -> a) -> List a -> Maybe a
+foldl1 f xs =
+  let
+    mf x m = Just (case m of
+                     Nothing -> x
+                     Just y -> f y x)
+  in
+    List.foldl mf Nothing xs
+
+last : List a -> Maybe a
+last = foldl1 (flip always)
+
 -- Type castings
 
 pos : Int -> Int -> Position
@@ -65,7 +77,7 @@ zeroPs = { x=0, y=0 }
 
 nullPiece : Piece
 nullPiece = 
-    Piece zeroPs Black Zebra False
+    Piece zeroPs Black Zebra 0 []
 
 emptySquare : Square
 emptySquare = 
@@ -77,4 +89,4 @@ idlePlayer color =
 
 noMove : Move 
 noMove =
-    Move zeroLoc zeroLoc nullPiece Nothing
+    Move zeroLoc zeroLoc nullPiece Nothing False

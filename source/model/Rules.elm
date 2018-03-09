@@ -25,16 +25,19 @@ left n (y,x) = loc y (x - n)
 right : Int -> Location -> Location
 right n (y,x) = loc y (x + n)
 
-pieceMoves : Piece -> Board -> List (Location -> Location)
+pieceMoves : Piece -> Board -> List Translation
 pieceMoves piece board = 
-    let location = toBoardLocation piece.position
+    let ((x,y) as location) = 
+            toBoardLocation piece.position
         find f = f board location
-        getMove role =
+        calc f = f board piece
+        moves role =
             case role of
-                Pawn    -> movePawn piece board
+                Pawn    -> calc pawnMoves
                 Bishop  -> find diagonals
                 Rook    -> find parallels
-                Queen   -> find diagonals ++ find parallels               
+                Queen   -> find diagonals 
+                        ++ find parallels               
                 Knight -> 
                     [ up 2 >> right 1
                     , up 2 >> left 1
@@ -56,12 +59,18 @@ pieceMoves piece board =
                     , down 1 >> right 1
                     ]
                 _ -> []
-    in getMove piece.role |> filterSameColor piece board
+    in 
+    -- get possible moves by role
+    moves piece.role 
+    -- and filter squares occupied
+    -- by same color pieces
+    |> distinct piece board
 
-movePawn : Piece -> Board -> List (Location -> Location)
-movePawn piece board =
+pawnMoves : Board -> Piece -> List Translation
+pawnMoves board piece =
         let ((y,x) as location) = 
                 toBoardLocation piece.position
+            checkRule = applyRule board piece
             step = 
                 case piece.color of
                     White -> up
@@ -78,6 +87,7 @@ movePawn piece board =
                 case sq.piece of
                     Just p -> False
                     Nothing -> True
+            possibleMoves : List (Location -> Location, Square -> Bool)
             possibleMoves = 
                 -- if pawn is hasn't moved
                 (if y == startLocation
@@ -90,17 +100,50 @@ movePawn piece board =
                 , (step 1 >> left 1, if_occupied)
                 , (step 1 >> right 1, if_occupied)
                 ]
-            applyRule (move, rule) moves =
-                let target = Matrix.get (move location) board
-                in 
-                (target |> Maybe.map 
-                    (\square ->
-                        if rule square
-                        then move::moves
-                        else moves)) ? moves
-        in List.foldl applyRule [] possibleMoves
+        in List.foldl checkRule (enPassant board piece) possibleMoves
 
-diagonals : Board -> Location -> List (Location -> Location)
+enPassant : Board -> Piece -> List Translation
+enPassant board piece = 
+    let ((y,x) as location) = 
+                last piece.path ? loc 0 0 
+        step = 
+            case piece.color of
+                White -> up
+                Black -> down
+        checkRule = applyRule2 board location
+        enPassantLocation = 
+            case piece.color of
+                White -> 3
+                Black -> 4
+        if_pawn sq =
+            case sq.piece of
+                Just p ->
+                    case p.role of
+                        Pawn -> p.ellapsed == 1
+                        _ -> False
+                _ -> False
+        if_enPassant : (Int -> Location -> Location) -> Square -> Bool
+        if_enPassant dir sq =
+            case sq.piece of
+                Just pc -> False
+                _ -> isJust <| List.head <| checkRule (dir 1, if_pawn) []
+        possibleMoves : List (Location -> Location, Square -> Bool)
+        possibleMoves =
+            [ (step 1 >> left 1, if_enPassant left)
+            , (step 1 >> right 1, if_enPassant right)
+            ]
+    in 
+    if y == enPassantLocation
+    then List.foldl checkRule [] possibleMoves
+    else []
+
+checkPassant : Board -> Piece -> Bool
+checkPassant board piece = 
+    let passante  = enPassant board piece
+    in 
+    isJust <| List.head passante
+
+diagonals : Board -> Location -> List Translation
 diagonals board point = 
     let directions = 
             [ (up, left)
@@ -131,7 +174,7 @@ diagonals board point =
                     ) (m, True) stepRange) ([],True)
     in fst <| step directions
 
-parallels : Board -> Location -> List (Location -> Location)
+parallels : Board -> Location -> List Translation
 parallels board point =
     let directions = 
             [ up
@@ -160,8 +203,8 @@ parallels board point =
                     ) (m, True) stepRange) ([],True)
     in fst <| step directions
 
-filterSameColor : Piece -> Board -> List (Location -> Location) -> List (Location -> Location)
-filterSameColor piece board locations = 
+distinct : Piece -> Board -> List Translation -> List Translation
+distinct piece board locations = 
     List.filterMap (\move -> 
         let sq = findSquare (move <| toBoardLocation piece.position) board
         in 
@@ -175,10 +218,32 @@ filterSameColor piece board locations =
 findSquare : Location -> Board -> Square
 findSquare lc board = 
     let sq = Matrix.get lc board
-    in case sq of
-            Just s -> s
-            Nothing -> emptySquare
+    in 
+    case sq of
+        Just s -> s
+        Nothing -> emptySquare
 
+applyRule : Board -> Piece -> (Location -> Location, Square -> Bool) -> List Translation -> List Translation
+applyRule board piece (move, rule) moves =
+    let ((y,x) as location) = 
+                toBoardLocation piece.position    
+        target = Matrix.get (move location) board
+    in 
+    (target |> Maybe.map 
+        (\square ->
+            if rule square
+            then move::moves
+            else moves)) ? moves
+
+applyRule2 : Board -> Location -> (Location -> Location, Square -> Bool) -> List Translation -> List Translation
+applyRule2 board location (move, rule) moves =
+    let target = Matrix.get (move location) board
+    in 
+    (target |> Maybe.map 
+        (\square ->
+            if rule square
+            then move::moves
+            else moves)) ? moves
 --stay : Position -> Position
 --stay p = p
 
