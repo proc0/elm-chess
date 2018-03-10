@@ -14,20 +14,24 @@ import Data.Tool exposing (..)
 --=========================================================--
 
 initialPieces = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-initialBoard = enPassantBoard ++ " w KQkq - 0 1"
+initialBoard = initialPieces ++ " w KQkq - 0 1"
 
 -- other examples
 --testingEngine = "K6k/3n2pp/8/1P6/B7/8/6PP/8 w - - 0 1"
 --whiteInCheck = "rnb1kbnr/pppppppp/4q3/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"
 --blackCheckMate = "1R6/8/kQ6/8/8/8/6K1/8 w - - 0 1"
-enPassantBoard = "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/RNBQKBNR w KQkq a6 0 1"
+--enPassantBoard = "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/RNBQKBNR w KQkq a6 0 1"
 --castlingAvailable = "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/R3K2R w KQkq - 0 1"
 
-fromFEN : String -> Board
+fromFEN : String -> Chess
 fromFEN fen =
     let parts =
         String.split " " fen |> Array.fromList
-    in parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))
+        hasEnPassant = Maybe.withDefault "-" (Array.get 3 parts)
+        board = parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))
+        history = []
+    in
+    Chess board history
             --(maybeContains (Array.get 1 parts) "w")
             --(maybeContains (Array.get 2 parts) "Q")
             --(maybeContains (Array.get 2 parts) "K")
@@ -73,8 +77,8 @@ toSquare lc ch =
 
 toPiece : Char -> Location -> Piece
 toPiece ch lc =
-    let white rl = Piece (toBoardPosition lc) White rl 0 [lc]
-        black rl = Piece (toBoardPosition lc) Black rl 0 [lc]
+    let white rl = Piece (toBoardPosition lc) lc White rl 0 [lc]
+        black rl = Piece (toBoardPosition lc) lc Black rl 0 [lc]
         role = charFigMap ch
     in if isUpper ch
         then white role

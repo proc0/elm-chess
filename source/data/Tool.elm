@@ -77,7 +77,7 @@ zeroPs = { x=0, y=0 }
 
 nullPiece : Piece
 nullPiece = 
-    Piece zeroPs Black Zebra 0 []
+    Piece zeroPs zeroLoc Black Zebra 0 []
 
 emptySquare : Square
 emptySquare = 

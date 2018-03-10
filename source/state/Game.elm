@@ -12,6 +12,7 @@ import Material.Layout as Layout
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
+import Model.FEN exposing (..)
 import Model.Board exposing (..)
 import State.Action as Action exposing (..)
 
@@ -19,9 +20,12 @@ newGame : (Game, Cmd Event)
 newGame = 
     let ui = UI Material.model ""
         cmd = [Layout.sub0 Mdl]
-        chess = Chess initBoard []
+        chess = fromFEN initialBoard
         player = idlePlayer
-        players = (player White, player Black)
+        players = 
+            ( player White
+            , player Black
+            )
         game = Game ui chess players
     in game ! cmd
 
@@ -56,24 +60,20 @@ update event { ui, chess, players } =
                     -- select board square 
                     (Action.select chess.board position 
                         |> Maybe.map (\selection -> 
+                            let lift = startMoving position
                             -- guard from illegal moves
                             -- and start dragging selected piece
-                            guard player selection (startMoving position)
+                            in guard player selection lift
                         )) ? Idle
                 -- drags piece
                 Drag position -> 
-                    let drag = 
-                        updateMoving position
-                    in whenMoving drag player.action
+                    whenMoving player.action 
+                    <| updateMoving position
                 -- drop piece on board
                 Drop position -> 
-                    let end = 
-                        endMove chess.board position
-                    in whenMoving end player.action
+                    whenMoving player.action 
+                    <| endMove chess.board position
                 othewise -> Idle
-
-        -- updates
-        ------------------ - - - -   -   -     -     -       -             .
 
         player_ : Player
         player_ = 
@@ -94,7 +94,8 @@ update event { ui, chess, players } =
                 Moving selected -> 
                     case player.action of
                         Moving _ -> chess.board
-                        otherwise -> pickup chess.board selected.piece
+                        otherwise -> 
+                            pickup chess.board selected.piece
                 End move -> 
                     case move.capture of
                         Just captured -> 
@@ -105,7 +106,7 @@ update event { ui, chess, players } =
                             then nextMove |> remove captured 
                             else nextMove
                         Nothing -> drop chess.board move.piece
-                Undo moving -> undo chess.board moving.piece
+                Undo moving -> undo moving.piece chess.board 
                 otherwise -> chess.board
 
         history : History

@@ -3,18 +3,17 @@ module State.Action exposing (..)
 import Matrix exposing (..)
 import Char exposing (..)
 import Maybe.Extra as Maebe exposing (..)
-import Debug exposing (..)
-
 import Mouse exposing (..)
+import Debug exposing (..)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.FEN exposing (..)
-import Model.Rules exposing (..)
+import Model.Moves exposing (..)
 
 select : Board -> Position -> Maybe Selection
 select board position = 
-    let check square = 
+    let focus square = 
             let selection piece = 
                 Selection square.location piece
             in 
@@ -22,7 +21,7 @@ select board position =
         locate xy = 
             Matrix.get (toBoardLocation xy) board
         selecting = 
-            Maebe.join << Maybe.map check << locate
+            Maebe.join << Maybe.map focus << locate
     in 
     selecting position
 
@@ -33,12 +32,18 @@ guard player selection fn =
     else Idle
 
 startMoving : Position -> Selection -> Action
-startMoving ps {location, piece} =  
-    Moving <| Selection location ({ piece | position = ps })
+startMoving ps {origin, piece} =  
+    Moving <| Selection origin ({ piece | position = ps, location = origin  })
 
 updateMoving : Position -> Selection -> Action
-updateMoving ps {location, piece} = 
-    Moving <| Selection location ({ piece | position = ps })
+updateMoving ps {origin, piece} = 
+    Moving <| Selection origin ({ piece | position = ps })
+
+whenMoving : Action -> (Selection -> Action) -> Action
+whenMoving action change = 
+    case action of
+        Moving selection -> change selection
+        _ -> Idle
 
 endMove : Board -> Position -> Selection -> Action
 endMove board ps select = 
@@ -52,12 +57,13 @@ endMove board ps select =
             (\s -> 
             { s 
             | position = ps
+            , location = toBoardLocation ps
             })
-        isPassant = checkPassant board select.piece
-        passante  = enPassant board select.piece
+        isPassant = enPassant board select.piece
+        passante  = passant board select.piece
         targetLoc = 
             if isPassant 
-            then select.location |> (List.head passante ? identity) 
+            then select.origin |> (List.head passante ? identity) 
             else destination
         target = Matrix.get targetLoc board ? emptySquare
         targetPiece = 
@@ -65,12 +71,6 @@ endMove board ps select =
             then (Matrix.get (step 1 targetLoc) board ? emptySquare).piece
             else target.piece
     in 
-    if (destination /= select.location && target.valid) || isPassant
-    then End <| Move select.location destination sourcePiece targetPiece isPassant
+    if (destination /= select.origin && target.valid) || isPassant
+    then End <| Move select.origin destination sourcePiece targetPiece isPassant
     else Undo select
-
-whenMoving : (Selection -> Action) -> Action -> Action
-whenMoving change action = 
-    case action of
-        Moving selection -> change selection
-        _ -> Idle

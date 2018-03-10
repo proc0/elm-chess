@@ -2,18 +2,13 @@ module Model.Board exposing (..)
 
 import Array exposing (..)
 import Matrix exposing (..)
+import Mouse exposing (..)
 import Maybe.Extra as Maebe exposing (..)
 import Debug exposing (..)
 
-import Mouse exposing (..)
-
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
-import Model.FEN exposing (..)
-import Model.Rules exposing (..)
-
-initBoard : Board
-initBoard = fromFEN initialBoard
+import Model.Moves exposing (..)
 
 -- board manipulations
 ----------------------
@@ -28,11 +23,6 @@ drop board piece =
     board
     |> add piece
     |> ellapse
-    |> clear
-
-undo : Board -> Piece -> Board
-undo board piece = 
-    return piece board 
     |> clear
 
 --logPiece : Piece -> Board -> Board
@@ -64,7 +54,7 @@ ellapse board =
 
 remove : Piece -> Board -> Board
 remove pc bd = 
-    let lastLocation = last pc.path ? toLocation pc.position
+    let lastLocation = last pc.path ? pc.location
         removePiece s = 
             { s 
             | piece = Nothing
@@ -75,11 +65,12 @@ remove pc bd =
 
 add : Piece -> Board -> Board
 add pc bd = 
-    let lc = toBoardLocation pc.position
-    in Matrix.update lc (\s -> 
+    let lc = pc.location
+    in Matrix.update pc.location (\s -> 
         let newPiece =  
                 { pc 
                 | position = toBoardPosition lc
+                , location = lc
                 , path = pc.path ++ [lc]
                 }
             newSquare = { s | piece = Just newPiece }
@@ -89,17 +80,17 @@ add pc bd =
         then newSquare
         else s) bd
 
-return : Piece -> Board -> Board
-return piece board = 
+undo : Piece -> Board -> Board
+undo piece board = 
     let putBack lc sq = 
         if sq.active 
-        then { sq | piece = Just { piece | position = toBoardPosition lc } }
+        then { sq | piece = Just { piece | position = toBoardPosition lc, location = lc } }
         else sq
     in Matrix.mapWithLocation putBack board
 
 validate : Piece -> Board -> Board
 validate piece board =
-    let lc = toBoardLocation piece.position
+    let lc = piece.location
         validMoves = pieceMoves piece board
         -- append input location as valid
         validLocations = lc::(List.map (\t -> t lc) validMoves)

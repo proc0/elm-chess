@@ -36,6 +36,7 @@ type Role =
 
 type alias Piece =
     { position : Position
+    , location : Location
     , color : Color
     , role : Role
     , ellapsed : Int
@@ -44,11 +45,8 @@ type alias Piece =
 
 type alias Square = 
     { location : Location
-    -- maybe occupied
     , piece : Maybe Piece
-    -- is potential move
     , valid : Bool
-    -- is selected 
     , active : Bool
     }
 
@@ -58,11 +56,14 @@ type alias Rank =
 type alias Board =
     Matrix Square
 
+type alias Rule =
+    Square -> Bool
+    
 --     Interaction       --
 --=======================--
 
 type alias Selection =
-    { location : Location
+    { origin : Location
     , piece : Piece
     }
 
@@ -76,6 +77,9 @@ type alias Move =
 
 type alias Translation = 
     Location -> Location
+
+type alias Movement =
+    Int -> Translation
 
 type Action =
       Moving Selection
