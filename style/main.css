@@ -42,6 +42,10 @@ square.active {
     background: #e6f14c !important;
 }
 
+square.valid {
+    cursor: pointer;
+}
+
 rank {
     display: flex;
     /* width: 512px; */

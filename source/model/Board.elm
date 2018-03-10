@@ -60,7 +60,6 @@ remove pc bd =
             | piece = Nothing
             , active = True 
             }
-        _ = log "removing piece" pc
     in Matrix.update lastLocation removePiece bd
 
 add : Piece -> Board -> Board
@@ -74,7 +73,6 @@ add pc bd =
                 , path = pc.path ++ [lc]
                 }
             newSquare = { s | piece = Just newPiece }
-            _ = log "adding piece" newPiece
         in
         if s.valid 
         then newSquare
@@ -90,13 +88,19 @@ undo piece board =
 
 validate : Piece -> Board -> Board
 validate piece board =
-    let lc = piece.location
-        validMoves = pieceMoves piece board
+    let plc = piece.location
+        translations = pieceMoves piece board
         -- append input location as valid
-        validLocations = lc::(List.map (\t -> t lc) validMoves)
+        moveList = List.map (flip (<|) plc) translations
         validateSquare sq = { sq | valid = True }
-        validateSquares lc bd = 
-            Matrix.update lc validateSquare bd
-        --_ = log "valid" validLocations
-    in List.foldl validateSquares board validLocations
-
+        validateSquares plc bd = 
+            Matrix.update plc validateSquare bd
+        locations = 
+            if List.length translations > 1
+            then plc::moveList
+            else []
+        validBoard = 
+            List.foldl validateSquares board locations
+        _ = log "translations" locations
+    in 
+    validBoard

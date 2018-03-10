@@ -51,21 +51,61 @@ update event { ui, chess, players } =
     let player : Player
         player = fst players
 
+        selection : Maybe Selection 
+        selection = 
+            case event of
+                Click position -> 
+                    -- selects only if square occupied
+                    Action.select position chess.board
+                _ -> Nothing
+
         -- next frame player action
         action : Action
         action = 
             case event of
-                -- clicks board
+                -- click board
                 Click position -> 
                     -- select board square 
-                    (Action.select chess.board position 
-                        |> Maybe.map (\selection -> 
+                    case selection of
+                        -- if target is piece
+                        Just selected -> 
+                            -- start dragging selected piece
                             let lift = startMoving position
                             -- guard from illegal moves
-                            -- and start dragging selected piece
-                            in guard player selection lift
-                        )) ? Idle
-                -- drags piece
+                            in guard player selected lift
+                        Nothing -> 
+                            let target = -- vacant square
+                                Matrix.get (toBoardLocation position) chess.board
+                            in
+                            case target of
+                                -- square click
+                                Just square -> 
+                                    -- if valid move
+                                    if square.valid
+                                    then 
+                                        -- check previous action
+                                        case player.action of
+                                            -- piece has not moved
+                                            Undo previous -> 
+                                                let prev = previous.piece
+                                                    -- simulate moving piece
+                                                    simulated = 
+                                                        { previous
+                                                        | piece =
+                                                            { prev
+                                                            -- coerce piece state
+                                                            | position = position
+                                                            , location = square.location
+                                                            }
+                                                        }
+                                                in 
+                                                -- simulate end move
+                                                whenMoving (Moving simulated) 
+                                                <| endMove chess.board position
+                                            _ -> Idle
+                                    else player.action
+                                _ -> Idle
+                -- drag piece
                 Drag position -> 
                     whenMoving player.action 
                     <| updateMoving position
@@ -81,11 +121,11 @@ update event { ui, chess, players } =
             | action = action 
             }
 
-        -- swap players 
-        -- if end of turn
         players_ = 
             case action of
+                -- if end move, swap players 
                 End mv -> (snd players, player_)
+                -- update current player
                 otherwise -> (player_, snd players)
 
         board : Board
@@ -97,15 +137,20 @@ update event { ui, chess, players } =
                         otherwise -> 
                             pickup chess.board selected.piece
                 End move -> 
-                    case move.capture of
-                        Just captured -> 
-                            let nextMove = 
-                                drop chess.board move.piece
-                            in
-                            if move.enPassant
-                            then nextMove |> remove captured 
-                            else nextMove
-                        Nothing -> drop chess.board move.piece
+                    let nextBoard =
+                        case move.capture of
+                            Just captured -> 
+                                let nextMove = 
+                                    drop chess.board move.piece
+                                in
+                                if move.enPassant
+                                then nextMove |> remove captured 
+                                else nextMove
+                            Nothing -> drop chess.board move.piece
+                    in
+                    case selection of
+                        Just _ -> nextBoard
+                        _ -> remove move.piece nextBoard
                 Undo moving -> undo moving.piece chess.board 
                 otherwise -> chess.board
 
@@ -117,8 +162,11 @@ update event { ui, chess, players } =
 
         ui_ : UI
         ui_ = 
+            let currentPlayer = fst players_
+                currentColor = toString currentPlayer.color
+            in
             { ui 
-            | turn = toString (fst players_).color ++ "'s turn" 
+            | turn = currentColor ++ "'s turn" 
             }
 
         game mat_ =

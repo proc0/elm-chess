@@ -11,8 +11,8 @@ import Data.Tool exposing (..)
 import Model.FEN exposing (..)
 import Model.Moves exposing (..)
 
-select : Board -> Position -> Maybe Selection
-select board position = 
+select : Position -> Board -> Maybe Selection
+select position board = 
     let focus square = 
             let selection piece = 
                 Selection square.location piece

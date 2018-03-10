@@ -181,12 +181,8 @@ r_rank f r = node "rank" [] (List.map f r)
 
 r_square : Square -> Html Event
 r_square sq = 
-    let activeClass = 
-            if sq.active
-            then "active"
-            else "selected"
-        attrs = 
+    let attrs = 
             if sq.valid 
-            then [class activeClass] 
+            then [classList [("active", sq.active), ("valid", sq.valid), ("selected", True)]] 
             else []
     in node "square" attrs []

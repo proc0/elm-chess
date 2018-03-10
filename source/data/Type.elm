@@ -58,7 +58,7 @@ type alias Board =
 
 type alias Rule =
     Square -> Bool
-    
+
 --     Interaction       --
 --=======================--
 
@@ -78,11 +78,15 @@ type alias Move =
 type alias Translation = 
     Location -> Location
 
+type alias Translations =
+    List Translation
+
 type alias Movement =
     Int -> Translation
 
 type Action =
       Moving Selection
+    --| Clicking Selection
     | Undo Selection
     | End Move
     | Idle

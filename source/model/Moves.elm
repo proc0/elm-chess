@@ -193,18 +193,19 @@ parallels board piece =
                     ) (m, True) stepRange) ([],True)
     in fst <| step directions
 
--- TODO: refactor and take out Rule, flip type
+-- TODO: refactor and take out Rules, flip type
 distinct : Piece -> Board -> List Translation -> List Translation
 distinct piece board locations = 
     List.filterMap (\move -> 
-        let sq = findSquare (move piece.location) board
-        in 
-        case sq.piece of
-            Just p -> 
-                if p.color == piece.color
-                then Nothing
-                else Just move
-            _ -> Just move) locations
+        case Matrix.get (move piece.location) board of
+            Just square ->
+                case square.piece of
+                    Just pc -> 
+                        if pc.color == piece.color
+                        then Nothing
+                        else Just move
+                    _ -> Just move
+            _ -> Nothing) locations
 
 findSquare : Location -> Board -> Square
 findSquare lc board = 
