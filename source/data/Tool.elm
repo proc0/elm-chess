@@ -77,7 +77,7 @@ zeroPs = { x=0, y=0 }
 
 nullPiece : Piece
 nullPiece = 
-    Piece zeroPs zeroLoc Black Ninja []
+    Piece zeroPs zeroLoc Black Ninja 0 []
 
 emptySquare : Square
 emptySquare = 
@@ -89,4 +89,4 @@ idlePlayer color =
 
 noMove : Move 
 noMove =
-    Move zeroLoc zeroLoc nullPiece Nothing False
+    Move 0 zeroLoc zeroLoc nullPiece Nothing False

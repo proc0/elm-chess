@@ -24,7 +24,7 @@ place : Board -> Piece -> Board
 place board piece = 
     board
     |> drop piece
-    |> clear
+    |> ticks >> clear
 
 --=============================--
 
@@ -64,15 +64,18 @@ occupySquare pc sq =
 translatePiece : Location -> Piece -> Piece
 translatePiece target piece =
     let destination = toBoardPosition target
-        lastPath = List.head piece.path
-        isDifferent = (/=) target
+        lastPath = last piece.path
+        different = ((/=) target)
+        isDifferent p = 
+            Maybe.map different p ? False
     in
     { piece 
     | position = destination
     , location = target
     , path = 
-        -- if the last path is different than target location
-        if Maybe.map isDifferent lastPath ? False
+        -- if the last path is 
+        -- different than target
+        if isDifferent lastPath
         -- add location to path
         then piece.path ++ [target]
         else piece.path
@@ -90,11 +93,32 @@ withActiveSquare fn square =
     then fn square
     else square
 
+withMovingPieces : (Piece -> Piece) -> Square -> Square
+withMovingPieces fn square =
+    case square.piece of
+        Just pc -> 
+            -- if path has more than initial location
+            if List.length pc.path > 1
+            then -- apply piece
+                { square 
+                | piece = Just (fn pc) 
+                }
+            else square
+        _ -> square
+
 --=============================--
 
 clear : Board -> Board
 clear board =
         Matrix.map clearSquare board
+
+ticks : Board -> Board
+ticks board =
+    let tickPiece _ = 
+            withMovingPieces 
+                (\p -> { p | tick = p.tick + 1 })
+    in
+    Matrix.mapWithLocation tickPiece board
 
 remove : Piece -> Board -> Board
 remove piece board = 
@@ -123,14 +147,14 @@ validate piece board =
             piece.location
         translations = 
             pieceMoves piece board
-        moveList = 
+        movelist = 
             List.map (flip (<|) origin) translations
         validateSquares origin bd = 
             Matrix.update origin validateSquare bd
         locations = 
             if List.length translations > 0
-            -- append input location as valid
-            then origin::moveList
+            -- append current location
+            then origin::movelist
             else []            
     in 
     List.foldl validateSquares board locations

@@ -39,8 +39,8 @@ whileMoving action change =
         Moving selection -> change selection
         _ -> Idle
 
-clickMove : Board -> Player -> Position -> Location -> Action
-clickMove board player pos loc =
+clickMove : Board -> Player -> Move -> Position -> Location -> Action
+clickMove board player lastMove pos loc =
     case player.action of
         Playing selected -> 
             let selPiece = 
@@ -56,7 +56,7 @@ clickMove board player pos loc =
                         }
                     }
             in 
-            endMove board sim
+            endMove board lastMove sim
         _ -> Idle
 
 capturing : Player -> Maybe Selection -> Bool 
@@ -65,41 +65,38 @@ capturing player selection =
                 s.piece.color /= player.color
               ) |> Maybe.withDefault False
 
-endMove : Board -> Selection -> Action
-endMove board select = 
-    let destination = toBoardLocation select.piece.position
-        --step = 
-        --    case select.piece.color of
-        --        White -> down 
-        --        Black -> up
-        --sourcePiece = 
-        --    select.piece |>
-        --    (\s -> 
-        --    { s 
-        --    | position = toBoardPosition select.origin
-        --    , location = select.origin
-        --    })
+endMove : Board -> Move -> Selection -> Action
+endMove board lastMove select = 
+    let destination = 
+            toBoardLocation select.piece.position
+        count = lastMove.number + 1
+        sourcePiece = 
+            select.piece |>
+            (\s -> 
+            { s 
+            | position = toBoardPosition select.origin
+            , location = select.origin
+            })
+        isPassant = isEnPassant board sourcePiece
         movingPiece =
             select.piece |>
             (\s -> 
             { s 
             | location = destination
             })
-        --isPassant = enPassant board select.piece
-        --passante  = passant board select.piece
-        --targetLoc = 
-        --    if isPassant 
-        --    then select.origin |> (List.head passante ? identity) 
-        --    else destination
-        target = Matrix.get destination board ? emptySquare
-        --targetPiece =
-        --    if isPassant
-        --    then 
-        --        let _ = log "isPassant"
-        --            passantCapture = (Matrix.get (step 1 destination) board ? emptySquare).piece
-        --        in passantCapture
-        --    else target.piece
+        target = 
+            Matrix.get destination board ? emptySquare
+        targetPiece =
+            if isPassant
+            then 
+                let passantStep = 
+                        backward select.piece 1 destination
+                    passantSquare = 
+                        Matrix.get passantStep board ? emptySquare
+                in passantSquare.piece
+            else 
+                target.piece
     in 
     if destination /= select.origin && target.valid
-    then End <| Move select.origin destination movingPiece target.piece False
+    then End <| Move count select.origin destination movingPiece targetPiece isPassant
     else Playing select

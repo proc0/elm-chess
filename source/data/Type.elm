@@ -38,6 +38,7 @@ type alias Piece =
     , location : Location
     , color : Color
     , role : Role
+    , tick : Int
     , path : List Location
     }
 
@@ -66,7 +67,8 @@ type alias Selection =
     }
 
 type alias Move =
-    { start : Location
+    { number : Int
+    , start : Location
     , end : Location
     , piece : Piece
     , capture : Maybe Piece

@@ -19,7 +19,7 @@ isVacant = not << isOccupied
 isFirstMove : Square -> Bool
 isFirstMove square =
     case square.piece of
-        Just piece -> List.length piece.path == 1
+        Just piece -> piece.tick == 1
         _ -> False
 
 isPawn : Square -> Bool

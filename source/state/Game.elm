@@ -58,6 +58,10 @@ update event { ui, chess, players } =
                     Action.select position chess.board
                 _ -> Nothing
 
+        lastMove : Move
+        lastMove = 
+            List.head chess.history ? noMove
+
         -- next frame action
         action : Action
         action = 
@@ -68,7 +72,7 @@ update event { ui, chess, players } =
                             toBoardLocation position
                         clickTo = 
                             -- click handler
-                            clickMove chess.board player
+                            clickMove chess.board player lastMove
                     in 
                     -- check selection 
                     case selection of
@@ -92,7 +96,7 @@ update event { ui, chess, players } =
                 -- place piece
                 Drop position -> 
                     whileMoving player.action
-                    <| endMove chess.board 
+                    <| endMove chess.board lastMove 
                             
                 othewise -> Idle
 
@@ -131,15 +135,34 @@ update event { ui, chess, players } =
                             |> validate selected.piece
                 -- next move board            
                 End move -> 
-                    case event of
-                        Click _ -> 
-                            -- lift origin piece if click move
-                            -- needs to place before removing? (bug?)
-                            place chess.board move.piece 
-                            |> lift move.piece 
-                        otherwise -> 
-                            -- piece was already moving
-                            place chess.board move.piece
+                    if move.enPassant
+                    then
+                        case event of
+                            Click _ -> 
+                                case move.capture of
+                                    Just captured ->
+                                        place chess.board move.piece 
+                                        |> lift move.piece |> lift captured
+                                    _ -> 
+                                        place chess.board move.piece 
+                                        |> lift move.piece
+                            otherwise -> 
+                                case move.capture of
+                                    Just captured ->
+                                        -- piece was already moving
+                                        place chess.board move.piece |> lift captured
+                                    _ -> 
+                                        place chess.board move.piece
+                    else
+                        case event of
+                            Click _ -> 
+                                -- lift origin piece if click move
+                                -- needs to place before removing? (bug?)
+                                place chess.board move.piece 
+                                |> lift move.piece 
+                            otherwise -> 
+                                -- piece was already moving
+                                place chess.board move.piece                        
 
                 Idle -> chess.board
 

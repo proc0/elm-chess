@@ -39,10 +39,9 @@ backward piece =
         White -> down
         Black -> up
 
-enPassant : Board -> Piece -> Bool
-enPassant board piece = 
-    let _ = log "check passant" piece
-    in passanting piece && (isJust << List.head <| passant board piece)
+isEnPassant : Board -> Piece -> Bool
+isEnPassant board piece = 
+    passanting piece && (isJust << List.head <| enPassant board piece)
 
 pieceMoves : Piece -> Board -> List Translation
 pieceMoves piece board = 
@@ -87,11 +86,10 @@ pawnMoves : Board -> Piece -> List Translation
 pawnMoves board pawn =
         let (y,x) = pawn.location
             step = forward pawn
-            checkPawn = List.foldl <| applyRule board pawn
-            checkPassant = 
-                if passanting pawn
-                then passant board pawn
-                else []
+            checkPawn fn = 
+                fn board pawn
+            checkRules = 
+                List.foldl (checkPawn applyRule) []
             rules : List (Translation, Square -> Bool)
             rules = 
                 -- if pawn hasn't moved
@@ -106,14 +104,11 @@ pawnMoves board pawn =
                 , (step 1 >> left 1, isOccupied)
                 , (step 1 >> right 1, isOccupied)
                 ]
-        --in 
-            test = checkPawn [] rules
-            _ = log "checkpawn" test
         in
-        test
+        checkRules rules ++ checkPawn enPassant
 
-passant : Board -> Piece -> List Translation
-passant board pawn = 
+enPassant : Board -> Piece -> List Translation
+enPassant board pawn = 
     let step = forward pawn
         checkPawn = List.foldl (applyRule board pawn) []
         passantRules move = 
@@ -126,12 +121,13 @@ passant board pawn =
             then (List.length << checkPawn <| passantRules dir)
                  == -- rules length does not change after check
                  (List.length <| passantRules identity)
-            else False -- some rule(s) failed
+            else False
         rules : List (Translation, Square -> Bool)
         rules =
             [ (step 1 >> left 1, passing left)
             , (step 1 >> right 1, passing right)
             ]
+        --_ = log "checkPassant" <| checkPawn rules
     in 
     checkPawn rules
 
@@ -145,10 +141,6 @@ diagonals board piece =
             , (down, right)
             ]
         stepRange = List.map ((+) 1) boardside
-        curPiece = 
-            let sq = findSquare point board
-            in Maybe.withDefault nullPiece sq.piece
-
         step = List.foldl 
             (\(d1,d2) (m, c) -> 
                 List.foldl (\i (memo, cont) -> 
@@ -157,9 +149,10 @@ diagonals board piece =
                     in if cont
                         then 
                             let blocking = findSquare (nextStep point) board
-                            in case blocking.piece of
+                            in 
+                            case blocking.piece of
                                 Just {color} -> 
-                                    if color /= curPiece.color
+                                    if color /= piece.color
                                     then (nextStep::memo, False)
                                     else (memo, False)
                                 Nothing -> (nextStep::memo, True)
@@ -177,10 +170,6 @@ parallels board piece =
             , left
             ]
         stepRange = List.map ((+) 1) boardside
-        curPiece = 
-            let sq = findSquare point board
-            in Maybe.withDefault nullPiece sq.piece
-
         step = List.foldl 
             (\d (m, c) -> 
                 List.foldl (\i (memo, cont) -> 
@@ -189,7 +178,7 @@ parallels board piece =
                         let blocking = findSquare (d i point) board
                         in case blocking.piece of
                             Just {color} ->
-                                if color /= curPiece.color
+                                if color /= piece.color
                                 then ((d i)::memo, False)
                                 else (memo, False)
                             Nothing -> ((d i)::memo, True)                            
