@@ -41,7 +41,8 @@ backward piece =
 
 enPassant : Board -> Piece -> Bool
 enPassant board piece = 
-    isJust << List.head <| passant board piece
+    let _ = log "check passant" piece
+    in passanting piece && (isJust << List.head <| passant board piece)
 
 pieceMoves : Piece -> Board -> List Translation
 pieceMoves piece board = 
@@ -105,8 +106,11 @@ pawnMoves board pawn =
                 , (step 1 >> left 1, isOccupied)
                 , (step 1 >> right 1, isOccupied)
                 ]
-        in 
-        checkPawn checkPassant rules
+        --in 
+            test = checkPawn [] rules
+            _ = log "checkpawn" test
+        in
+        test
 
 passant : Board -> Piece -> List Translation
 passant board pawn = 

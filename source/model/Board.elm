@@ -10,97 +10,127 @@ import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.Moves exposing (..)
 
--- board manipulations
-----------------------
-pickup : Board -> Piece -> Board
-pickup board piece = 
-    clear board 
-    |> validate piece
-    |> remove piece
-
-drop : Board -> Piece -> Board
-drop board piece = 
-    board
-    |> add piece
-    |> ellapse
-    |> clear
-
 --logPiece : Piece -> Board -> Board
 --logPiece pc bd =
 --    let _ = log "piece" pc
 --    in bd
 
+lift : Piece -> Board -> Board
+lift piece board = 
+    clear board 
+    |> remove piece
+
+place : Board -> Piece -> Board
+place board piece = 
+    board
+    |> drop piece
+    |> clear
+
+--=============================--
+
+clearSquare :  Square -> Square
+clearSquare sq =
+    { sq 
+    | valid = False
+    , active = False 
+    }
+
+activateSquare : Square -> Square   
+activateSquare sq = 
+    { sq 
+    | active = True 
+    }
+
+emptySquare :  Square -> Square   
+emptySquare sq = 
+    { sq 
+    | piece = Nothing
+    }
+
+validateSquare :  Square -> Square   
+validateSquare sq = 
+    { sq 
+    | valid = True 
+    }
+
+--=============================--
+
+occupySquare : Piece -> Square -> Square   
+occupySquare pc sq = 
+    { sq 
+    | piece = Just pc
+    }
+
+translatePiece : Location -> Piece -> Piece
+translatePiece target piece =
+    let destination = toBoardPosition target
+        lastPath = List.head piece.path
+        isDifferent = (/=) target
+    in
+    { piece 
+    | position = destination
+    , location = target
+    , path = 
+        -- if the last path is different than target location
+        if Maybe.map isDifferent lastPath ? False
+        -- add location to path
+        then piece.path ++ [target]
+        else piece.path
+    }
+
+withValidSquare : (Square -> Square) -> Square -> Square
+withValidSquare fn square =
+    if square.valid
+    then fn square
+    else square
+
+withActiveSquare : (Square -> Square) -> Square -> Square
+withActiveSquare fn square =
+    if square.active
+    then fn square
+    else square
+
+--=============================--
+
 clear : Board -> Board
 clear board =
-        Matrix.map (\sq -> { sq | valid = False, active = False }) board
-
-ellapse : Board -> Board
-ellapse board =
-    let calcEllaps p =
-            -- if piece has more 
-            -- than initial location
-            if List.length p.path > 1
-            then p.ellapsed + 1 
-            else p.ellapsed         
-    in 
-    board 
-    |> Matrix.map (\sq -> 
-        case sq.piece of
-            Just pc -> 
-                { sq 
-                | piece = Just ({ pc | ellapsed = calcEllaps pc }) 
-                }
-            _ -> sq)
+        Matrix.map clearSquare board
 
 remove : Piece -> Board -> Board
-remove pc bd = 
-    let lastLocation = last pc.path ? pc.location
-        removePiece s = 
-            { s 
-            | piece = Nothing
-            , active = True 
-            }
-    in Matrix.update lastLocation removePiece bd
+remove piece board = 
+    let lastLocation = 
+            last piece.path ? piece.location
+    in 
+    Matrix.update lastLocation (activateSquare << emptySquare) board
 
-add : Piece -> Board -> Board
-add pc bd = 
-    let lc = pc.location
-    in Matrix.update pc.location (\s -> 
-        let newPiece =  
-                { pc 
-                | position = toBoardPosition lc
-                , location = lc
-                , path = pc.path ++ [lc]
-                }
-            newSquare = { s | piece = Just newPiece }
-        in
-        if s.valid 
-        then newSquare
-        else s) bd
+drop : Piece -> Board -> Board
+drop piece board = 
+    let target = piece.location
+        newPiece = translatePiece target piece
+    in 
+    Matrix.update target (withValidSquare <| occupySquare newPiece) board
 
-undo : Piece -> Board -> Board
-undo piece board = 
-    let putBack lc sq = 
-        if sq.active 
-        then { sq | piece = Just { piece | position = toBoardPosition lc, location = lc } }
-        else sq
-    in Matrix.mapWithLocation putBack board
+revert : Piece -> Board -> Board
+revert piece board = 
+    let putback target = 
+            withActiveSquare (occupySquare <| translatePiece target piece)
+    in 
+    Matrix.mapWithLocation putback board
 
 validate : Piece -> Board -> Board
 validate piece board =
-    let plc = piece.location
-        translations = pieceMoves piece board
-        -- append input location as valid
-        moveList = List.map (flip (<|) plc) translations
-        validateSquare sq = { sq | valid = True }
-        validateSquares plc bd = 
-            Matrix.update plc validateSquare bd
+    let origin = 
+            piece.location
+        translations = 
+            pieceMoves piece board
+        moveList = 
+            List.map (flip (<|) origin) translations
+        validateSquares origin bd = 
+            Matrix.update origin validateSquare bd
         locations = 
-            if List.length translations > 1
-            then plc::moveList
-            else []
-        validBoard = 
-            List.foldl validateSquares board locations
-        _ = log "translations" locations
+            if List.length translations > 0
+            -- append input location as valid
+            then origin::moveList
+            else []            
     in 
-    validBoard
+    List.foldl validateSquares board locations

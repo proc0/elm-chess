@@ -91,3 +91,13 @@ table thead {
     background: white;
     border: 1px solid #eaeaea;
 }
+
+.debug-panel {
+    font-size: 10px;
+    color: white;
+    position: absolute;
+    background: black;
+    right: 30px;
+    top: 0;
+    width: 160px;
+}

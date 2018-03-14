@@ -19,7 +19,7 @@ isVacant = not << isOccupied
 isFirstMove : Square -> Bool
 isFirstMove square =
     case square.piece of
-        Just piece -> piece.ellapsed == 1
+        Just piece -> List.length piece.path == 1
         _ -> False
 
 isPawn : Square -> Bool
@@ -31,14 +31,23 @@ isPawn square =
                 _ -> False
         _ -> False
 
+startingRank : Piece -> Int
+startingRank piece =
+    let offset n = 
+        case piece.color of
+            White -> 7 - n
+            Black -> n
+    in
+    case piece.role of
+        Pawn -> offset 1
+        _ -> offset 0
+
 starting : Piece -> Bool
 starting piece = 
     let (y,x) = 
         piece.location
     in 
-    case piece.color of
-        White -> y == 6
-        Black -> y == 1
+    startingRank piece == y
 
 passanting : Piece -> Bool
 passanting pawn =

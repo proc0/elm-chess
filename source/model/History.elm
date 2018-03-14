@@ -20,6 +20,18 @@ formatHistory =
     << toTuples 
     << List.reverse 
 
+debugHistory : History -> String
+debugHistory history =
+    let lastMove = 
+            List.head history ? noMove
+        debugPiece : Piece -> String
+        debugPiece pc =
+            case pc.role of
+                Zebra -> ""
+                _ -> String.join "\n" <| String.split "," <| toString pc         
+    in
+    debugPiece lastMove.piece ++ "\ncapture:" ++ debugPiece (lastMove.capture ? nullPiece)
+
 fullMove : Int -> (String, String) -> String
 fullMove i (w,b) =
     if w /= b

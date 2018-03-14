@@ -1,9 +1,8 @@
 module Data.Type exposing (..)
 
-import Matrix exposing (..)
-import Array exposing (..)
-import Mouse exposing (..)
-import Material
+import Mouse exposing (Position)
+import Matrix exposing (Matrix, Location)
+import Material exposing (Model, Msg)
 
 --=======================--
 
@@ -39,7 +38,6 @@ type alias Piece =
     , location : Location
     , color : Color
     , role : Role
-    , ellapsed : Int
     , path : List Location
     }
 
@@ -65,6 +63,7 @@ type alias Rule =
 type alias Selection =
     { origin : Location
     , piece : Piece
+    --, capture : Maybe Piece
     }
 
 type alias Move =
@@ -87,7 +86,7 @@ type alias Movement =
 type Action =
       Moving Selection
     --| Clicking Selection
-    | Undo Selection
+    | Playing Selection
     | End Move
     | Idle
 
@@ -116,10 +115,10 @@ type Event =
       Click Position
     | Drag Position
     | Drop Position
-    | Mdl (Material.Msg Event)
+    | Mdl (Msg Event)
 
 type alias UI =
-    { mdl : Material.Model
+    { mdl : Model
     , turn : String
     }
 

@@ -55,64 +55,45 @@ update event { ui, chess, players } =
         selection = 
             case event of
                 Click position -> 
-                    -- selects only if square occupied
                     Action.select position chess.board
                 _ -> Nothing
 
-        -- next frame player action
+        -- next frame action
         action : Action
         action = 
             case event of
-                -- click board
+                -- !! click board
                 Click position -> 
-                    -- select board square 
+                    let target = 
+                            toBoardLocation position
+                        clickTo = 
+                            -- click handler
+                            clickMove chess.board player
+                    in 
+                    -- check selection 
                     case selection of
-                        -- if target is piece
+                        -- !! click piece
                         Just selected -> 
-                            -- start dragging selected piece
-                            let lift = startMoving position
-                            -- guard from illegal moves
-                            in guard player selected lift
+                            -- opponent piece click
+                            if capturing player selection
+                            -- capture selected piece
+                            then clickTo position target
+                            -- lift and drag selected piece
+                            else startMoving position selected
+                        -- !! click vacant square                      
                         Nothing -> 
-                            let target = -- vacant square
-                                Matrix.get (toBoardLocation position) chess.board
-                            in
-                            case target of
-                                -- square click
-                                Just square -> 
-                                    -- if valid move
-                                    if square.valid
-                                    then 
-                                        -- check previous action
-                                        case player.action of
-                                            -- piece has not moved
-                                            Undo previous -> 
-                                                let prev = previous.piece
-                                                    -- simulate moving piece
-                                                    simulated = 
-                                                        { previous
-                                                        | piece =
-                                                            { prev
-                                                            -- coerce piece state
-                                                            | position = position
-                                                            , location = square.location
-                                                            }
-                                                        }
-                                                in 
-                                                -- simulate end move
-                                                whenMoving (Moving simulated) 
-                                                <| endMove chess.board position
-                                            _ -> Idle
-                                    else player.action
-                                _ -> Idle
+                            clickTo position target
+
                 -- drag piece
                 Drag position -> 
-                    whenMoving player.action 
+                    whileMoving player.action 
                     <| updateMoving position
-                -- drop piece on board
+
+                -- place piece
                 Drop position -> 
-                    whenMoving player.action 
-                    <| endMove chess.board position
+                    whileMoving player.action
+                    <| endMove chess.board 
+                            
                 othewise -> Idle
 
         player_ : Player
@@ -131,33 +112,41 @@ update event { ui, chess, players } =
         board : Board
         board = 
             case action of
+                Playing selected -> 
+                    -- return piece to its origin
+                    revert selected.piece chess.board
+                -- dragging piece
                 Moving selected -> 
+                    -- check last frame action
                     case player.action of
-                        Moving _ -> chess.board
+                        -- last frame was moving
+                        Moving _ -> 
+                            -- highlight valid moves
+                            validate selected.piece chess.board
+                        -- if last frame was not moving
                         otherwise -> 
-                            pickup chess.board selected.piece
+                            -- start moving (lift piece)
+                            -- and highlight valid moves
+                            lift selected.piece chess.board 
+                            |> validate selected.piece
+                -- next move board            
                 End move -> 
-                    let nextBoard =
-                        case move.capture of
-                            Just captured -> 
-                                let nextMove = 
-                                    drop chess.board move.piece
-                                in
-                                if move.enPassant
-                                then nextMove |> remove captured 
-                                else nextMove
-                            Nothing -> drop chess.board move.piece
-                    in
-                    case selection of
-                        Just _ -> nextBoard
-                        _ -> remove move.piece nextBoard
-                Undo moving -> undo moving.piece chess.board 
-                otherwise -> chess.board
+                    case event of
+                        Click _ -> 
+                            -- lift origin piece if click move
+                            -- needs to place before removing? (bug?)
+                            place chess.board move.piece 
+                            |> lift move.piece 
+                        otherwise -> 
+                            -- piece was already moving
+                            place chess.board move.piece
+
+                Idle -> chess.board
 
         history : History
         history = 
             case action of
-                End mv -> mv::chess.history
+                End move -> move::chess.history
                 otherwise -> chess.history
 
         ui_ : UI

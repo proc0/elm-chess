@@ -77,8 +77,8 @@ toSquare lc ch =
 
 toPiece : Char -> Location -> Piece
 toPiece ch lc =
-    let white rl = Piece (toBoardPosition lc) lc White rl 0 [lc]
-        black rl = Piece (toBoardPosition lc) lc Black rl 0 [lc]
+    let white rl = Piece (toBoardPosition lc) lc White rl [lc]
+        black rl = Piece (toBoardPosition lc) lc Black rl [lc]
         role = charFigMap ch
     in if isUpper ch
         then white role

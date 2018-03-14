@@ -39,7 +39,16 @@ render ({ ui, chess, players } as game) =
                     [ Typo.subhead
                     , Color.text (Color.white)
                     ] 
-                    [ text "Demo Chess" ]
+                    [ Options.div [] 
+                        [ text "Demo Chess"
+                        ],
+                        node "pre" 
+                            [ class "debug-panel"
+                            ]
+                            [ text <| debugHistory chess.history
+                            ]
+                        
+                    ]
                 ]
             , drawer = []
             , tabs = ([], [])

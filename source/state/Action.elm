@@ -13,64 +13,93 @@ import Model.Moves exposing (..)
 
 select : Position -> Board -> Maybe Selection
 select position board = 
-    let focus square = 
+    let locate xy = 
+            Matrix.get (toBoardLocation xy) board
+        selectPiece square = 
             let selection piece = 
                 Selection square.location piece
             in 
             Maybe.map selection square.piece
-        locate xy = 
-            Matrix.get (toBoardLocation xy) board
         selecting = 
-            Maebe.join << Maybe.map focus << locate
+            Maebe.join << Maybe.map selectPiece << locate
     in 
     selecting position
 
-guard : Player -> Selection -> (Selection -> Action) -> Action
-guard player selection fn =                             
-    if selection.piece.color == player.color
-    then fn selection
-    else Idle
-
 startMoving : Position -> Selection -> Action
 startMoving ps {origin, piece} =  
-    Moving <| Selection origin ({ piece | position = ps, location = origin  })
+    Moving <| Selection origin ({ piece | position = ps  })
 
 updateMoving : Position -> Selection -> Action
 updateMoving ps {origin, piece} = 
     Moving <| Selection origin ({ piece | position = ps })
 
-whenMoving : Action -> (Selection -> Action) -> Action
-whenMoving action change = 
+whileMoving : Action -> (Selection -> Action) -> Action
+whileMoving action change = 
     case action of
         Moving selection -> change selection
         _ -> Idle
 
-endMove : Board -> Position -> Selection -> Action
-endMove board ps select = 
-    let destination = toBoardLocation ps
-        step = 
-            case select.piece.color of
-                White -> down 
-                Black -> up
-        sourcePiece = 
+clickMove : Board -> Player -> Position -> Location -> Action
+clickMove board player pos loc =
+    case player.action of
+        Playing selected -> 
+            let selPiece = 
+                    selected.piece
+                -- simulate 
+                -- Moving selection
+                sim = 
+                    { selected
+                    | piece =
+                        { selPiece
+                        | position = pos
+                        , location = loc
+                        }
+                    }
+            in 
+            endMove board sim
+        _ -> Idle
+
+capturing : Player -> Maybe Selection -> Bool 
+capturing player selection =
+    selection |> Maybe.map (\s -> 
+                s.piece.color /= player.color
+              ) |> Maybe.withDefault False
+
+endMove : Board -> Selection -> Action
+endMove board select = 
+    let destination = toBoardLocation select.piece.position
+        --step = 
+        --    case select.piece.color of
+        --        White -> down 
+        --        Black -> up
+        --sourcePiece = 
+        --    select.piece |>
+        --    (\s -> 
+        --    { s 
+        --    | position = toBoardPosition select.origin
+        --    , location = select.origin
+        --    })
+        movingPiece =
             select.piece |>
             (\s -> 
             { s 
-            | position = ps
-            , location = toBoardLocation ps
+            | location = destination
             })
-        isPassant = enPassant board select.piece
-        passante  = passant board select.piece
-        targetLoc = 
-            if isPassant 
-            then select.origin |> (List.head passante ? identity) 
-            else destination
-        target = Matrix.get targetLoc board ? emptySquare
-        targetPiece = 
-            if isPassant
-            then (Matrix.get (step 1 targetLoc) board ? emptySquare).piece
-            else target.piece
+        --isPassant = enPassant board select.piece
+        --passante  = passant board select.piece
+        --targetLoc = 
+        --    if isPassant 
+        --    then select.origin |> (List.head passante ? identity) 
+        --    else destination
+        target = Matrix.get destination board ? emptySquare
+        --targetPiece =
+        --    if isPassant
+        --    then 
+        --        let _ = log "isPassant"
+        --            passantCapture = (Matrix.get (step 1 destination) board ? emptySquare).piece
+        --        in passantCapture
+        --    else target.piece
     in 
-    if (destination /= select.origin && target.valid) || isPassant
-    then End <| Move select.origin destination sourcePiece targetPiece isPassant
-    else Undo select
+    if destination /= select.origin && target.valid
+    then End <| Move select.origin destination movingPiece target.piece False
+    else Playing select
