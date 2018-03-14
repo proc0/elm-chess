@@ -27,7 +27,7 @@ debugHistory history =
         debugPiece : Piece -> String
         debugPiece pc =
             case pc.role of
-                Zebra -> ""
+                Ninja -> ""
                 _ -> String.join "\n" <| String.split "," <| toString pc         
     in
     debugPiece lastMove.piece ++ "\ncapture:" ++ debugPiece (lastMove.capture ? nullPiece)

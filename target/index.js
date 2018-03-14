@@ -15045,7 +15045,7 @@ var _darrensiegel$elm_chess_client$Data_Type$UI = F2(
 	});
 var _darrensiegel$elm_chess_client$Data_Type$Black = {ctor: 'Black'};
 var _darrensiegel$elm_chess_client$Data_Type$White = {ctor: 'White'};
-var _darrensiegel$elm_chess_client$Data_Type$Zebra = {ctor: 'Zebra'};
+var _darrensiegel$elm_chess_client$Data_Type$Ninja = {ctor: 'Ninja'};
 var _darrensiegel$elm_chess_client$Data_Type$King = {ctor: 'King'};
 var _darrensiegel$elm_chess_client$Data_Type$Queen = {ctor: 'Queen'};
 var _darrensiegel$elm_chess_client$Data_Type$Knight = {ctor: 'Knight'};
@@ -15272,7 +15272,7 @@ var _darrensiegel$elm_chess_client$Data_Tool$nullPiece = A5(
 	_darrensiegel$elm_chess_client$Data_Tool$zeroPs,
 	_darrensiegel$elm_chess_client$Data_Tool$zeroLoc,
 	_darrensiegel$elm_chess_client$Data_Type$Black,
-	_darrensiegel$elm_chess_client$Data_Type$Zebra,
+	_darrensiegel$elm_chess_client$Data_Type$Ninja,
 	{ctor: '[]'});
 var _darrensiegel$elm_chess_client$Data_Tool$emptySquare = A4(_darrensiegel$elm_chess_client$Data_Type$Square, _darrensiegel$elm_chess_client$Data_Tool$zeroLoc, _elm_lang$core$Maybe$Nothing, false, false);
 var _darrensiegel$elm_chess_client$Data_Tool$noMove = A5(_darrensiegel$elm_chess_client$Data_Type$Move, _darrensiegel$elm_chess_client$Data_Tool$zeroLoc, _darrensiegel$elm_chess_client$Data_Tool$zeroLoc, _darrensiegel$elm_chess_client$Data_Tool$nullPiece, _elm_lang$core$Maybe$Nothing, false);
@@ -15493,7 +15493,7 @@ var _darrensiegel$elm_chess_client$Model_FEN$figCharMap = function (fig) {
 		case 'King':
 			return _elm_lang$core$Native_Utils.chr('k');
 		default:
-			return _elm_lang$core$Native_Utils.chr('z');
+			return _elm_lang$core$Native_Utils.chr('j');
 	}
 };
 var _darrensiegel$elm_chess_client$Model_FEN$charFigMap = function (ch) {
@@ -15512,7 +15512,7 @@ var _darrensiegel$elm_chess_client$Model_FEN$charFigMap = function (ch) {
 		case 'k':
 			return _darrensiegel$elm_chess_client$Data_Type$King;
 		default:
-			return _darrensiegel$elm_chess_client$Data_Type$Zebra;
+			return _darrensiegel$elm_chess_client$Data_Type$Ninja;
 	}
 };
 var _darrensiegel$elm_chess_client$Model_FEN$toPiece = F2(
@@ -15558,7 +15558,7 @@ var _darrensiegel$elm_chess_client$Model_FEN$toSquare = F2(
 		var vacant = A4(_darrensiegel$elm_chess_client$Data_Type$Square, lc, _elm_lang$core$Maybe$Nothing, false, false);
 		return _elm_lang$core$Native_Utils.eq(
 			_darrensiegel$elm_chess_client$Model_FEN$charFigMap(ch),
-			_darrensiegel$elm_chess_client$Data_Type$Zebra) ? vacant : occupied;
+			_darrensiegel$elm_chess_client$Data_Type$Ninja) ? vacant : occupied;
 	});
 var _darrensiegel$elm_chess_client$Model_FEN$expandMatch = function (_p2) {
 	var _p3 = _p2;
@@ -18914,7 +18914,7 @@ var _darrensiegel$elm_chess_client$Model_History$fullMove = F2(
 var _darrensiegel$elm_chess_client$Model_History$debugHistory = function (history) {
 	var debugPiece = function (pc) {
 		var _p17 = pc.role;
-		if (_p17.ctor === 'Zebra') {
+		if (_p17.ctor === 'Ninja') {
 			return '';
 		} else {
 			return A2(

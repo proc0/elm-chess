@@ -31,7 +31,7 @@ type Role =
     | Knight
     | Queen
     | King
-    | Zebra
+    | Ninja
 
 type alias Piece =
     { position : Position
@@ -63,7 +63,6 @@ type alias Rule =
 type alias Selection =
     { origin : Location
     , piece : Piece
-    --, capture : Maybe Piece
     }
 
 type alias Move =

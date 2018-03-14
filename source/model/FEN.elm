@@ -71,7 +71,7 @@ toSquare : Location -> Char -> Square
 toSquare lc ch = 
     let vacant = Square lc Nothing False False
         occupied = Square lc (Just <| toPiece ch lc) False False
-    in if charFigMap ch == Zebra -- empty square sentinel
+    in if charFigMap ch == Ninja -- empty square sentinel
         then vacant              -- guards against invalid 
         else occupied            -- piece letters
 
@@ -93,7 +93,7 @@ charFigMap ch =
                 'r' -> Rook
                 'q' -> Queen
                 'k' -> King
-                _   -> Zebra
+                _   -> Ninja
 
 figCharMap : Role -> Char
 figCharMap fig = 
@@ -104,4 +104,4 @@ figCharMap fig =
                 Knight  -> 'n'
                 Queen   -> 'q'
                 King    -> 'k'
-                Zebra   -> 'z'
+                Ninja   -> 'j'
