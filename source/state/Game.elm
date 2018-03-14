@@ -133,38 +133,47 @@ update event { ui, chess, players } =
                             -- and highlight valid moves
                             lift selected.piece chess.board 
                             |> validate selected.piece
-                -- next move board            
+                -- next move board
                 End move -> 
-                    if move.enPassant
-                    then
-                        case event of
-                            Click _ -> 
-                                case move.capture of
-                                    Just captured ->
-                                        place chess.board move.piece 
-                                        |> lift move.piece |> lift captured
-                                    _ -> 
-                                        place chess.board move.piece 
-                                        |> lift move.piece
-                            otherwise -> 
-                                case move.capture of
-                                    Just captured ->
-                                        -- piece was already moving
-                                        place chess.board move.piece |> lift captured
-                                    _ -> 
-                                        place chess.board move.piece
-                    else
-                        case event of
-                            Click _ -> 
-                                -- lift origin piece if click move
-                                -- needs to place before removing? (bug?)
-                                place chess.board move.piece 
-                                |> lift move.piece 
-                            otherwise -> 
-                                -- piece was already moving
-                                place chess.board move.piece                        
-
-                Idle -> chess.board
+                    let isClick : Bool
+                        isClick = 
+                            case event of
+                                Click _ -> True
+                                _ -> False
+                        movePiece : Move -> Board -> Board                    
+                        movePiece mv bd =
+                            if isClick
+                            then place bd mv.piece 
+                                    |> lift mv.piece
+                            else place bd mv.piece
+                        eatPiece : Piece -> Board -> Board
+                        eatPiece cp bd =
+                            if isClick
+                            then lift cp bd
+                            else bd
+                        whenCapturing : 
+                            (Piece -> Board -> Board) 
+                            -> Move -> Board -> Board
+                        whenCapturing fn mv bd =
+                            case mv.capture of
+                                Just captured -> 
+                                    fn captured bd
+                                _ -> bd
+                        ifEnPassant : 
+                            (Move -> Board -> Board) 
+                            -> Move -> Board -> Board
+                        ifEnPassant fn mv bd =
+                            if mv.enPassant 
+                            then fn mv bd
+                            else bd
+                    in
+                    chess.board
+                    |> movePiece move 
+                    |> ifEnPassant 
+                        (whenCapturing eatPiece) move
+                    
+                Idle -> 
+                    chess.board
 
         history : History
         history = 
