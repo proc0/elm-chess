@@ -141,7 +141,7 @@ diagonals board piece =
             , (down, right)
             ]
         stepRange = List.map ((+) 1) boardside
-        step = List.foldl 
+        search = List.foldl 
             (\(d1,d2) (m, c) -> 
                 List.foldl (\i (memo, cont) -> 
                     let nextStep = (d1 i) >> (d2 i)
@@ -158,7 +158,7 @@ diagonals board piece =
                                 Nothing -> (nextStep::memo, True)
                         else (memo, False)
                     ) (m, True) stepRange) ([],True)
-    in fst <| step directions
+    in fst <| search directions
 
 parallels : Board -> Piece -> List Translation
 parallels board piece =
@@ -170,7 +170,7 @@ parallels board piece =
             , left
             ]
         stepRange = List.map ((+) 1) boardside
-        step = List.foldl 
+        search = List.foldl 
             (\d (m, c) -> 
                 List.foldl (\i (memo, cont) -> 
                     if cont
@@ -184,7 +184,7 @@ parallels board piece =
                             Nothing -> ((d i)::memo, True)                            
                     else (memo, False)
                     ) (m, True) stepRange) ([],True)
-    in fst <| step directions
+    in fst <| search directions
 
 -- TODO: refactor and take out Rules, flip type
 distinct : Piece -> Board -> List Translation -> List Translation
