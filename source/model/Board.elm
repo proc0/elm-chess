@@ -158,3 +158,16 @@ validate piece board =
             else []            
     in 
     List.foldl validateSquares board locations
+
+whenCapturing : (Piece -> Board -> Board) -> Move -> Board -> Board
+whenCapturing fn mv bd =
+    case mv.capture of
+        Just captured -> 
+            fn captured bd
+        _ -> bd
+        
+ifEnPassant : (Move -> Board -> Board) -> Move -> Board -> Board
+ifEnPassant fn mv bd =
+    if mv.enPassant 
+    then fn mv bd
+    else bd

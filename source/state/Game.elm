@@ -1,14 +1,10 @@
 module State.Game exposing (..)
 
-import Array exposing (..)
-import Char exposing (..)
-import Matrix exposing (..)
-import Html exposing (..)
-import Mouse exposing (..)
-import Debug exposing (..)
-import Maybe.Extra as Maebe exposing (..)
+import Debug exposing (log)
+import Mouse exposing (Position, moves, ups)
 import Material
 import Material.Layout as Layout
+import Maybe.Extra as Maebe exposing (..)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
@@ -18,8 +14,10 @@ import State.Action as Action exposing (..)
 
 newGame : (Game, Cmd Event)
 newGame = 
-    let ui = UI Material.model ""
+    let -- UI events
+        ui = UI Material.model ""
         cmd = [Layout.sub0 Mdl]
+        -- derive from FEN notation
         chess = fromFEN initialBoard
         player = idlePlayer
         players = 
@@ -29,8 +27,8 @@ newGame =
         game = Game ui chess players
     in game ! cmd
 
-subs : Game -> Sub Event
-subs { ui, players } = 
+subscribe : Game -> Sub Event
+subscribe { ui, players } = 
     let player = fst players
         layout = Layout.subs Mdl ui.mdl
     in -- if player 
@@ -55,12 +53,8 @@ update event { ui, chess, players } =
         selection = 
             case event of
                 Click position -> 
-                    Action.select position chess.board
+                    select position chess.board
                 _ -> Nothing
-
-        lastMove : Move
-        lastMove = 
-            List.head chess.history ? noMove
 
         -- next frame action
         action : Action
@@ -72,7 +66,7 @@ update event { ui, chess, players } =
                             toBoardLocation position
                         clickTo = 
                             -- click handler
-                            clickMove chess.board player lastMove
+                            clickMove chess.board player
                     in 
                     -- check selection 
                     case selection of
@@ -96,7 +90,7 @@ update event { ui, chess, players } =
                 -- place piece
                 Drop position -> 
                     whileMoving player.action
-                    <| endMove chess.board lastMove 
+                    <| endMove chess.board 
                             
                 othewise -> Idle
 
@@ -142,29 +136,20 @@ update event { ui, chess, players } =
                                 _ -> False
                         movePiece : Move -> Board -> Board                    
                         movePiece mv bd =
+                            -- if click (or drag)
                             if isClick
+                            -- lift from last loc 
+                            -- and place piece
                             then place bd mv.piece 
                                     |> lift mv.piece
+                            -- just place piece 
                             else place bd mv.piece
                         eatPiece : Piece -> Board -> Board
                         eatPiece cp bd =
+                            -- if click lift captured piece
+                            -- else player drops piece on it
                             if isClick
                             then lift cp bd
-                            else bd
-                        whenCapturing : 
-                            (Piece -> Board -> Board) 
-                            -> Move -> Board -> Board
-                        whenCapturing fn mv bd =
-                            case mv.capture of
-                                Just captured -> 
-                                    fn captured bd
-                                _ -> bd
-                        ifEnPassant : 
-                            (Move -> Board -> Board) 
-                            -> Move -> Board -> Board
-                        ifEnPassant fn mv bd =
-                            if mv.enPassant 
-                            then fn mv bd
                             else bd
                     in
                     chess.board

@@ -67,8 +67,7 @@ type alias Selection =
     }
 
 type alias Move =
-    { number : Int
-    , start : Location
+    { start : Location
     , end : Location
     , piece : Piece
     , capture : Maybe Piece

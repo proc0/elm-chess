@@ -39,8 +39,8 @@ whileMoving action change =
         Moving selection -> change selection
         _ -> Idle
 
-clickMove : Board -> Player -> Move -> Position -> Location -> Action
-clickMove board player lastMove pos loc =
+clickMove : Board -> Player -> Position -> Location -> Action
+clickMove board player pos loc =
     case player.action of
         Playing selected -> 
             let selPiece = 
@@ -56,7 +56,7 @@ clickMove board player lastMove pos loc =
                         }
                     }
             in 
-            endMove board lastMove sim
+            endMove board sim
         _ -> Idle
 
 capturing : Player -> Maybe Selection -> Bool 
@@ -65,38 +65,52 @@ capturing player selection =
                 s.piece.color /= player.color
               ) |> Maybe.withDefault False
 
-endMove : Board -> Move -> Selection -> Action
-endMove board lastMove select = 
-    let destination = 
+endMove : Board -> Selection -> Action
+endMove board select = 
+    let -- calculate moving position
+        destination = 
             toBoardLocation select.piece.position
-        count = lastMove.number + 1
-        sourcePiece = 
-            select.piece |>
-            (\s -> 
-            { s 
-            | position = toBoardPosition select.origin
-            , location = select.origin
-            })
-        isPassant = isEnPassant board sourcePiece
+        -- obtain target square
+        target = 
+            Matrix.get destination board ? emptySquare            
+        -- update moving piece location
         movingPiece =
             select.piece |>
             (\s -> 
             { s 
             | location = destination
+            })        
+        -- simulate pre-move piece 
+        originPiece = 
+            select.piece |>
+            (\s -> 
+            { s 
+              -- triangulate moving piece origin
+            | position = toBoardPosition select.origin
+            , location = select.origin
             })
-        target = 
-            Matrix.get destination board ? emptySquare
+        -- test en passant
+        isPassant = 
+            case originPiece.role of
+                Pawn -> 
+                    isEnPassant board originPiece
+                _ -> False
+
+        -- capture target
         targetPiece =
+            -- check pawns for enpassant
             if isPassant
-            then 
-                let passantStep = 
-                        backward select.piece 1 destination
-                    passantSquare = 
-                        Matrix.get passantStep board ? emptySquare
-                in passantSquare.piece
-            else 
+            then -- change target capture
+                let captureLocation =
+                        backward originPiece 1 destination
+                    passantCapture = 
+                        Matrix.get captureLocation board ? emptySquare
+                in -- and capture pawn
+                passantCapture.piece
+            else -- or capture target
                 target.piece
     in 
+    -- if not same square, and destination is a valid move
     if destination /= select.origin && target.valid
-    then End <| Move count select.origin destination movingPiece targetPiece isPassant
-    else Playing select
+    then End <| Move select.origin destination movingPiece targetPiece isPassant
+    else Playing select -- keep playing

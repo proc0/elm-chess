@@ -1,15 +1,16 @@
 module Data.Tool exposing (..)
 
-import Array exposing (..)
-import Matrix exposing (..)
-import Mouse exposing (..)
+import Matrix exposing (Location, loc)
+import Mouse exposing (Position)
+import List exposing (range, foldl)
+import Tuple exposing (first, second)
 
 import Data.Type exposing (..)
 
 -- Global settings
 
 boardside : List Int
-boardside = List.range 0 7
+boardside = range 0 7
 
 squareSize : Int
 squareSize = 54
@@ -18,8 +19,8 @@ squareSize = 54
 
 (=>) = (,)
 
-fst = Tuple.first
-snd = Tuple.second
+fst = first
+snd = second
 
 swap : (a,b) -> (b,a)
 swap (a,b) = (b,a)
@@ -27,11 +28,12 @@ swap (a,b) = (b,a)
 foldl1 : (a -> a -> a) -> List a -> Maybe a
 foldl1 f xs =
   let
-    mf x m = Just (case m of
-                     Nothing -> x
-                     Just y -> f y x)
+    mf x m = 
+        Just (case m of
+            Nothing -> x
+            Just y -> f y x)
   in
-    List.foldl mf Nothing xs
+    foldl mf Nothing xs
 
 last : List a -> Maybe a
 last = foldl1 (flip always)
@@ -89,4 +91,4 @@ idlePlayer color =
 
 noMove : Move 
 noMove =
-    Move 0 zeroLoc zeroLoc nullPiece Nothing False
+    Move zeroLoc zeroLoc nullPiece Nothing False
