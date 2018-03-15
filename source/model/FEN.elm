@@ -27,7 +27,8 @@ fromFEN : String -> Chess
 fromFEN fen =
     let parts =
         String.split " " fen |> Array.fromList
-        hasEnPassant = Maybe.withDefault "-" (Array.get 3 parts)
+        -- TODO: update state when initial FEN has en passant flag
+        --hasEnPassant = Maybe.withDefault "-" (Array.get 3 parts)
         board = parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))
         history = []
     in
@@ -50,10 +51,10 @@ fromFEN fen =
 
 parsePieces : String -> Board
 parsePieces s =
-    String.split "/" s |> List.map2 mapRank boardside |> Matrix.fromList
+    String.split "/" s |> List.map2 toRank boardside |> Matrix.fromList
 
-mapRank : Int -> String -> Rank
-mapRank y row =
+toRank : Int -> String -> Rank
+toRank y row =
     let pieces = expand row 
                  |> String.toList
         points = List.map2 (,) boardside (List.repeat 8 y)
@@ -71,37 +72,50 @@ toSquare : Location -> Char -> Square
 toSquare lc ch = 
     let vacant = Square lc Nothing False False
         occupied = Square lc (Just <| toPiece ch lc) False False
-    in if charFigMap ch == Ninja -- empty square sentinel
-        then vacant              -- guards against invalid 
-        else occupied            -- piece letters
+    in 
+    if toRole ch == Ninja -- empty square sentinel
+    then vacant           -- guards against invalid 
+    else occupied         -- piece letters
 
 toPiece : Char -> Location -> Piece
-toPiece ch lc =
-    let white rl = Piece (toBoardPosition lc) lc White rl 0 [lc]
-        black rl = Piece (toBoardPosition lc) lc Black rl 0 [lc]
-        role = charFigMap ch
-    in if isUpper ch
-        then white role
-        else black role
+toPiece ch location =
+    let position = 
+            toBoardPosition location
+        -- initial location
+        path = [location]
+        role = toRole ch
+        tick = 0
+        newPiece color = 
+            (Piece 
+                position 
+                location 
+                color 
+                role 
+                tick
+                path)
+    in 
+    if isUpper ch
+    then newPiece White
+    else newPiece Black
 
-charFigMap : Char -> Role
-charFigMap ch =
-            case (toLower ch) of 
-                'p' -> Pawn
-                'n' -> Knight
-                'b' -> Bishop
-                'r' -> Rook
-                'q' -> Queen
-                'k' -> King
-                _   -> Ninja
+toRole : Char -> Role
+toRole ch =
+    case (toLower ch) of 
+        'p' -> Pawn
+        'n' -> Knight
+        'b' -> Bishop
+        'r' -> Rook
+        'q' -> Queen
+        'k' -> King
+        _   -> Ninja
 
-figCharMap : Role -> Char
-figCharMap fig = 
-            case fig of
-                Pawn    -> 'p'
-                Rook    -> 'r'
-                Bishop  -> 'b'
-                Knight  -> 'n'
-                Queen   -> 'q'
-                King    -> 'k'
-                Ninja   -> 'j'
+fromRole : Role -> Char
+fromRole fig = 
+    case fig of
+        Pawn    -> 'p'
+        Rook    -> 'r'
+        Bishop  -> 'b'
+        Knight  -> 'n'
+        Queen   -> 'q'
+        King    -> 'k'
+        Ninja   -> 'j'

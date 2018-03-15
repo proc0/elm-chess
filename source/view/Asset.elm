@@ -10,7 +10,7 @@ getSvg  {color, role} =
         White -> getSvgTag "w_" role
 
 getSvgTag : String -> Role -> String
-getSvgTag prefix f = svgTag (prefix ++ String.fromChar (figCharMap f))
+getSvgTag prefix f = svgTag (prefix ++ String.fromChar (fromRole f))
 
 svgTag : String -> String
 svgTag s =

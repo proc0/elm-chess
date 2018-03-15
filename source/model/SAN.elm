@@ -12,7 +12,7 @@ import Model.FEN exposing (..)
 toSAN : Move -> String
 toSAN move =
     let letter p = 
-            let c = figCharMap p.role
+            let c = fromRole p.role
                 l = if p.color == White
                     then toUpper c
                     else c

@@ -15478,7 +15478,7 @@ var _elm_lang$core$Regex$AtMost = function (a) {
 };
 var _elm_lang$core$Regex$All = {ctor: 'All'};
 
-var _darrensiegel$elm_chess_client$Model_FEN$figCharMap = function (fig) {
+var _darrensiegel$elm_chess_client$Model_FEN$fromRole = function (fig) {
 	var _p0 = fig;
 	switch (_p0.ctor) {
 		case 'Pawn':
@@ -15497,7 +15497,7 @@ var _darrensiegel$elm_chess_client$Model_FEN$figCharMap = function (fig) {
 			return _elm_lang$core$Native_Utils.chr('j');
 	}
 };
-var _darrensiegel$elm_chess_client$Model_FEN$charFigMap = function (ch) {
+var _darrensiegel$elm_chess_client$Model_FEN$toRole = function (ch) {
 	var _p1 = _elm_lang$core$Char$toLower(ch);
 	switch (_p1.valueOf()) {
 		case 'p':
@@ -15517,37 +15517,19 @@ var _darrensiegel$elm_chess_client$Model_FEN$charFigMap = function (ch) {
 	}
 };
 var _darrensiegel$elm_chess_client$Model_FEN$toPiece = F2(
-	function (ch, lc) {
-		var role = _darrensiegel$elm_chess_client$Model_FEN$charFigMap(ch);
-		var black = function (rl) {
-			return A6(
-				_darrensiegel$elm_chess_client$Data_Type$Piece,
-				_darrensiegel$elm_chess_client$Data_Tool$toBoardPosition(lc),
-				lc,
-				_darrensiegel$elm_chess_client$Data_Type$Black,
-				rl,
-				0,
-				{
-					ctor: '::',
-					_0: lc,
-					_1: {ctor: '[]'}
-				});
+	function (ch, location) {
+		var tick = 0;
+		var role = _darrensiegel$elm_chess_client$Model_FEN$toRole(ch);
+		var path = {
+			ctor: '::',
+			_0: location,
+			_1: {ctor: '[]'}
 		};
-		var white = function (rl) {
-			return A6(
-				_darrensiegel$elm_chess_client$Data_Type$Piece,
-				_darrensiegel$elm_chess_client$Data_Tool$toBoardPosition(lc),
-				lc,
-				_darrensiegel$elm_chess_client$Data_Type$White,
-				rl,
-				0,
-				{
-					ctor: '::',
-					_0: lc,
-					_1: {ctor: '[]'}
-				});
+		var position = _darrensiegel$elm_chess_client$Data_Tool$toBoardPosition(location);
+		var newPiece = function (color) {
+			return A6(_darrensiegel$elm_chess_client$Data_Type$Piece, position, location, color, role, tick, path);
 		};
-		return _elm_lang$core$Char$isUpper(ch) ? white(role) : black(role);
+		return _elm_lang$core$Char$isUpper(ch) ? newPiece(_darrensiegel$elm_chess_client$Data_Type$White) : newPiece(_darrensiegel$elm_chess_client$Data_Type$Black);
 	});
 var _darrensiegel$elm_chess_client$Model_FEN$toSquare = F2(
 	function (lc, ch) {
@@ -15560,7 +15542,7 @@ var _darrensiegel$elm_chess_client$Model_FEN$toSquare = F2(
 			false);
 		var vacant = A4(_darrensiegel$elm_chess_client$Data_Type$Square, lc, _elm_lang$core$Maybe$Nothing, false, false);
 		return _elm_lang$core$Native_Utils.eq(
-			_darrensiegel$elm_chess_client$Model_FEN$charFigMap(ch),
+			_darrensiegel$elm_chess_client$Model_FEN$toRole(ch),
 			_darrensiegel$elm_chess_client$Data_Type$Ninja) ? vacant : occupied;
 	});
 var _darrensiegel$elm_chess_client$Model_FEN$expandMatch = function (_p2) {
@@ -15581,7 +15563,7 @@ var _darrensiegel$elm_chess_client$Model_FEN$expand = function (s) {
 		_darrensiegel$elm_chess_client$Model_FEN$expandMatch,
 		s);
 };
-var _darrensiegel$elm_chess_client$Model_FEN$mapRank = F2(
+var _darrensiegel$elm_chess_client$Model_FEN$toRank = F2(
 	function (y, row) {
 		var points = A2(
 			_elm_lang$core$List$map,
@@ -15605,7 +15587,7 @@ var _darrensiegel$elm_chess_client$Model_FEN$parsePieces = function (s) {
 	return _chendrix$elm_matrix$Matrix$fromList(
 		A3(
 			_elm_lang$core$List$map2,
-			_darrensiegel$elm_chess_client$Model_FEN$mapRank,
+			_darrensiegel$elm_chess_client$Model_FEN$toRank,
 			_darrensiegel$elm_chess_client$Data_Tool$boardside,
 			A2(_elm_lang$core$String$split, '/', s)));
 };
@@ -15615,10 +15597,6 @@ var _darrensiegel$elm_chess_client$Model_FEN$fromFEN = function (fen) {
 	var history = {ctor: '[]'};
 	var parts = _elm_lang$core$Array$fromList(
 		A2(_elm_lang$core$String$split, ' ', fen));
-	var hasEnPassant = A2(
-		_elm_lang$core$Maybe$withDefault,
-		'-',
-		A2(_elm_lang$core$Array$get, 3, parts));
 	var board = _darrensiegel$elm_chess_client$Model_FEN$parsePieces(
 		A2(
 			_elm_lang$core$Maybe$withDefault,
@@ -16640,6 +16618,9 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 					}
 				case 'End':
 					var _p12 = _p8._0;
+					var checkEnPassant = function (fn) {
+						return A2(_darrensiegel$elm_chess_client$Model_Board$ifEnPassant, fn, _p12);
+					};
 					var isClick = function () {
 						var _p11 = event;
 						if (_p11.ctor === 'Click') {
@@ -16648,22 +16629,22 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 							return false;
 						}
 					}();
-					var movePiece = F2(
+					var placePiece = F2(
 						function (mv, bd) {
 							return isClick ? A2(
 								_darrensiegel$elm_chess_client$Model_Board$lift,
 								mv.piece,
 								A2(_darrensiegel$elm_chess_client$Model_Board$place, bd, mv.piece)) : A2(_darrensiegel$elm_chess_client$Model_Board$place, bd, mv.piece);
 						});
+					var movePiece = placePiece(_p12);
 					var eatPiece = F2(
 						function (cp, bd) {
 							return isClick ? A2(_darrensiegel$elm_chess_client$Model_Board$lift, cp, bd) : bd;
 						});
-					return A3(
-						_darrensiegel$elm_chess_client$Model_Board$ifEnPassant,
+					return A2(
+						checkEnPassant,
 						_darrensiegel$elm_chess_client$Model_Board$whenCapturing(eatPiece),
-						_p12,
-						A2(movePiece, _p12, _p15.board));
+						movePiece(_p15.board));
 				default:
 					return _p15.board;
 			}
@@ -18857,7 +18838,7 @@ var _darrensiegel$elm_chess_client$Model_SAN$toSAN = function (move) {
 			_elm_lang$core$Char$fromCode(x_ + 97));
 	};
 	var letter = function (p) {
-		var c = _darrensiegel$elm_chess_client$Model_FEN$figCharMap(p.role);
+		var c = _darrensiegel$elm_chess_client$Model_FEN$fromRole(p.role);
 		var l = _elm_lang$core$Native_Utils.eq(p.color, _darrensiegel$elm_chess_client$Data_Type$White) ? _elm_lang$core$Char$toUpper(c) : c;
 		return _elm_lang$core$String$fromChar(l);
 	};
@@ -19083,7 +19064,7 @@ var _darrensiegel$elm_chess_client$View_Asset$getSvgTag = F2(
 				_elm_lang$core$Basics_ops['++'],
 				prefix,
 				_elm_lang$core$String$fromChar(
-					_darrensiegel$elm_chess_client$Model_FEN$figCharMap(f))));
+					_darrensiegel$elm_chess_client$Model_FEN$fromRole(f))));
 	});
 var _darrensiegel$elm_chess_client$View_Asset$getSvg = function (_p1) {
 	var _p2 = _p1;

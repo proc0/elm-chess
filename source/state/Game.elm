@@ -4,13 +4,13 @@ import Debug exposing (log)
 import Mouse exposing (Position, moves, ups)
 import Material
 import Material.Layout as Layout
-import Maybe.Extra as Maebe exposing (..)
+import Maybe.Extra exposing (..)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.FEN exposing (..)
 import Model.Board exposing (..)
-import State.Action as Action exposing (..)
+import State.Action exposing (..)
 
 newGame : (Game, Cmd Event)
 newGame = 
@@ -134,8 +134,8 @@ update event { ui, chess, players } =
                             case event of
                                 Click _ -> True
                                 _ -> False
-                        movePiece : Move -> Board -> Board                    
-                        movePiece mv bd =
+                        placePiece : Move -> Board -> Board                    
+                        placePiece mv bd =
                             -- if click (or drag)
                             if isClick
                             -- lift from last loc 
@@ -146,16 +146,20 @@ update event { ui, chess, players } =
                             else place bd mv.piece
                         eatPiece : Piece -> Board -> Board
                         eatPiece cp bd =
-                            -- if click lift captured piece
+                            -- if click, lift captured piece
                             -- else player drops piece on it
                             if isClick
                             then lift cp bd
                             else bd
+                        -- helpers
+                        movePiece = placePiece move
+                        checkEnPassant fn =
+                            ifEnPassant fn move
                     in
                     chess.board
-                    |> movePiece move 
-                    |> ifEnPassant 
-                        (whenCapturing eatPiece) move
+                    |> movePiece 
+                    |> checkEnPassant 
+                        (whenCapturing eatPiece)
                     
                 Idle -> 
                     chess.board
