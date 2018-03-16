@@ -16,6 +16,17 @@ isOccupied square = isJust square.piece
 isVacant : Square -> Bool
 isVacant = not << isOccupied
 
+isNewRook : Square -> Bool
+isNewRook square =
+    case square.piece of
+        Just pc ->
+            case pc.role of
+                Rook -> 
+                    pc.tick == 0
+                _ -> False
+        _ -> False
+
+
 isFirstMove : Square -> Bool
 isFirstMove square =
     case square.piece of
@@ -57,3 +68,8 @@ passanting pawn =
     case pawn.color of
         White -> y == 3
         Black -> y == 4
+
+stationary : Piece -> Bool
+stationary piece = 
+    piece.tick == 0
+    

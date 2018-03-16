@@ -1,9 +1,9 @@
 module Model.Moves exposing (..)
 
-import Array exposing (..)
-import Matrix exposing (..)
-import Debug exposing (..)
-import Maybe.Extra as Maebe exposing (..)
+import Matrix exposing (Location, loc, get)
+import List exposing (foldl, map, concatMap, filterMap, length, head)
+import Debug exposing (log)
+import Maybe.Extra exposing (..)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
@@ -41,7 +41,7 @@ backward piece =
 
 isEnPassant : Board -> Piece -> Bool
 isEnPassant board piece = 
-    passanting piece && (isJust << List.head <| enPassant board piece)
+    passanting piece && (isJust << head <| enPassant board piece)
 
 pieceMoves : Piece -> Board -> List Translation
 pieceMoves piece board = 
@@ -74,6 +74,8 @@ pieceMoves piece board =
                     , down 1 >> left 1
                     , down 1 >> right 1
                     ]
+                    ++
+                    find castle
                 _ -> []
     in 
     -- get possible moves by role
@@ -82,35 +84,95 @@ pieceMoves piece board =
     -- by same color pieces
     |> distinct piece board
 
+--kingside : Color -> List Location
+--kingside color =
+--    toLocations (case color of
+--        White -> [(7,5),(7,6),(7,7)]
+--        Black -> [(0,5),(0,6),(0,7)])
+
+--queenside : Color -> List Location
+--queenside color =
+--    toLocations (case color of
+--        White -> [(7,0),(7,1),(7,2),(7,3)]
+--        Black -> [(0,0),(0,1),(0,2),(0,3)])
+
+applyRule : Board -> Piece -> (Translation, Square -> Bool) -> List Translation -> List Translation
+applyRule board piece (move, rule) moves =
+    let target = Matrix.get (move piece.location) board
+    in 
+    (target |> Maybe.map 
+        (\square ->
+            if rule square
+            then move::moves
+            else moves)) ? moves
+
+castle : Board -> Piece -> List Translation
+castle board king = 
+    let withKing fn =
+            fn board king
+        clearKing = 
+            foldl (withKing applyRule) []
+        sides = 
+            [ right
+            , left
+            ]
+        clear tests =
+            (length <| clearKing tests)
+            ==
+            (length tests)
+        castling step =
+            let (y,x) = 
+                    step 4 king.location
+                rookLoc =
+                    if y /= 0
+                    then 3
+                    else 4
+                newRook = 
+                    [ (step rookLoc, isNewRook)
+                    ]
+                jumpSquares =
+                    [ (step 1, isVacant)
+                    , (step 2, isVacant)
+                    ]
+            in 
+            if clear newRook && clear jumpSquares
+            then map fst jumpSquares
+            else []
+    in
+    if stationary king
+    then concatMap castling sides
+    else []
+
+
 pawnMoves : Board -> Piece -> List Translation
 pawnMoves board pawn =
-        let (y,x) = pawn.location
-            step = forward pawn
-            checkPawn fn = 
-                fn board pawn
-            checkRules = 
-                List.foldl (checkPawn applyRule) []
-            rules : List (Translation, Square -> Bool)
-            rules = 
-                -- if pawn hasn't moved
-                (if starting pawn
-                -- add two steps if vacant
-                then [(step 2, isVacant)] 
-                else []) 
-                ++ 
-                -- can step forward if vacant
-                [ (step 1, isVacant)
-                -- can eat diagonals if occupied
-                , (step 1 >> left 1, isOccupied)
-                , (step 1 >> right 1, isOccupied)
-                ]
-        in
-        checkRules rules ++ checkPawn enPassant
+    let (y,x) = pawn.location
+        step = forward pawn
+        checkPawn fn = 
+            fn board pawn
+        checkRules = 
+            foldl (checkPawn applyRule) []
+        rules : List (Translation, Square -> Bool)
+        rules = 
+            -- if pawn hasn't moved
+            (if starting pawn
+            -- add two steps if vacant
+            then [(step 2, isVacant)] 
+            else []) 
+            ++ 
+            -- can step forward if vacant
+            [ (step 1, isVacant)
+            -- can eat diagonals if occupied
+            , (step 1 >> left 1, isOccupied)
+            , (step 1 >> right 1, isOccupied)
+            ]
+    in
+    checkRules rules ++ checkPawn enPassant
 
 enPassant : Board -> Piece -> List Translation
 enPassant board pawn = 
     let step = forward pawn
-        checkPawn = List.foldl (applyRule board pawn) []
+        checkPawn = foldl (applyRule board pawn) []
         passantRules move = 
             [ (move 1, isFirstMove)
             , (move 1, isPawn)
@@ -118,9 +180,9 @@ enPassant board pawn =
         passing : Movement -> Square -> Bool
         passing dir square =
             if isVacant square
-            then (List.length << checkPawn <| passantRules dir)
+            then (length << checkPawn <| passantRules dir)
                  == -- rules length does not change after check
-                 (List.length <| passantRules identity)
+                 (length <| passantRules identity)
             else False
         rules : List (Translation, Square -> Bool)
         rules =
@@ -140,10 +202,10 @@ diagonals board piece =
             , (up, right)
             , (down, right)
             ]
-        stepRange = List.map ((+) 1) boardside
-        search = List.foldl 
+        stepRange = map ((+) 1) boardside
+        search = foldl 
             (\(d1,d2) (m, c) -> 
-                List.foldl (\i (memo, cont) -> 
+                foldl (\i (memo, cont) -> 
                     let nextStep = (d1 i) >> (d2 i)
                     -- stop processing if piece found
                     in if cont
@@ -169,10 +231,10 @@ parallels board piece =
             , down
             , left
             ]
-        stepRange = List.map ((+) 1) boardside
-        search = List.foldl 
+        stepRange = map ((+) 1) boardside
+        search = foldl 
             (\d (m, c) -> 
-                List.foldl (\i (memo, cont) -> 
+                foldl (\i (memo, cont) -> 
                     if cont
                     then 
                         let blocking = findSquare (d i point) board
@@ -189,7 +251,7 @@ parallels board piece =
 -- TODO: refactor and take out Rules, flip type
 distinct : Piece -> Board -> List Translation -> List Translation
 distinct piece board locations = 
-    List.filterMap (\move -> 
+    filterMap (\move -> 
         case Matrix.get (move piece.location) board of
             Just square ->
                 case square.piece of
@@ -208,12 +270,3 @@ findSquare lc board =
         Just s -> s
         Nothing -> emptySquare
 
-applyRule : Board -> Piece -> (Translation, Square -> Bool) -> List Translation -> List Translation
-applyRule board piece (move, rule) moves =
-    let target = Matrix.get (move piece.location) board
-    in 
-    (target |> Maybe.map 
-        (\square ->
-            if rule square
-            then move::moves
-            else moves)) ? moves

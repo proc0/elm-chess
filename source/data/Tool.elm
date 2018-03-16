@@ -2,7 +2,7 @@ module Data.Tool exposing (..)
 
 import Matrix exposing (Location, loc)
 import Mouse exposing (Position)
-import List exposing (range, foldl)
+import List exposing (range, foldl, map)
 import Tuple exposing (first, second)
 
 import Data.Type exposing (..)
@@ -45,6 +45,9 @@ pos x_ y_ = {x=x_, y=y_}
 
 toLocation : Position -> Location
 toLocation p = loc p.y p.x -- loc col row
+
+toLocations : List (Int, Int) -> List Location
+toLocations = map (uncurry loc)
 
 toPosition : (Int, Int) -> Position
 toPosition (x_, y_) = {x=y_, y=x_} -- {row, col}
