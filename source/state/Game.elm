@@ -4,25 +4,23 @@ import Debug exposing (log)
 import Mouse exposing (Position, moves, ups)
 import Material
 import Material.Layout as Layout
-import Maybe.Extra exposing (..)
+--import Maybe.Extra exposing ((?))
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
-import Model.FEN exposing (..)
 import Model.Board exposing (..)
 import State.Action exposing (..)
 
 newGame : (Game, Cmd Event)
 newGame = 
-    let -- UI events
+    let -- UI events and subs
         ui = UI Material.model ""
         cmd = [Layout.sub0 Mdl]
-        -- derive from FEN notation
-        chess = fromFEN initialBoard
-        player = idlePlayer
+        -- prep game args
+        chess = Chess openingBoard []
         players = 
-            ( player White
-            , player Black
+            ( idlePlayer White
+            , idlePlayer Black
             )
         game = Game ui chess players
     in game ! cmd
@@ -120,13 +118,13 @@ update event { ui, chess, players } =
                         -- last frame was moving
                         Moving _ -> 
                             -- highlight valid moves
-                            validate selected.piece chess.board
+                            analyze selected.piece chess.board
                         -- if last frame was not moving
                         otherwise -> 
                             -- start moving (lift piece)
                             -- and highlight valid moves
                             lift selected.piece chess.board 
-                            |> validate selected.piece
+                            |> analyze selected.piece
                 -- next move board
                 End move -> 
                     let isClick : Bool
@@ -155,9 +153,12 @@ update event { ui, chess, players } =
                         movePiece = placePiece move
                         checkEnPassant fn =
                             ifEnPassant fn move
+                        ifCastling fn =
+                            whenCastling fn move
                     in
                     chess.board
                     |> movePiece 
+                    |> ifCastling castleRook
                     |> checkEnPassant 
                         (whenCapturing eatPiece)
                     

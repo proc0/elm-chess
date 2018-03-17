@@ -2,7 +2,7 @@ module Data.Tool exposing (..)
 
 import Matrix exposing (Location, loc)
 import Mouse exposing (Position)
-import List exposing (range, foldl, map)
+import List exposing (range, foldl, map, length)
 import Tuple exposing (first, second)
 
 import Data.Type exposing (..)
@@ -18,6 +18,11 @@ squareSize = 54
 -- Global tools
 
 (=>) = (,)
+
+(??) a b = 
+    if a
+    then b
+    else []
 
 fst = first
 snd = second
@@ -37,6 +42,9 @@ foldl1 f xs =
 
 last : List a -> Maybe a
 last = foldl1 (flip always)
+
+isPositive : Int -> Bool
+isPositive n = (negate <| abs n) /= n 
 
 -- Type castings
 
@@ -84,8 +92,8 @@ nullPiece : Piece
 nullPiece = 
     Piece zeroPs zeroLoc Black Ninja 0 []
 
-emptySquare : Square
-emptySquare = 
+vacantSquare : Square
+vacantSquare = 
     Square zeroLoc Nothing False False
 
 idlePlayer : Color -> Player 

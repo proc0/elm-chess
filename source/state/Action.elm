@@ -1,27 +1,26 @@
 module State.Action exposing (..)
 
-import Matrix exposing (..)
-import Char exposing (..)
-import Maybe.Extra as Maebe exposing (..)
-import Mouse exposing (..)
-import Debug exposing (..)
+import Matrix exposing (Location, get)
+import Maybe.Extra exposing ((?), join)
+import Mouse exposing (Position)
+import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
-import Model.FEN exposing (..)
 import Model.Moves exposing (..)
+import Model.Rules exposing (..)
 
 select : Position -> Board -> Maybe Selection
 select position board = 
     let locate xy = 
-            Matrix.get (toBoardLocation xy) board
+            get (toBoardLocation xy) board
         selectPiece square = 
             let selection piece = 
                 Selection square.location piece
             in 
             Maybe.map selection square.piece
         selecting = 
-            Maebe.join << Maybe.map selectPiece << locate
+            join << Maybe.map selectPiece << locate
     in 
     selecting position
 
@@ -72,7 +71,7 @@ endMove board select =
             toBoardLocation select.piece.position
         -- obtain target square
         target = 
-            Matrix.get destination board ? emptySquare            
+            get destination board ? vacantSquare            
         -- update moving piece location
         movingPiece =
             select.piece |>
@@ -104,7 +103,7 @@ endMove board select =
                 let captureLocation =
                         backward originPiece 1 destination
                     passantCapture = 
-                        Matrix.get captureLocation board ? emptySquare
+                        get captureLocation board ? vacantSquare
                 in -- and capture pawn
                 passantCapture.piece
             else -- or capture target

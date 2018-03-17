@@ -15,24 +15,25 @@ import Data.Tool exposing (..)
 
 initialPieces = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 initialBoard = initialPieces ++ " w KQkq - 0 1"
+--initialBoard = blackCastlingAvailable
 
 -- other examples
 --testingEngine = "K6k/3n2pp/8/1P6/B7/8/6PP/8 w - - 0 1"
 --whiteInCheck = "rnb1kbnr/pppppppp/4q3/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"
 --blackCheckMate = "1R6/8/kQ6/8/8/8/6K1/8 w - - 0 1"
 --enPassantBoard = "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/RNBQKBNR w KQkq a6 0 1"
---castlingAvailable = "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/R3K2R w KQkq - 0 1"
+--whiteCastlingAvailable = "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/R3K2R w KQkq - 0 1"
+--blackCastlingAvailable = "r3k2r/1ppppppp/8/pP6/8/8/P1PPPPPP/R3K2R b KQkq - 0 1"
 
-fromFEN : String -> Chess
+fromFEN : String -> Board
 fromFEN fen =
     let parts =
         String.split " " fen |> Array.fromList
         -- TODO: update state when initial FEN has en passant flag
         --hasEnPassant = Maybe.withDefault "-" (Array.get 3 parts)
         board = parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))
-        history = []
     in
-    Chess board history
+    board
             --(maybeContains (Array.get 1 parts) "w")
             --(maybeContains (Array.get 2 parts) "Q")
             --(maybeContains (Array.get 2 parts) "K")

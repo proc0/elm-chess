@@ -8,7 +8,13 @@ import Debug exposing (..)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
-import Model.Moves exposing (..)
+import Model.FEN exposing (..)
+import Model.Rules exposing (..)
+import Model.Query exposing (..)
+
+-- derive from FEN notation
+openingBoard : Board
+openingBoard = fromFEN initialBoard
 
 --logPiece : Piece -> Board -> Board
 --logPiece pc bd =
@@ -134,6 +140,13 @@ drop piece board =
     in 
     Matrix.update target (withValidSquare <| occupySquare newPiece) board
 
+jump : Piece -> Board -> Board
+jump piece board = 
+    let target = piece.location
+        newPiece = translatePiece target piece
+    in 
+    Matrix.update target (occupySquare newPiece) board
+
 revert : Piece -> Board -> Board
 revert piece board = 
     let putback target = 
@@ -141,8 +154,8 @@ revert piece board =
     in 
     Matrix.mapWithLocation putback board
 
-validate : Piece -> Board -> Board
-validate piece board =
+analyze : Piece -> Board -> Board
+analyze piece board =
     let origin = 
             piece.location
         translations = 
@@ -159,6 +172,12 @@ validate piece board =
     in 
     List.foldl validateSquares board locations
 
+whenCastling : (Move -> Board -> Board) -> Move -> Board -> Board
+whenCastling fn mv bd =
+    if isCastling mv.piece
+    then fn mv bd
+    else bd
+
 whenCapturing : (Piece -> Board -> Board) -> Move -> Board -> Board
 whenCapturing fn mv bd =
     case mv.capture of
@@ -171,3 +190,20 @@ ifEnPassant fn mv bd =
     if mv.enPassant 
     then fn mv bd
     else bd
+
+castleRook : Move -> Board -> Board
+castleRook move board = 
+    let (y1,x1) =
+            move.start
+        (y2,x2) =
+            move.end
+        castleDiff = x2 - x1
+        rookMove = 
+            if isPositive castleDiff
+            then ((loc y1 7), (loc y1 5))
+            else ((loc y1 0), (loc y1 3))
+        rook =
+            (Matrix.get (fst rookMove) board ? vacantSquare).piece ? nullPiece
+    in
+    remove rook board |> jump ({ rook | location = snd rookMove })
+
