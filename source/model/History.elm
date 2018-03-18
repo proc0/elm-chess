@@ -1,9 +1,10 @@
 module Model.History exposing (..)
 
-import Char exposing (..)
-import Tuple exposing (..)
-import Maybe.Extra as Maebe exposing (..)
-import Debug exposing (..)
+import Char exposing (isUpper, toLower)
+import Tuple exposing (mapFirst, mapSecond)
+import List exposing (foldl, head, indexedMap, map, reverse)
+import Maybe.Extra exposing ((?))
+import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
@@ -12,25 +13,27 @@ import Model.SAN exposing (..)
 
 formatHistory : History -> List String
 formatHistory =
-    List.map (uncurry fullMove) 
-    << List.indexedMap (,)
-    << List.map 
-        (Tuple.mapSecond toSAN 
-            << Tuple.mapFirst toSAN) 
+    map (uncurry fullMove) 
+    << indexedMap (,)
+    << map 
+        (mapSecond toSAN 
+            << mapFirst toSAN) 
     << toTuples 
-    << List.reverse 
+    << reverse 
 
 debugHistory : History -> String
 debugHistory history =
     let lastMove = 
-            List.head history ? noMove
+            head history ? noMove
+        formatPiece p =
+            String.join " " [(toString p.color), (toString p.role), (toString p.location)]
         debugPiece : Piece -> String
         debugPiece pc =
             case pc.role of
-                Ninja -> ""
-                _ -> String.join "\n" <| String.split "," <| toString pc         
+                Joker -> ""
+                _ -> formatPiece pc         
     in
-    debugPiece lastMove.piece ++ "\ncapture:" ++ debugPiece (lastMove.capture ? nullPiece)
+    debugPiece lastMove.piece ++ "\ncapture:\n" ++ debugPiece (lastMove.capture ? nullPiece)
 
 fullMove : Int -> (String, String) -> String
 fullMove i (w,b) =
@@ -49,12 +52,12 @@ toTuples moves =
             case mx of
                 Just mv_ -> ms ++ [(mv_, mv_)]
                 _ -> ms
-    in tuckFold <| List.foldl foldzip (Nothing, []) moves
+    in tuckFold <| foldl foldzip (Nothing, []) moves
 
 prevPlayerColor : History -> Color
 prevPlayerColor ms = 
     -- if no history, prev player was tech black
-    (Maybe.map (\m -> m.piece.color) (List.head ms)) ? Black
+    (Maybe.map (\m -> m.piece.color) (head ms)) ? Black
 
 getPlayerByColor : Color -> History -> Players -> Player
 getPlayerByColor color history (curPlayer, prevPlayer) = 

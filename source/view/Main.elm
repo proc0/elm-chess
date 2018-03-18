@@ -1,23 +1,19 @@
 module View.Main exposing (..)
 
-import Char exposing (..)
-import Matrix exposing (..)
-import Maybe.Extra as Maebe exposing (..)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import Mouse exposing (..)
+import Matrix exposing (flatten, toList)
+import Html exposing (Attribute, Html, div, node, text)
+import Html.Attributes exposing (class, classList, style)
+import Html.Events exposing (on)
+import Mouse exposing (Position)
 import SvgParser exposing (parse)
-import Json.Decode as Json exposing (..)
-import Debug exposing (..)
-
-import Material.Layout as Layout
-import Material.Options as Options exposing (css, cs, when)
+import Json.Decode as Json exposing (map)
+import Material.Layout as Layout exposing (render, fixedHeader)
+import Material.Options as Options
 import Material.Color as Color
 import Material.Typography as Typo
 import Material.Table as Table
 import Material.List as MList
-import Material.Options as Options
+import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
@@ -32,6 +28,16 @@ render : Game -> Html Event
 render ({ ui, chess, players } as game) =
     let whitePlayer = getWhite chess.history players
         blackPlayer = getBlack chess.history players
+        debugPanel =
+            if ui.debug
+            then 
+                [(node "pre" 
+                [ class "debug-panel"
+                ]
+                [ text <| debugHistory chess.history
+                ])]
+            else 
+                []     
     in 
     (Layout.render Mdl ui.mdl [Layout.fixedHeader]
             { header = [
@@ -40,28 +46,24 @@ render ({ ui, chess, players } as game) =
                     , Color.text (Color.white)
                     ] 
                     [ Options.div [] 
-                        [ text "Demo Chess"
-                        ],
-                        node "pre" 
-                            [ class "debug-panel"
-                            ]
-                            [ text <| debugHistory chess.history
-                            ]
-                        
+                        ([ text "Demo Chess"
+                        ] 
+                        ++ 
+                        debugPanel)
                     ]
                 ]
             , drawer = []
             , tabs = ([], [])
             , main = [
                 r_game game
-                , Options.div [ cs "hud" ]
+                , Options.div [ Options.cs "hud" ]
                     [ Options.div
-                        [ cs "player"
+                        [ Options.cs "player"
                         ]
                         [ text blackPlayer.name
                         ]
                     , Options.div 
-                        [ cs "history"
+                        [ Options.cs "history"
                         ] 
                         [ Options.div 
                             [ Typo.subhead
@@ -69,21 +71,21 @@ render ({ ui, chess, players } as game) =
                             [ text ui.turn
                             ]
                         , MList.ul 
-                            [ cs "moves" 
+                            [ Options.cs "moves" 
                             ]
                             (chess.history 
                                 |> formatHistory
                                 |> List.map (\move ->
                                     MList.li 
-                                        [ -- 
-                                        ] 
-                                        [ text move 
-                                        ]
+                                    [ -- 
+                                    ] 
+                                    [ text move 
+                                    ]
                                 )
                             )
                         ]
                     , Options.div
-                        [ cs "player"
+                        [ Options.cs "player"
                         ]
                         [ text whitePlayer.name
                         ]
@@ -109,7 +111,7 @@ r_player : Player -> Html Event
 r_player {color, action} =
     let mv_piece = 
             case action of
-                Moving sel -> ([classList [("visible", True), (toString color, True)]], [r_dragSvg sel.piece])
+                Moving sel -> ([classList [("visible", True), (toString color, True)]], [r_dragSvg sel])
                 _ -> ([], [])
     in (uncurry (node "player")) mv_piece
 
@@ -162,21 +164,35 @@ r_svg ({ position } as piece) =
         Ok svg -> node "piece" styles [svg]
 
 -- dragable svg markup
-r_dragSvg : Piece -> Html Event
-r_dragSvg ({ position } as piece) = 
-    let x = position.x
-        y = position.y
-    in -- parse SVG from String
-        case parse (getSvg piece) of
-            Err e -> text e
-            Ok svg -> node "piece" 
-                        [ style 
-                            [ "position" => "absolute"
-                            -- minus 56px from header
-                            , "top" => px ((y - 32) - 56)
-                            , "left" => px (x - 32)
-                            ]
-                        ] [svg]
+r_dragSvg : Selection -> Html Event
+r_dragSvg { origin, piece } = 
+    let x = piece.position.x
+        y = piece.position.y
+        o = toBoardPosition origin
+        -- minus 56px from header
+        newPos = Position (x - 32) ((y - 32) - 56)
+        l_t = newPos.x < o.x - 18
+        r_t = newPos.x > o.x + 18
+        u_t = newPos.y < o.y - 18
+        d_t = newPos.y > o.y + 18
+        dest =
+            if l_t || r_t || u_t || d_t
+            then newPos
+            -- not sure why the offset to 
+            -- keep piece still on click
+            else Position (o.x+4) (o.y+4)
+    in 
+    -- parse SVG from String
+    case parse (getSvg piece) of
+        Err e -> text e
+        Ok svg -> node "piece" 
+                    [ style 
+                        [ "position" => "absolute"
+                        , "top" => px dest.y
+                        , "left" => px dest.x
+                        ]
+                    ] [svg]
+
 
 -- render board
 ---------------

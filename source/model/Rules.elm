@@ -17,12 +17,12 @@ pieceMoves piece board =
     let find f = f board piece
         moves role =
             case role of
-                Pawn    -> find pawnMoves
-                Bishop  -> find diagonals
-                Rook    -> find parallels
-                Queen   -> find diagonals 
-                           ++ 
-                           find parallels               
+                Pawn   -> find pawnMoves
+                Bishop -> find diagonals
+                Rook   -> find parallels
+                Queen  -> find diagonals 
+                          ++ 
+                          find parallels               
                 Knight -> 
                     [ up 2 >> right 1
                     , up 2 >> left 1

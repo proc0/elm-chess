@@ -1,10 +1,11 @@
 module State.Game exposing (..)
 
-import Debug exposing (log)
+import Char exposing (fromCode, toCode)
 import Mouse exposing (Position, moves, ups)
+import Keyboard exposing (downs, ups)
 import Material
 import Material.Layout as Layout
---import Maybe.Extra exposing ((?))
+import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
@@ -14,7 +15,7 @@ import State.Action exposing (..)
 newGame : (Game, Cmd Event)
 newGame = 
     let -- UI events and subs
-        ui = UI Material.model ""
+        ui = UI Material.model "" False
         cmd = [Layout.sub0 Mdl]
         -- prep game args
         chess = Chess openingBoard []
@@ -29,17 +30,27 @@ subscribe : Game -> Sub Event
 subscribe { ui, players } = 
     let player = fst players
         layout = Layout.subs Mdl ui.mdl
+        persistent =
+            [ layout
+            , Keyboard.presses (\k ->  
+                if fromCode k == '`' && ui.debug == False
+                then Debug True
+                else if fromCode k == '`'
+                then Debug False
+                else Debug ui.debug)
+            ]
     in -- if player 
     case player.action of
         -- is moving
         Moving _ -> 
-            Sub.batch 
+            Sub.batch <|
                 -- track position
                 [ Mouse.moves Drag
                 , Mouse.ups Drop
-                , layout
                 ]
-        _ -> layout
+                ++
+                persistent
+        _ -> Sub.batch persistent
 
 update : Event -> Game -> ( Game, Cmd Event )
 update event { ui, chess, players } =
@@ -83,12 +94,12 @@ update event { ui, chess, players } =
                 -- drag piece
                 Drag position -> 
                     whileMoving player.action 
-                    <| updateMoving position
+                        <| updateMoving position
 
                 -- place piece
                 Drop position -> 
                     whileMoving player.action
-                    <| endMove chess.board 
+                        <| endMove chess.board 
                             
                 othewise -> Idle
 
@@ -177,7 +188,11 @@ update event { ui, chess, players } =
                 currentColor = toString currentPlayer.color
             in
             { ui 
-            | turn = currentColor ++ "'s turn" 
+            | turn = currentColor ++ "'s turn"
+            , debug = 
+                case event of
+                    Debug debug -> debug
+                    _ -> ui.debug
             }
 
         game mat_ =

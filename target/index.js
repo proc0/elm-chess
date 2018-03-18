@@ -8708,6 +8708,175 @@ var _elm_lang$mouse$Mouse$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Mouse'] = {pkg: 'elm-lang/mouse', init: _elm_lang$mouse$Mouse$init, onEffects: _elm_lang$mouse$Mouse$onEffects, onSelfMsg: _elm_lang$mouse$Mouse$onSelfMsg, tag: 'sub', subMap: _elm_lang$mouse$Mouse$subMap};
 
+var _elm_lang$keyboard$Keyboard$onSelfMsg = F3(
+	function (router, _p0, state) {
+		var _p1 = _p0;
+		var _p2 = A2(_elm_lang$core$Dict$get, _p1.category, state);
+		if (_p2.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (tagger) {
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					tagger(_p1.keyCode));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (_p3) {
+					return _elm_lang$core$Task$succeed(state);
+				},
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p2._0.taggers)));
+		}
+	});
+var _elm_lang$keyboard$Keyboard_ops = _elm_lang$keyboard$Keyboard_ops || {};
+_elm_lang$keyboard$Keyboard_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p4) {
+				return task2;
+			},
+			task1);
+	});
+var _elm_lang$keyboard$Keyboard$init = _elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty);
+var _elm_lang$keyboard$Keyboard$categorizeHelpHelp = F2(
+	function (value, maybeValues) {
+		var _p5 = maybeValues;
+		if (_p5.ctor === 'Nothing') {
+			return _elm_lang$core$Maybe$Just(
+				{
+					ctor: '::',
+					_0: value,
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return _elm_lang$core$Maybe$Just(
+				{ctor: '::', _0: value, _1: _p5._0});
+		}
+	});
+var _elm_lang$keyboard$Keyboard$categorizeHelp = F2(
+	function (subs, subDict) {
+		categorizeHelp:
+		while (true) {
+			var _p6 = subs;
+			if (_p6.ctor === '[]') {
+				return subDict;
+			} else {
+				var _v4 = _p6._1,
+					_v5 = A3(
+					_elm_lang$core$Dict$update,
+					_p6._0._0,
+					_elm_lang$keyboard$Keyboard$categorizeHelpHelp(_p6._0._1),
+					subDict);
+				subs = _v4;
+				subDict = _v5;
+				continue categorizeHelp;
+			}
+		}
+	});
+var _elm_lang$keyboard$Keyboard$categorize = function (subs) {
+	return A2(_elm_lang$keyboard$Keyboard$categorizeHelp, subs, _elm_lang$core$Dict$empty);
+};
+var _elm_lang$keyboard$Keyboard$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$keyboard$Keyboard$subscription = _elm_lang$core$Native_Platform.leaf('Keyboard');
+var _elm_lang$keyboard$Keyboard$Watcher = F2(
+	function (a, b) {
+		return {taggers: a, pid: b};
+	});
+var _elm_lang$keyboard$Keyboard$Msg = F2(
+	function (a, b) {
+		return {category: a, keyCode: b};
+	});
+var _elm_lang$keyboard$Keyboard$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var rightStep = F3(
+			function (category, taggers, task) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (state) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (pid) {
+								return _elm_lang$core$Task$succeed(
+									A3(
+										_elm_lang$core$Dict$insert,
+										category,
+										A2(_elm_lang$keyboard$Keyboard$Watcher, taggers, pid),
+										state));
+							},
+							_elm_lang$core$Process$spawn(
+								A3(
+									_elm_lang$dom$Dom_LowLevel$onDocument,
+									category,
+									_elm_lang$keyboard$Keyboard$keyCode,
+									function (_p7) {
+										return A2(
+											_elm_lang$core$Platform$sendToSelf,
+											router,
+											A2(_elm_lang$keyboard$Keyboard$Msg, category, _p7));
+									})));
+					},
+					task);
+			});
+		var bothStep = F4(
+			function (category, _p8, taggers, task) {
+				var _p9 = _p8;
+				return A2(
+					_elm_lang$core$Task$map,
+					A2(
+						_elm_lang$core$Dict$insert,
+						category,
+						A2(_elm_lang$keyboard$Keyboard$Watcher, taggers, _p9.pid)),
+					task);
+			});
+		var leftStep = F3(
+			function (category, _p10, task) {
+				var _p11 = _p10;
+				return A2(
+					_elm_lang$keyboard$Keyboard_ops['&>'],
+					_elm_lang$core$Process$kill(_p11.pid),
+					task);
+			});
+		return A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			oldState,
+			_elm_lang$keyboard$Keyboard$categorize(newSubs),
+			_elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty));
+	});
+var _elm_lang$keyboard$Keyboard$MySub = F2(
+	function (a, b) {
+		return {ctor: 'MySub', _0: a, _1: b};
+	});
+var _elm_lang$keyboard$Keyboard$presses = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keypress', tagger));
+};
+var _elm_lang$keyboard$Keyboard$downs = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keydown', tagger));
+};
+var _elm_lang$keyboard$Keyboard$ups = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keyup', tagger));
+};
+var _elm_lang$keyboard$Keyboard$subMap = F2(
+	function (func, _p12) {
+		var _p13 = _p12;
+		return A2(
+			_elm_lang$keyboard$Keyboard$MySub,
+			_p13._0,
+			function (_p14) {
+				return func(
+					_p13._1(_p14));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Keyboard'] = {pkg: 'elm-lang/keyboard', init: _elm_lang$keyboard$Keyboard$init, onEffects: _elm_lang$keyboard$Keyboard$onEffects, onSelfMsg: _elm_lang$keyboard$Keyboard$onSelfMsg, tag: 'sub', subMap: _elm_lang$keyboard$Keyboard$subMap};
+
 var _elm_lang$html$Html_Attributes$map = _elm_lang$virtual_dom$VirtualDom$mapProperty;
 var _elm_lang$html$Html_Attributes$attribute = _elm_lang$virtual_dom$VirtualDom$attribute;
 var _elm_lang$html$Html_Attributes$contextmenu = function (value) {
@@ -15039,13 +15208,13 @@ var _darrensiegel$elm_chess_client$Data_Type$Player = F4(
 	function (a, b, c, d) {
 		return {color: a, name: b, action: c, pieces: d};
 	});
-var _darrensiegel$elm_chess_client$Data_Type$UI = F2(
-	function (a, b) {
-		return {mdl: a, turn: b};
+var _darrensiegel$elm_chess_client$Data_Type$UI = F3(
+	function (a, b, c) {
+		return {mdl: a, turn: b, debug: c};
 	});
 var _darrensiegel$elm_chess_client$Data_Type$Black = {ctor: 'Black'};
 var _darrensiegel$elm_chess_client$Data_Type$White = {ctor: 'White'};
-var _darrensiegel$elm_chess_client$Data_Type$Ninja = {ctor: 'Ninja'};
+var _darrensiegel$elm_chess_client$Data_Type$Joker = {ctor: 'Joker'};
 var _darrensiegel$elm_chess_client$Data_Type$King = {ctor: 'King'};
 var _darrensiegel$elm_chess_client$Data_Type$Queen = {ctor: 'Queen'};
 var _darrensiegel$elm_chess_client$Data_Type$Knight = {ctor: 'Knight'};
@@ -15061,6 +15230,9 @@ var _darrensiegel$elm_chess_client$Data_Type$Playing = function (a) {
 };
 var _darrensiegel$elm_chess_client$Data_Type$Moving = function (a) {
 	return {ctor: 'Moving', _0: a};
+};
+var _darrensiegel$elm_chess_client$Data_Type$Debug = function (a) {
+	return {ctor: 'Debug', _0: a};
 };
 var _darrensiegel$elm_chess_client$Data_Type$Mdl = function (a) {
 	return {ctor: 'Mdl', _0: a};
@@ -15093,7 +15265,7 @@ var _darrensiegel$elm_chess_client$Data_Tool$nullPiece = A6(
 	_darrensiegel$elm_chess_client$Data_Tool$zeroPs,
 	_darrensiegel$elm_chess_client$Data_Tool$zeroLoc,
 	_darrensiegel$elm_chess_client$Data_Type$Black,
-	_darrensiegel$elm_chess_client$Data_Type$Ninja,
+	_darrensiegel$elm_chess_client$Data_Type$Joker,
 	0,
 	{ctor: '[]'});
 var _darrensiegel$elm_chess_client$Data_Tool$vacantSquare = A4(_darrensiegel$elm_chess_client$Data_Type$Square, _darrensiegel$elm_chess_client$Data_Tool$zeroLoc, _elm_lang$core$Maybe$Nothing, false, false);
@@ -15526,7 +15698,7 @@ var _darrensiegel$elm_chess_client$Model_FEN$toRole = function (ch) {
 		case 'k':
 			return _darrensiegel$elm_chess_client$Data_Type$King;
 		default:
-			return _darrensiegel$elm_chess_client$Data_Type$Ninja;
+			return _darrensiegel$elm_chess_client$Data_Type$Joker;
 	}
 };
 var _darrensiegel$elm_chess_client$Model_FEN$toPiece = F2(
@@ -15556,7 +15728,7 @@ var _darrensiegel$elm_chess_client$Model_FEN$toSquare = F2(
 		var vacant = A4(_darrensiegel$elm_chess_client$Data_Type$Square, lc, _elm_lang$core$Maybe$Nothing, false, false);
 		return _elm_lang$core$Native_Utils.eq(
 			_darrensiegel$elm_chess_client$Model_FEN$toRole(ch),
-			_darrensiegel$elm_chess_client$Data_Type$Ninja) ? vacant : occupied;
+			_darrensiegel$elm_chess_client$Data_Type$Joker) ? vacant : occupied;
 	});
 var _darrensiegel$elm_chess_client$Model_FEN$expandMatch = function (_p2) {
 	var _p3 = _p2;
@@ -16714,23 +16886,24 @@ var _darrensiegel$elm_chess_client$State_Action$select = F2(
 var _darrensiegel$elm_chess_client$State_Game$update = F2(
 	function (event, _p0) {
 		var _p1 = _p0;
-		var _p16 = _p1.players;
-		var _p15 = _p1.chess;
+		var _p18 = _p1.ui;
+		var _p17 = _p1.players;
+		var _p16 = _p1.chess;
 		var selection = function () {
 			var _p2 = event;
 			if (_p2.ctor === 'Click') {
-				return A2(_darrensiegel$elm_chess_client$State_Action$select, _p2._0, _p15.board);
+				return A2(_darrensiegel$elm_chess_client$State_Action$select, _p2._0, _p16.board);
 			} else {
 				return _elm_lang$core$Maybe$Nothing;
 			}
 		}();
-		var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p16);
+		var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p17);
 		var action = function () {
 			var _p3 = event;
 			switch (_p3.ctor) {
 				case 'Click':
 					var _p5 = _p3._0;
-					var clickTo = A2(_darrensiegel$elm_chess_client$State_Action$clickMove, _p15.board, player);
+					var clickTo = A2(_darrensiegel$elm_chess_client$State_Action$clickMove, _p16.board, player);
 					var target = _darrensiegel$elm_chess_client$Data_Tool$toBoardLocation(_p5);
 					var _p4 = selection;
 					if (_p4.ctor === 'Just') {
@@ -16747,7 +16920,7 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 					return A2(
 						_darrensiegel$elm_chess_client$State_Action$whileMoving,
 						player.action,
-						_darrensiegel$elm_chess_client$State_Action$endMove(_p15.board));
+						_darrensiegel$elm_chess_client$State_Action$endMove(_p16.board));
 				default:
 					return _darrensiegel$elm_chess_client$Data_Type$Idle;
 			}
@@ -16755,9 +16928,9 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 		var history = function () {
 			var _p6 = action;
 			if (_p6.ctor === 'End') {
-				return {ctor: '::', _0: _p6._0, _1: _p15.history};
+				return {ctor: '::', _0: _p6._0, _1: _p16.history};
 			} else {
-				return _p15.history;
+				return _p16.history;
 			}
 		}();
 		var player_ = _elm_lang$core$Native_Utils.update(
@@ -16768,14 +16941,14 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 			if (_p7.ctor === 'End') {
 				return {
 					ctor: '_Tuple2',
-					_0: _darrensiegel$elm_chess_client$Data_Tool$snd(_p16),
+					_0: _darrensiegel$elm_chess_client$Data_Tool$snd(_p17),
 					_1: player_
 				};
 			} else {
 				return {
 					ctor: '_Tuple2',
 					_0: player_,
-					_1: _darrensiegel$elm_chess_client$Data_Tool$snd(_p16)
+					_1: _darrensiegel$elm_chess_client$Data_Tool$snd(_p17)
 				};
 			}
 		}();
@@ -16783,38 +16956,46 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 			var currentPlayer = _darrensiegel$elm_chess_client$Data_Tool$fst(players_);
 			var currentColor = _elm_lang$core$Basics$toString(currentPlayer.color);
 			return _elm_lang$core$Native_Utils.update(
-				_p1.ui,
+				_p18,
 				{
-					turn: A2(_elm_lang$core$Basics_ops['++'], currentColor, '\'s turn')
+					turn: A2(_elm_lang$core$Basics_ops['++'], currentColor, '\'s turn'),
+					debug: function () {
+						var _p8 = event;
+						if (_p8.ctor === 'Debug') {
+							return _p8._0;
+						} else {
+							return _p18.debug;
+						}
+					}()
 				});
 		}();
 		var board = function () {
-			var _p8 = action;
-			switch (_p8.ctor) {
+			var _p9 = action;
+			switch (_p9.ctor) {
 				case 'Playing':
-					return A2(_darrensiegel$elm_chess_client$Model_Board$revert, _p8._0.piece, _p15.board);
+					return A2(_darrensiegel$elm_chess_client$Model_Board$revert, _p9._0.piece, _p16.board);
 				case 'Moving':
-					var _p10 = _p8._0;
-					var _p9 = player.action;
-					if (_p9.ctor === 'Moving') {
-						return A2(_darrensiegel$elm_chess_client$Model_Board$analyze, _p10.piece, _p15.board);
+					var _p11 = _p9._0;
+					var _p10 = player.action;
+					if (_p10.ctor === 'Moving') {
+						return A2(_darrensiegel$elm_chess_client$Model_Board$analyze, _p11.piece, _p16.board);
 					} else {
 						return A2(
 							_darrensiegel$elm_chess_client$Model_Board$analyze,
-							_p10.piece,
-							A2(_darrensiegel$elm_chess_client$Model_Board$lift, _p10.piece, _p15.board));
+							_p11.piece,
+							A2(_darrensiegel$elm_chess_client$Model_Board$lift, _p11.piece, _p16.board));
 					}
 				case 'End':
-					var _p12 = _p8._0;
+					var _p13 = _p9._0;
 					var ifCastling = function (fn) {
-						return A2(_darrensiegel$elm_chess_client$Model_Board$whenCastling, fn, _p12);
+						return A2(_darrensiegel$elm_chess_client$Model_Board$whenCastling, fn, _p13);
 					};
 					var checkEnPassant = function (fn) {
-						return A2(_darrensiegel$elm_chess_client$Model_Board$ifEnPassant, fn, _p12);
+						return A2(_darrensiegel$elm_chess_client$Model_Board$ifEnPassant, fn, _p13);
 					};
 					var isClick = function () {
-						var _p11 = event;
-						if (_p11.ctor === 'Click') {
+						var _p12 = event;
+						if (_p12.ctor === 'Click') {
 							return true;
 						} else {
 							return false;
@@ -16827,7 +17008,7 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 								mv.piece,
 								A2(_darrensiegel$elm_chess_client$Model_Board$place, bd, mv.piece)) : A2(_darrensiegel$elm_chess_client$Model_Board$place, bd, mv.piece);
 						});
-					var movePiece = placePiece(_p12);
+					var movePiece = placePiece(_p13);
 					var eatPiece = F2(
 						function (cp, bd) {
 							return isClick ? A2(_darrensiegel$elm_chess_client$Model_Board$lift, cp, bd) : bd;
@@ -16838,9 +17019,9 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 						A2(
 							ifCastling,
 							_darrensiegel$elm_chess_client$Model_Board$castleRook,
-							movePiece(_p15.board)));
+							movePiece(_p16.board)));
 				default:
-					return _p15.board;
+					return _p16.board;
 			}
 		}();
 		var game = function (mat_) {
@@ -16850,11 +17031,11 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 				A2(_darrensiegel$elm_chess_client$Data_Type$Chess, board, history),
 				players_);
 		};
-		var _p13 = event;
-		if (_p13.ctor === 'Mdl') {
-			var _p14 = A3(_debois$elm_mdl$Material$update, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p13._0, ui_);
-			var mat_ = _p14._0;
-			var sub_ = _p14._1;
+		var _p14 = event;
+		if (_p14.ctor === 'Mdl') {
+			var _p15 = A3(_debois$elm_mdl$Material$update, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p14._0, ui_);
+			var mat_ = _p15._0;
+			var sub_ = _p15._1;
 			return A2(
 				_elm_lang$core$Platform_Cmd_ops['!'],
 				game(mat_),
@@ -16870,28 +17051,44 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 				{ctor: '[]'});
 		}
 	});
-var _darrensiegel$elm_chess_client$State_Game$subscribe = function (_p17) {
-	var _p18 = _p17;
-	var layout = A2(_debois$elm_mdl$Material_Layout$subs, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p18.ui.mdl);
-	var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p18.players);
-	var _p19 = player.action;
-	if (_p19.ctor === 'Moving') {
+var _darrensiegel$elm_chess_client$State_Game$subscribe = function (_p19) {
+	var _p20 = _p19;
+	var _p22 = _p20.ui;
+	var layout = A2(_debois$elm_mdl$Material_Layout$subs, _darrensiegel$elm_chess_client$Data_Type$Mdl, _p22.mdl);
+	var persistent = {
+		ctor: '::',
+		_0: layout,
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$keyboard$Keyboard$presses(
+				function (k) {
+					return (_elm_lang$core$Native_Utils.eq(
+						_elm_lang$core$Char$fromCode(k),
+						_elm_lang$core$Native_Utils.chr('`')) && _elm_lang$core$Native_Utils.eq(_p22.debug, false)) ? _darrensiegel$elm_chess_client$Data_Type$Debug(true) : (_elm_lang$core$Native_Utils.eq(
+						_elm_lang$core$Char$fromCode(k),
+						_elm_lang$core$Native_Utils.chr('`')) ? _darrensiegel$elm_chess_client$Data_Type$Debug(false) : _darrensiegel$elm_chess_client$Data_Type$Debug(_p22.debug));
+				}),
+			_1: {ctor: '[]'}
+		}
+	};
+	var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p20.players);
+	var _p21 = player.action;
+	if (_p21.ctor === 'Moving') {
 		return _elm_lang$core$Platform_Sub$batch(
-			{
-				ctor: '::',
-				_0: _elm_lang$mouse$Mouse$moves(_darrensiegel$elm_chess_client$Data_Type$Drag),
-				_1: {
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
 					ctor: '::',
-					_0: _elm_lang$mouse$Mouse$ups(_darrensiegel$elm_chess_client$Data_Type$Drop),
+					_0: _elm_lang$mouse$Mouse$moves(_darrensiegel$elm_chess_client$Data_Type$Drag),
 					_1: {
 						ctor: '::',
-						_0: layout,
+						_0: _elm_lang$mouse$Mouse$ups(_darrensiegel$elm_chess_client$Data_Type$Drop),
 						_1: {ctor: '[]'}
 					}
-				}
-			});
+				},
+				persistent));
 	} else {
-		return layout;
+		return _elm_lang$core$Platform_Sub$batch(persistent);
 	}
 };
 var _darrensiegel$elm_chess_client$State_Game$newGame = function () {
@@ -16909,7 +17106,7 @@ var _darrensiegel$elm_chess_client$State_Game$newGame = function () {
 		_0: _debois$elm_mdl$Material_Layout$sub0(_darrensiegel$elm_chess_client$Data_Type$Mdl),
 		_1: {ctor: '[]'}
 	};
-	var ui = A2(_darrensiegel$elm_chess_client$Data_Type$UI, _debois$elm_mdl$Material$model, '');
+	var ui = A3(_darrensiegel$elm_chess_client$Data_Type$UI, _debois$elm_mdl$Material$model, '', false);
 	var game = A3(_darrensiegel$elm_chess_client$Data_Type$Game, ui, chess, players);
 	return A2(_elm_lang$core$Platform_Cmd_ops['!'], game, cmd);
 }();
@@ -19173,18 +19370,30 @@ var _darrensiegel$elm_chess_client$Model_History$fullMove = F2(
 			A2(_elm_lang$core$Basics_ops['++'], '. ', _p16));
 	});
 var _darrensiegel$elm_chess_client$Model_History$debugHistory = function (history) {
+	var formatPiece = function (p) {
+		return A2(
+			_elm_lang$core$String$join,
+			' ',
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Basics$toString(p.color),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Basics$toString(p.role),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Basics$toString(p.location),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	};
 	var debugPiece = function (pc) {
 		var _p17 = pc.role;
-		if (_p17.ctor === 'Ninja') {
+		if (_p17.ctor === 'Joker') {
 			return '';
 		} else {
-			return A2(
-				_elm_lang$core$String$join,
-				'\n',
-				A2(
-					_elm_lang$core$String$split,
-					',',
-					_elm_lang$core$Basics$toString(pc)));
+			return formatPiece(pc);
 		}
 	};
 	var lastMove = A2(
@@ -19196,7 +19405,7 @@ var _darrensiegel$elm_chess_client$Model_History$debugHistory = function (histor
 		debugPiece(lastMove.piece),
 		A2(
 			_elm_lang$core$Basics_ops['++'],
-			'\ncapture:',
+			'\ncapture:\n',
 			debugPiece(
 				A2(_elm_community$maybe_extra$Maybe_Extra_ops['?'], lastMove.capture, _darrensiegel$elm_chess_client$Data_Tool$nullPiece))));
 };
@@ -19319,11 +19528,18 @@ var _darrensiegel$elm_chess_client$View_Main$r_board = function (board) {
 };
 var _darrensiegel$elm_chess_client$View_Main$r_dragSvg = function (_p0) {
 	var _p1 = _p0;
-	var _p3 = _p1.position;
-	var y = _p3.y;
-	var x = _p3.x;
+	var _p3 = _p1.piece;
+	var o = _darrensiegel$elm_chess_client$Data_Tool$toBoardPosition(_p1.origin);
+	var y = _p3.position.y;
+	var x = _p3.position.x;
+	var newPos = A2(_elm_lang$mouse$Mouse$Position, x - 32, (y - 32) - 56);
+	var l_t = _elm_lang$core$Native_Utils.cmp(newPos.x, o.x - 18) < 0;
+	var r_t = _elm_lang$core$Native_Utils.cmp(newPos.x, o.x + 18) > 0;
+	var u_t = _elm_lang$core$Native_Utils.cmp(newPos.y, o.y - 18) < 0;
+	var d_t = _elm_lang$core$Native_Utils.cmp(newPos.y, o.y + 18) > 0;
+	var dest = (l_t || (r_t || (u_t || d_t))) ? newPos : A2(_elm_lang$mouse$Mouse$Position, o.x + 4, o.y + 4);
 	var _p2 = _rnons$elm_svg_parser$SvgParser$parse(
-		_darrensiegel$elm_chess_client$View_Asset$getSvg(_p1));
+		_darrensiegel$elm_chess_client$View_Asset$getSvg(_p3));
 	if (_p2.ctor === 'Err') {
 		return _elm_lang$html$Html$text(_p2._0);
 	} else {
@@ -19341,13 +19557,13 @@ var _darrensiegel$elm_chess_client$View_Main$r_dragSvg = function (_p0) {
 							_0: A2(
 								_darrensiegel$elm_chess_client$Data_Tool_ops['=>'],
 								'top',
-								_darrensiegel$elm_chess_client$Data_Tool$px((y - 32) - 56)),
+								_darrensiegel$elm_chess_client$Data_Tool$px(dest.y)),
 							_1: {
 								ctor: '::',
 								_0: A2(
 									_darrensiegel$elm_chess_client$Data_Tool_ops['=>'],
 									'left',
-									_darrensiegel$elm_chess_client$Data_Tool$px(x - 32)),
+									_darrensiegel$elm_chess_client$Data_Tool$px(dest.x)),
 								_1: {ctor: '[]'}
 							}
 						}
@@ -19533,7 +19749,7 @@ var _darrensiegel$elm_chess_client$View_Main$r_player = function (_p13) {
 				},
 				_1: {
 					ctor: '::',
-					_0: _darrensiegel$elm_chess_client$View_Main$r_dragSvg(_p15._0.piece),
+					_0: _darrensiegel$elm_chess_client$View_Main$r_dragSvg(_p15._0),
 					_1: {ctor: '[]'}
 				}
 			};
@@ -19593,6 +19809,24 @@ var _darrensiegel$elm_chess_client$View_Main$render = function (_p20) {
 	var _p24 = _p21.ui;
 	var _p23 = _p21.players;
 	var _p22 = _p21.chess;
+	var debugPanel = _p24.debug ? {
+		ctor: '::',
+		_0: A3(
+			_elm_lang$html$Html$node,
+			'pre',
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('debug-panel'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					_darrensiegel$elm_chess_client$Model_History$debugHistory(_p22.history)),
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	} : {ctor: '[]'};
 	var blackPlayer = A2(_darrensiegel$elm_chess_client$Model_History$getBlack, _p22.history, _p23);
 	var whitePlayer = A2(_darrensiegel$elm_chess_client$Model_History$getWhite, _p22.history, _p23);
 	return A4(
@@ -19623,29 +19857,15 @@ var _darrensiegel$elm_chess_client$View_Main$render = function (_p20) {
 						_0: A2(
 							_debois$elm_mdl$Material_Options$div,
 							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Demo Chess'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A3(
-								_elm_lang$html$Html$node,
-								'pre',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('debug-panel'),
+									_0: _elm_lang$html$Html$text('Demo Chess'),
 									_1: {ctor: '[]'}
 								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										_darrensiegel$elm_chess_client$Model_History$debugHistory(_p22.history)),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+								debugPanel)),
+						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
 			},

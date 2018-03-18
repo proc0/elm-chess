@@ -1,6 +1,7 @@
 module Data.Type exposing (..)
 
 import Mouse exposing (Position)
+import Keyboard exposing (KeyCode)
 import Matrix exposing (Matrix, Location)
 import Material exposing (Model, Msg)
 
@@ -31,7 +32,7 @@ type Role =
     | Knight
     | Queen
     | King
-    | Ninja
+    | Joker
 
 type alias Piece =
     { position : Position
@@ -74,6 +75,9 @@ type alias Move =
     , enPassant : Bool
     }
 
+type alias History 
+    = List Move
+
 type alias Translation = 
     Location -> Location
 
@@ -85,15 +89,11 @@ type alias Movement =
 
 type Action =
       Moving Selection
-    --| Clicking Selection
     | Playing Selection
     | End Move
     | Idle
 
-type alias History 
-    = List Move
-
---        Actors         --
+--        Agents         --
 --=======================--
 
 type alias Player =
@@ -108,6 +108,12 @@ type alias Player =
 type alias Players = 
     (Player, Player)
 
+--       Rules           --
+--=======================--
+
+type alias Condition =
+    (Translation, Square -> Bool)
+
 --      Interface        --
 --=======================--
 
@@ -116,9 +122,11 @@ type Event =
     | Drag Position
     | Drop Position
     | Mdl (Msg Event)
+    | Debug Bool
 
 type alias UI =
     { mdl : Model
     , turn : String
+    , debug : Bool
     }
 

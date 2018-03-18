@@ -25,11 +25,11 @@ select position board =
     selecting position
 
 startMoving : Position -> Selection -> Action
-startMoving ps {origin, piece} =  
-    Moving <| Selection origin ({ piece | position = ps  })
+startMoving ps ({origin, piece} as selection) =  
+    Moving <| Selection origin ({ piece | position = ps })
 
 updateMoving : Position -> Selection -> Action
-updateMoving ps {origin, piece} = 
+updateMoving ps ({origin, piece} as selection) = 
     Moving <| Selection origin ({ piece | position = ps })
 
 whileMoving : Action -> (Selection -> Action) -> Action

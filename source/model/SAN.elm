@@ -1,12 +1,9 @@
 module Model.SAN exposing (..)
 
-import Char exposing (..)
-import Tuple exposing (..)
-import Maybe.Extra as Maebe exposing (..)
-import Debug exposing (..)
+import Char exposing (fromCode, toUpper)
+import Debug exposing (log)
 
 import Data.Type exposing (..)
-import Data.Tool exposing (..)
 import Model.FEN exposing (..)
 
 toSAN : Move -> String

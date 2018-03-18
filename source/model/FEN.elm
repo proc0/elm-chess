@@ -1,11 +1,11 @@
 module Model.FEN exposing (..)
 
 import Regex
-import String
-import Char exposing (..)
-import Array exposing (..)
-import Matrix exposing (..)
-import Debug exposing (..)
+import String exposing (contains, split, toInt)
+import Char exposing (isUpper, toLower)
+import Array exposing (get)
+import Matrix exposing (Location, loc)
+import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
@@ -74,7 +74,7 @@ toSquare lc ch =
     let vacant = Square lc Nothing False False
         occupied = Square lc (Just <| toPiece ch lc) False False
     in 
-    if toRole ch == Ninja -- empty square sentinel
+    if toRole ch == Joker -- empty square sentinel
     then vacant           -- guards against invalid 
     else occupied         -- piece letters
 
@@ -108,7 +108,7 @@ toRole ch =
         'r' -> Rook
         'q' -> Queen
         'k' -> King
-        _   -> Ninja
+        _   -> Joker
 
 fromRole : Role -> Char
 fromRole fig = 
@@ -119,4 +119,4 @@ fromRole fig =
         Knight  -> 'n'
         Queen   -> 'q'
         King    -> 'k'
-        Ninja   -> 'j'
+        Joker   -> 'j'

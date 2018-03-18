@@ -1,10 +1,8 @@
 module Model.Board exposing (..)
 
-import Array exposing (..)
-import Matrix exposing (..)
-import Mouse exposing (..)
-import Maybe.Extra as Maebe exposing (..)
-import Debug exposing (..)
+import Matrix exposing (Location, get, loc, map, mapWithLocation, update)
+import Maybe.Extra exposing ((?))
+import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
@@ -116,7 +114,7 @@ withMovingPieces fn square =
 
 clear : Board -> Board
 clear board =
-        Matrix.map clearSquare board
+        map clearSquare board
 
 ticks : Board -> Board
 ticks board =
@@ -124,35 +122,35 @@ ticks board =
             withMovingPieces 
                 (\p -> { p | tick = p.tick + 1 })
     in
-    Matrix.mapWithLocation tickPiece board
+    mapWithLocation tickPiece board
 
 remove : Piece -> Board -> Board
 remove piece board = 
     let lastLocation = 
             last piece.path ? piece.location
     in 
-    Matrix.update lastLocation (activateSquare << emptySquare) board
+    update lastLocation (activateSquare << emptySquare) board
 
 drop : Piece -> Board -> Board
 drop piece board = 
     let target = piece.location
         newPiece = translatePiece target piece
     in 
-    Matrix.update target (withValidSquare <| occupySquare newPiece) board
+    update target (withValidSquare <| occupySquare newPiece) board
 
 jump : Piece -> Board -> Board
 jump piece board = 
     let target = piece.location
         newPiece = translatePiece target piece
     in 
-    Matrix.update target (occupySquare newPiece) board
+    update target (occupySquare newPiece) board
 
 revert : Piece -> Board -> Board
 revert piece board = 
     let putback target = 
             withActiveSquare (occupySquare <| translatePiece target piece)
     in 
-    Matrix.mapWithLocation putback board
+    mapWithLocation putback board
 
 analyze : Piece -> Board -> Board
 analyze piece board =
@@ -163,7 +161,7 @@ analyze piece board =
         movelist = 
             List.map (flip (<|) origin) translations
         validateSquares origin bd = 
-            Matrix.update origin validateSquare bd
+            update origin validateSquare bd
         locations = 
             if List.length translations > 0
             -- append current location
@@ -203,7 +201,7 @@ castleRook move board =
             then ((loc y1 7), (loc y1 5))
             else ((loc y1 0), (loc y1 3))
         rook =
-            (Matrix.get (fst rookMove) board ? vacantSquare).piece ? nullPiece
+            (get (fst rookMove) board ? vacantSquare).piece ? nullPiece
     in
     remove rook board |> jump ({ rook | location = snd rookMove })
 

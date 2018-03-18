@@ -1,13 +1,14 @@
 module Model.Query exposing (..)
 
 import Maybe.Extra exposing (isJust)
-import Data.Type exposing (..)
 import List exposing (head, any)
+
+import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.Moves exposing (..)
 
--- queries
---========--
+-- general queries
+--================--
 
 startingRank : Piece -> Int
 startingRank piece =

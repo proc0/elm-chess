@@ -90,7 +90,7 @@ zeroPs = { x=0, y=0 }
 
 nullPiece : Piece
 nullPiece = 
-    Piece zeroPs zeroLoc Black Ninja 0 []
+    Piece zeroPs zeroLoc Black Joker 0 []
 
 vacantSquare : Square
 vacantSquare = 
