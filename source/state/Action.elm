@@ -10,13 +10,13 @@ import Data.Tool exposing (..)
 import Model.Moves exposing (..)
 import Model.Rules exposing (..)
 
-select : Position -> Board -> Maybe Selection
-select position board = 
+select : Board -> Player -> Position -> Maybe Selection
+select board player position = 
     let locate xy = 
             get (toBoardLocation xy) board
         selectPiece square = 
             let selection piece = 
-                Selection square.location piece
+                Selection board player square piece 
             in 
             Maybe.map selection square.piece
         selecting = 
@@ -25,12 +25,12 @@ select position board =
     selecting position
 
 startMoving : Position -> Selection -> Action
-startMoving ps ({origin, piece} as selection) =  
-    Moving <| Selection origin ({ piece | position = ps })
+startMoving ps ({square, piece} as selection) =  
+    Moving <| { selection | square = square, piece = ({ piece | position = ps }) }
 
 updateMoving : Position -> Selection -> Action
-updateMoving ps ({origin, piece} as selection) = 
-    Moving <| Selection origin ({ piece | position = ps })
+updateMoving ps ({piece} as selection) = 
+    Moving <| { selection | piece = ({ piece | position = ps }) }
 
 whileMoving : Action -> (Selection -> Action) -> Action
 whileMoving action change = 
@@ -85,8 +85,8 @@ endMove board select =
             (\s -> 
             { s 
               -- triangulate moving piece origin
-            | position = toBoardPosition select.origin
-            , location = select.origin
+            | position = toBoardPosition select.square.location
+            , location = select.square.location
             })
         -- test en passant
         isPassant = 
@@ -110,6 +110,6 @@ endMove board select =
                 target.piece
     in 
     -- if not same square, and destination is a valid move
-    if destination /= select.origin && target.valid
-    then End <| Move select.origin destination movingPiece targetPiece isPassant
+    if destination /= select.square.location && target.valid
+    then End <| Move select.square.location destination movingPiece targetPiece isPassant
     else Playing select -- keep playing

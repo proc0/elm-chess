@@ -56,14 +56,13 @@ type alias Rank =
 type alias Board =
     Matrix Square
 
-type alias Rule =
-    Square -> Bool
-
 --     Interaction       --
 --=======================--
 
 type alias Selection =
-    { origin : Location
+    { board : Board
+    , player : Player
+    , square : Square
     , piece : Piece
     }
 
@@ -75,8 +74,8 @@ type alias Move =
     , enPassant : Bool
     }
 
-type alias History 
-    = List Move
+type alias History = 
+    List Move
 
 type alias Translation = 
     Location -> Location

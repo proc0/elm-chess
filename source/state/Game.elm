@@ -30,7 +30,7 @@ subscribe : Game -> Sub Event
 subscribe { ui, players } = 
     let player = fst players
         layout = Layout.subs Mdl ui.mdl
-        persistent =
+        default =
             [ layout
             , Keyboard.presses (\k ->  
                 if fromCode k == '`' && ui.debug == False
@@ -49,8 +49,8 @@ subscribe { ui, players } =
                 , Mouse.ups Drop
                 ]
                 ++
-                persistent
-        _ -> Sub.batch persistent
+                default
+        _ -> Sub.batch default
 
 update : Event -> Game -> ( Game, Cmd Event )
 update event { ui, chess, players } =
@@ -62,7 +62,7 @@ update event { ui, chess, players } =
         selection = 
             case event of
                 Click position -> 
-                    select position chess.board
+                    select chess.board player position
                 _ -> Nothing
 
         -- next frame action
@@ -119,56 +119,62 @@ update event { ui, chess, players } =
         board : Board
         board = 
             case action of
+                -- neutral action
                 Playing selected -> 
-                    -- return piece to its origin
-                    revert selected.piece chess.board
+                    revert selected
                 -- dragging piece
                 Moving selected -> 
                     -- check last frame action
                     case player.action of
                         -- last frame was moving
+                        -- highlight valid moves
                         Moving _ -> 
-                            -- highlight valid moves
-                            analyze selected.piece chess.board
-                        -- if last frame was not moving
+                            analyze selected
+                        -- not yet moving
                         otherwise -> 
                             -- start moving (lift piece)
                             -- and highlight valid moves
-                            lift selected.piece chess.board 
-                            |> analyze selected.piece
+                            analyze ({ selected | board = remove selected })
                 -- next move board
                 End move -> 
-                    let isClick : Bool
+                    let endSelect =
+                            case selection of
+                                Just sel ->
+                                    { sel
+                                    | board = chess.board
+                                    , piece = move.piece
+                                    }
+                                _ -> Selection chess.board player vacantSquare nullPiece
+                        isClick : Bool
                         isClick = 
                             case event of
                                 Click _ -> True
                                 _ -> False
-                        placePiece : Move -> Board -> Board                    
-                        placePiece mv bd =
-                            -- if click (or drag)
-                            if isClick
-                            -- lift from last loc 
-                            -- and place piece
-                            then place bd mv.piece 
-                                    |> lift mv.piece
-                            -- just place piece 
-                            else place bd mv.piece
+                        --placePiece : Move -> Board -> Board                    
+                        --placePiece mv bd =
+                        --    -- if click (or drag)
+                        --    if isClick
+                        --    -- lift from last loc 
+                        --    -- and place piece
+                        --    then 
+                        --        lift <| endSelect (place <| endSelect bd mv.piece) mv.piece
+                        --    -- just place piece 
+                        --    else place <| endSelect bd mv.piece
                         eatPiece : Piece -> Board -> Board
-                        eatPiece cp bd =
+                        eatPiece pc bd =
                             -- if click, lift captured piece
                             -- else player drops piece on it
                             if isClick
-                            then lift cp bd
+                            then lift <| { endSelect | piece = pc }
                             else bd
                         -- helpers
-                        movePiece = placePiece move
+                        --movePiece = placePiece move
                         checkEnPassant fn =
                             ifEnPassant fn move
                         ifCastling fn =
                             whenCastling fn move
                     in
-                    chess.board
-                    |> movePiece 
+                    place ({ endSelect | board = remove endSelect })
                     |> ifCastling castleRook
                     |> checkEnPassant 
                         (whenCapturing eatPiece)

@@ -15,19 +15,21 @@ import Model.Moves exposing (..)
 
 pieceMoves : Piece -> Board -> List Translation
 pieceMoves piece board = 
-    let find f = f board piece
+    let cast fn = 
+            fn board piece
         diagonals =
-            find stepSearch asterisk
+            cast stepSearch asterisk
         parallels =
-            find stepSearch cross
+            cast stepSearch cross
         moves role =
             case role of
-                Pawn   -> find pawnMoves
+                Pawn   -> cast pawnMoves
                 Bishop -> diagonals
                 Rook   -> parallels
-                Queen  -> diagonals 
-                          ++ 
-                          parallels               
+                Queen  -> 
+                    diagonals 
+                    ++ 
+                    parallels               
                 Knight -> 
                     [ up 2 >> right 1
                     , up 2 >> left 1
@@ -49,33 +51,33 @@ pieceMoves piece board =
                     , down 1 >> right 1
                     ]
                     ++
-                    find castle
+                    cast castle
                 _ -> []
     in 
     -- get possible moves by role
     moves piece.role 
     -- and filter squares occupied
     -- by same color pieces
-    |> distinct piece board
+    |> cast distinct
 
 -- helpers
 -- =======--
 
 validate : Board -> Piece -> (Translation, Square -> Bool) -> List Translation -> List Translation
 validate board piece (move, rule) moves =
-    let target = Matrix.get (move piece.location) board
+    let target = 
+        get (move piece.location) board
     in 
-    (target |> Maybe.map 
-        (\square ->
-            if rule square
-            then move::moves
-            else moves)) ? moves
+    ((\square ->
+    if rule square
+    then move::moves
+    else moves) <? target) ? moves
 
 -- TODO: refactor and take out Rules, flip type
-distinct : Piece -> Board -> List Translation -> List Translation
-distinct piece board locations = 
+distinct : Board -> Piece -> List Translation -> List Translation
+distinct board piece locations = 
     filterMap (\move -> 
-        case Matrix.get (move piece.location) board of
+        case get (move piece.location) board of
             Just square ->
                 case square.piece of
                     Just pc -> 
@@ -146,7 +148,9 @@ pawnMoves board pawn =
             , (step 1 >> right 1, isOccupied)
             ]
     in
-    checkRules rules ++ checkPawn enPassant
+    checkRules rules 
+    ++ 
+    checkPawn enPassant
 
 enPassant : Board -> Piece -> List Translation
 enPassant board pawn = 

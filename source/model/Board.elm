@@ -19,16 +19,14 @@ openingBoard = fromFEN initialBoard
 --    let _ = log "piece" pc
 --    in bd
 
-lift : Piece -> Board -> Board
-lift piece board = 
-    clear board 
-    |> remove piece
+lift : Selection -> Board
+lift ({ board, piece } as selection) = 
+    remove ({ selection | board = clear board })
 
-place : Board -> Piece -> Board
-place board piece = 
-    board
-    |> drop piece
-    |> ticks >> clear
+place : Selection -> Board
+place selection = 
+    drop selection
+    |> ticks
 
 --=============================--
 
@@ -124,36 +122,36 @@ ticks board =
     in
     mapWithLocation tickPiece board
 
-remove : Piece -> Board -> Board
-remove piece board = 
+remove : Selection -> Board
+remove { board, piece } = 
     let lastLocation = 
             last piece.path ? piece.location
     in 
     update lastLocation (activateSquare << emptySquare) board
 
-drop : Piece -> Board -> Board
-drop piece board = 
+drop : Selection -> Board
+drop { board, piece }= 
     let target = piece.location
         newPiece = translatePiece target piece
     in 
     update target (withValidSquare <| occupySquare newPiece) board
 
-jump : Piece -> Board -> Board
-jump piece board = 
+jump : Selection -> Board
+jump { board, piece }= 
     let target = piece.location
         newPiece = translatePiece target piece
     in 
     update target (occupySquare newPiece) board
 
-revert : Piece -> Board -> Board
-revert piece board = 
+revert : Selection -> Board
+revert { board, piece }= 
     let putback target = 
             withActiveSquare (occupySquare <| translatePiece target piece)
     in 
     mapWithLocation putback board
 
-analyze : Piece -> Board -> Board
-analyze piece board =
+analyze : Selection -> Board
+analyze { board, piece } =
     let origin = 
             piece.location
         translations = 
@@ -200,8 +198,17 @@ castleRook move board =
             if isPositive castleDiff
             then ((loc y1 7), (loc y1 5))
             else ((loc y1 0), (loc y1 3))
+        rookSquare =
+            (get (fst rookMove) board ? vacantSquare)
         rook =
-            (get (fst rookMove) board ? vacantSquare).piece ? nullPiece
+            rookSquare.piece ? nullPiece
+        rookSrc =
+            Selection board nullPlayer rookSquare rook
+        rookDest =
+            { rookSrc 
+            | board = remove rookSrc
+            , piece = ({ rook | location = snd rookMove }) 
+            }
     in
-    remove rook board |> jump ({ rook | location = snd rookMove })
+    jump rookDest
 

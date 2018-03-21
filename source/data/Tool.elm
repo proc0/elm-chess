@@ -137,6 +137,9 @@ idlePlayer : Color -> Player
 idlePlayer color =
     Player color (toString color ++ " Player") Idle []
 
+nullPlayer : Player
+nullPlayer = idlePlayer White
+
 noMove : Move 
 noMove =
     Move zeroLoc zeroLoc nullPiece Nothing False
