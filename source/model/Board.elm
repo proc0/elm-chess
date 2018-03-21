@@ -8,7 +8,7 @@ import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.FEN exposing (..)
 import Model.Rules exposing (..)
-import Model.Query exposing (..)
+import Data.Query exposing (..)
 
 -- derive from FEN notation
 openingBoard : Board

@@ -2,8 +2,9 @@ module Data.Tool exposing (..)
 
 import Matrix exposing (Location, loc)
 import Mouse exposing (Position)
-import List exposing (range, foldl, map, length)
-import Tuple exposing (first, second)
+import List exposing (range, foldl, map, map2, length)
+import Tuple exposing (first, second, mapFirst, mapSecond)
+import Maybe.Extra exposing ((?), isJust)
 
 import Data.Type exposing (..)
 
@@ -16,6 +17,29 @@ squareSize : Int
 squareSize = 54
 
 -- Global tools
+-- Shorthand map over List-like
+($>>) f lx = map f lx  -- <$> in Haskell
+(<<$) lx f = map f lx
+infixr 2 $>>
+infixr 2 <<$
+
+-- Shorthand sequential application 
+-- <*> in Haskell
+($$>) lf lx = map2 (\f x -> f x) lf lx
+-- <**> in Haskell
+--(<$$) lx lf = map2 (|>) lf lx   
+infixr 1 $$>
+--infixr 1 <$$
+
+--Shorthand map over Maybe
+(<?) f mx = case mx of   
+  (Just x) -> Just (f x)
+  Nothing  -> Nothing
+(?>) mx f = case mx of 
+  Just x  -> Just (f x)
+  Nothing -> Nothing
+infixr 2 <?
+infixr 2 ?>
 
 (=>) = (,)
 
@@ -43,6 +67,19 @@ foldl1 f xs =
 last : List a -> Maybe a
 last = foldl1 (flip always)
 
+mapBoth : (a -> b) -> (a,a) -> (b,b)
+mapBoth fn tup =
+  mapSecond fn <| mapFirst fn tup
+
+liftAp : (a -> b -> c) -> List a -> List b -> List c
+liftAp fn l1 l2 =
+  fn $>> l1 $$> l2
+
+tupleToList : (a,a) -> List a
+tupleToList t = [fst t, snd t]
+
+--
+    
 isPositive : Int -> Bool
 isPositive n = (negate <| abs n) /= n 
 

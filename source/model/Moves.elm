@@ -1,11 +1,13 @@
 module Model.Moves exposing (..)
 
 import Matrix exposing (Location, loc, get)
-import List exposing (foldl, any, map, concatMap, filterMap, length, head)
+import List exposing (foldl, any, map, concat, concatMap, filterMap, length, head, reverse, singleton)
+import Maybe.Extra exposing ((?))
 import Debug exposing (log)
 
-import Data.Type exposing (..)
 import Data.Tool exposing (..)
+import Data.Type exposing (..)
+import Data.Query exposing (..)
 
 -- board translations
 -- ==================
@@ -13,90 +15,84 @@ stay : Translation
 stay l = l
 
 -- Location y is reversed
-up : Int -> Translation
+up : Movement
 up n (y,x) = loc (y - n) x
 
-down : Int -> Translation
+down : Movement
 down n (y,x) = loc (y + n) x
 
-left : Int -> Translation
+left : Movement
 left n (y,x) = loc y (x - n)
 
-right : Int -> Translation
+right : Movement
 right n (y,x) = loc y (x + n)
 
-forward : Piece -> Int -> Translation
+cardinals : (Movements, Movements)
+cardinals = ([up, down], [left, right])
+        {-
+↖ ↑ ↗   all possible movements,    
+←   →   asterisk shaped arrows
+↙ ↓ ↘   -}
+asterisk : List Movements
+asterisk = 
+    let combinatorial = 
+        (uncurry <| liftAp (++)) << mapBoth (($>>) singleton)
+    in combinatorial cardinals
+        {-  
+  ↑     [[up], [down], 
+←   →   [left], [right]]
+  ↓     -}
+cross : List Movements
+cross = 
+    let wrap = 
+        ($>>) singleton << concat << tupleToList
+    in wrap cardinals
+
+forward : Piece -> Movement
 forward piece = 
     case piece.color of
         White -> up
         Black -> down
 
-backward : Piece -> Int -> Translation
+backward : Piece -> Movement
 backward piece = 
     case piece.color of
         White -> down
         Black -> up
 
-diagonals : Board -> Piece -> List Translation
-diagonals board piece = 
-    let point = piece.location
-        directions = 
-            [ (up, left)
-            , (down, left)
-            , (up, right)
-            , (down, right)
-            ]
-        stepRange = map ((+) 1) boardside
-        search = foldl 
-            (\(d1,d2) (m, c) -> 
-                foldl (\i (memo, cont) -> 
-                    let nextStep = (d1 i) >> (d2 i)
-                    -- stop processing if piece found
-                    in if cont
-                        then 
-                            let blocking = findSquare (nextStep point) board
-                            in 
-                            case blocking.piece of
-                                Just {color} -> 
-                                    if color /= piece.color
-                                    then (nextStep::memo, False)
-                                    else (memo, False)
-                                Nothing -> (nextStep::memo, True)
-                        else (memo, False)
-                    ) (m, True) stepRange) ([],True)
-    in fst <| search directions
 
-parallels : Board -> Piece -> List Translation
-parallels board piece =
-    let point = piece.location
-        directions = 
-            [ up
-            , right
-            , down
-            , left
-            ]
+stepSearch : Board -> Piece -> List Movements -> List Translation
+stepSearch board piece directions =
+    let go = True
+        stop = False
+        accum = (go, [])
         stepRange = map ((+) 1) boardside
-        search = foldl 
-            (\d (m, c) -> 
-                foldl (\i (memo, cont) -> 
-                    if cont
-                    then 
-                        let blocking = findSquare (d i point) board
-                        in case blocking.piece of
-                            Just {color} ->
-                                if color /= piece.color
-                                then ((d i)::memo, False)
-                                else (memo, False)
-                            Nothing -> ((d i)::memo, True)                            
-                    else (memo, False)
-                    ) (m, True) stepRange) ([],True)
-    in fst <| search directions
-
-findSquare : Location -> Board -> Square
-findSquare lc board = 
-    let sq = Matrix.get lc board
-    in 
-    case sq of
-        Just s -> s
-        Nothing -> vacantSquare
+        walk : Movements -> Int -> (Bool, List Translation) -> (Bool, List Translation)
+        walk ways depth (go, paths) =
+            if go
+            then 
+                let tracePath : Translation
+                    tracePath = 
+                        if length ways == 1
+                        then (head ways ? always stay) depth
+                        -- map dirs to depth and compose them into one move
+                        else (foldl1 (>>) <| map ((|>) depth) ways) ? stay
+                    target : Square
+                    target = 
+                    get (tracePath piece.location) board ? vacantSquare
+                in 
+                if isVacant target
+                then (go, tracePath::paths)
+                else if not <| friendlyOccupied piece.color target
+                then (stop, tracePath::paths)
+                else (stop, paths)             
+            else (stop, paths)          
+        search ways (_, paths) =
+            -- override sentinel, keep going
+            foldl (walk ways) (go, paths) stepRange
+        (_, paths) =
+            -- fold directions into list of paths
+            foldl search accum directions
+    in
+    paths 
 

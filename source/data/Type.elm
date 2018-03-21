@@ -87,6 +87,9 @@ type alias Translations =
 type alias Movement =
     Int -> Translation
 
+type alias Movements =
+    List (Int -> Translation)
+      
 type Action =
       Moving Selection
     | Playing Selection

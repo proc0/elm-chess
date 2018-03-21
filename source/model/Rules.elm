@@ -3,11 +3,12 @@ module Model.Rules exposing (..)
 import Matrix exposing (Location, get)
 import Maybe.Extra exposing ((?), isJust)
 import List exposing (filterMap, concatMap, map, foldl, head, any, length)
+import Debug exposing (log)
 
 import Data.Tool exposing (..)
 import Data.Type exposing (..)
+import Data.Query exposing (..)
 import Model.Moves exposing (..)
-import Model.Query exposing (..)
 
 -- main moves
 -- ==========--
@@ -15,14 +16,18 @@ import Model.Query exposing (..)
 pieceMoves : Piece -> Board -> List Translation
 pieceMoves piece board = 
     let find f = f board piece
+        diagonals =
+            find stepSearch asterisk
+        parallels =
+            find stepSearch cross
         moves role =
             case role of
                 Pawn   -> find pawnMoves
-                Bishop -> find diagonals
-                Rook   -> find parallels
-                Queen  -> find diagonals 
+                Bishop -> diagonals
+                Rook   -> parallels
+                Queen  -> diagonals 
                           ++ 
-                          find parallels               
+                          parallels               
                 Knight -> 
                     [ up 2 >> right 1
                     , up 2 >> left 1
