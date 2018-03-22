@@ -2,7 +2,8 @@ module Chess exposing (main)
 
 import Html       exposing (program)
 import Data.Type  exposing (Game, Event)
-import State.Game exposing (newGame, update, subscribe)
+import Data.Pure  exposing (newGame)
+import State.Game exposing (update, subscribe)
 import View.Main  exposing (render)
 
 --  ♘ 

@@ -7,6 +7,7 @@ import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
+import Data.Pure exposing (..)
 import Model.Moves exposing (..)
 import Model.Rules exposing (..)
 

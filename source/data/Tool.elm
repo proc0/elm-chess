@@ -117,27 +117,3 @@ toBoardLocation ps = toLocation <| fromMousePosition ps
 
 px : Int -> String
 px value = (toString value) ++ "px"
-
--- Nuetral type instances
-
-zeroLoc : Location
-zeroLoc = loc 0 0
-
-zeroPs : Position
-zeroPs = { x=0, y=0 }
-
-nullPiece : Piece
-nullPiece = 
-    Piece zeroPs zeroLoc Black Joker 0 []
-
-vacantSquare : Square
-vacantSquare = 
-    Square zeroLoc Nothing False False
-
-idlePlayer : Color -> Player 
-idlePlayer color =
-    Player color (toString color ++ " Player") Idle []
-
-noMove : Move 
-noMove =
-    Move zeroLoc zeroLoc nullPiece Nothing False

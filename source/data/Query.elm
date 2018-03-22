@@ -9,6 +9,12 @@ import Data.Tool exposing (..)
 -- general queries
 --================--
 
+isClick : Event -> Bool
+isClick event = 
+    case event of
+        Click _ -> True
+        _ -> False
+
 
 isColor : Color -> Piece -> Bool
 isColor color piece = 

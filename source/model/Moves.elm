@@ -8,6 +8,7 @@ import Debug exposing (log)
 import Data.Tool exposing (..)
 import Data.Type exposing (..)
 import Data.Query exposing (..)
+import Data.Pure exposing (..)
 
 -- board translations
 -- ==================

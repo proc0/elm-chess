@@ -9,23 +9,11 @@ import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
+import Data.Query exposing (..)
+import Data.Pure exposing (..)
 import Model.Board exposing (..)
 import Model.Rules exposing (..)
 import State.Action exposing (..)
-
-newGame : (Game, Cmd Event)
-newGame = 
-    let -- UI events and subs
-        ui = UI Material.model "" False
-        cmd = [Layout.sub0 Mdl]
-        -- prep game args
-        chess = Chess openingBoard []
-        players = 
-            ( idlePlayer White
-            , idlePlayer Black
-            )
-        game = Game ui chess players
-    in game ! cmd
 
 subscribe : Game -> Sub Event
 subscribe { ui, players } = 
@@ -140,15 +128,10 @@ update event { ui, chess, players } =
                 -- TODO: refactor using new Piece -> Board pattern
                 -- next move board
                 End move -> 
-                    let isClick : Bool
-                        isClick = 
-                            case event of
-                                Click _ -> True
-                                _ -> False
-                        placePiece : Move -> Board -> Board                    
+                    let placePiece : Move -> Board -> Board                    
                         placePiece mv bd =
                             -- if click (or drag)
-                            if isClick
+                            if isClick event
                             -- lift from last loc 
                             -- and place piece
                             then drop mv.piece bd
@@ -159,7 +142,7 @@ update event { ui, chess, players } =
                         eatPiece cp bd =
                             -- if click, lift captured piece
                             -- else player drops piece on it
-                            if isClick
+                            if isClick event
                             then grab cp bd
                             else bd
                         -- helpers

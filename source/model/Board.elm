@@ -6,13 +6,9 @@ import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
-import Model.FEN exposing (..)
+import Data.Pure exposing (..)
 import Model.Rules exposing (..)
 import Data.Query exposing (..)
-
--- derive from FEN notation
-openingBoard : Board
-openingBoard = fromFEN initialBoard
 
 --logPiece : Piece -> Board -> Board
 --logPiece pc bd =
