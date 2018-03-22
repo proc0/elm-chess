@@ -68,7 +68,7 @@ endMove board select =
         target = 
             get destination board ? vacantSquare            
         -- update moving piece location
-        movingPiece =
+        boarded =
             select.piece |>
             (\s -> 
             { s 
@@ -91,7 +91,7 @@ endMove board select =
                 _ -> False
 
         -- capture target
-        targetPiece =
+        captured =
             -- check pawns for enpassant
             if isPassant
             then -- change target capture
@@ -106,5 +106,5 @@ endMove board select =
     in 
     -- if not same square, and destination is a valid move
     if destination /= select.focus && target.valid
-    then End <| Move select.focus destination movingPiece targetPiece isPassant
+    then End <| Move select.focus destination boarded captured isPassant
     else Playing select -- keep playing

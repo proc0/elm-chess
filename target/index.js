@@ -16896,12 +16896,12 @@ var _darrensiegel$elm_chess_client$State_Action$endMove = F2(
 			_elm_community$maybe_extra$Maybe_Extra_ops['?'],
 			A2(_chendrix$elm_matrix$Matrix$get, destination, board),
 			_darrensiegel$elm_chess_client$Data_Pure$vacantSquare);
-		var movingPiece = function (s) {
+		var boarded = function (s) {
 			return _elm_lang$core$Native_Utils.update(
 				s,
 				{location: destination});
 		}(select.piece);
-		var targetPiece = function () {
+		var captured = function () {
 			if (isPassant) {
 				var captureLocation = A3(_darrensiegel$elm_chess_client$Model_Moves$backward, ghost, 1, destination);
 				var passantCapture = A2(
@@ -16914,7 +16914,7 @@ var _darrensiegel$elm_chess_client$State_Action$endMove = F2(
 			}
 		}();
 		return ((!_elm_lang$core$Native_Utils.eq(destination, select.focus)) && target.valid) ? _darrensiegel$elm_chess_client$Data_Type$End(
-			A5(_darrensiegel$elm_chess_client$Data_Type$Move, select.focus, destination, movingPiece, targetPiece, isPassant)) : _darrensiegel$elm_chess_client$Data_Type$Playing(select);
+			A5(_darrensiegel$elm_chess_client$Data_Type$Move, select.focus, destination, boarded, captured, isPassant)) : _darrensiegel$elm_chess_client$Data_Type$Playing(select);
 	});
 var _darrensiegel$elm_chess_client$State_Action$clickMove = F4(
 	function (board, player, pos, loc) {
