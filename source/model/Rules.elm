@@ -13,13 +13,13 @@ import Model.Moves exposing (..)
 -- main moves
 -- ==========--
 
-pieceMoves : Piece -> Board -> List Translation
+pieceMoves : Piece -> Board -> Translations
 pieceMoves piece board = 
     let find f = f piece board
         diagonals =
-            find stepSearch asterisk
+            find linearMove asterisk
         parallels =
-            find stepSearch cross
+            find linearMove cross
         moves role =
             case role of
                 Pawn   -> find pawnMoves
@@ -61,7 +61,7 @@ pieceMoves piece board =
 -- helpers
 -- =======--
 
-validate : Piece -> Board -> (Translation, Square -> Bool) -> List Translation -> List Translation
+validate : Piece -> Board -> (Translation, Square -> Bool) -> Translations -> Translations
 validate piece board (move, rule) moves =
     let target = Matrix.get (move piece.location) board
     in 
@@ -71,7 +71,7 @@ validate piece board (move, rule) moves =
             then move::moves
             else moves)) ? moves
 
-distinct : Piece -> Board -> List Translation -> List Translation
+distinct : Piece -> Board -> Translations -> Translations
 distinct piece board locations = 
     filterMap (\move -> 
         case Matrix.get (move piece.location) board of
@@ -118,7 +118,7 @@ isEnPassant piece board =
 -- general rules
 -- =================--
 
-castle : Piece -> Board -> List Translation
+castle : Piece -> Board -> Translations
 castle king board = 
     let sides = 
             [ right
@@ -153,7 +153,7 @@ castle king board =
     in
     stationary king ?? concatMap castling sides
 
-pawnMoves : Piece -> Board -> List Translation
+pawnMoves : Piece -> Board -> Translations
 pawnMoves pawn board =
     let (y,x) = pawn.location
         step = forward pawn
@@ -178,7 +178,7 @@ pawnMoves pawn board =
     in
     checkRules rules ++ checkPawn enPassant
 
-enPassant : Piece -> Board -> List Translation
+enPassant : Piece -> Board -> Translations
 enPassant pawn board = 
     let step = forward pawn
         checkPawn = foldl (validate pawn board) []

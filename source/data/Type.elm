@@ -75,8 +75,11 @@ type alias Move =
     , enPassant : Bool
     }
 
-type alias History 
-    = List Move
+type alias Moves =
+    List Move
+
+type alias History = 
+    Moves
 
 type alias Translation = 
     Location -> Location

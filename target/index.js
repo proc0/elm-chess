@@ -16014,6 +16014,22 @@ var _darrensiegel$elm_chess_client$Model_Moves$up = F2(
 		var _p7 = _p6;
 		return A2(_chendrix$elm_matrix$Matrix$loc, _p7._0 - n, _p7._1);
 	});
+var _darrensiegel$elm_chess_client$Model_Moves$forward = function (piece) {
+	var _p8 = piece.color;
+	if (_p8.ctor === 'White') {
+		return _darrensiegel$elm_chess_client$Model_Moves$up;
+	} else {
+		return _darrensiegel$elm_chess_client$Model_Moves$down;
+	}
+};
+var _darrensiegel$elm_chess_client$Model_Moves$backward = function (piece) {
+	var _p9 = piece.color;
+	if (_p9.ctor === 'White') {
+		return _darrensiegel$elm_chess_client$Model_Moves$down;
+	} else {
+		return _darrensiegel$elm_chess_client$Model_Moves$up;
+	}
+};
 var _darrensiegel$elm_chess_client$Model_Moves$cardinals = {
 	ctor: '_Tuple2',
 	_0: {
@@ -16036,7 +16052,7 @@ var _darrensiegel$elm_chess_client$Model_Moves$cardinals = {
 	}
 };
 var _darrensiegel$elm_chess_client$Model_Moves$asterisk = function () {
-	var combinatorial = function (_p8) {
+	var cartesian = function (_p10) {
 		return _elm_lang$core$Basics$uncurry(
 			_darrensiegel$elm_chess_client$Data_Tool$liftAp(
 				F2(
@@ -16049,12 +16065,12 @@ var _darrensiegel$elm_chess_client$Model_Moves$asterisk = function () {
 					function (x, y) {
 						return A2(_darrensiegel$elm_chess_client$Data_Tool_ops['$>>'], x, y);
 					})(_elm_lang$core$List$singleton),
-				_p8));
+				_p10));
 	};
-	return combinatorial(_darrensiegel$elm_chess_client$Model_Moves$cardinals);
+	return cartesian(_darrensiegel$elm_chess_client$Model_Moves$cardinals);
 }();
 var _darrensiegel$elm_chess_client$Model_Moves$cross = function () {
-	var wrap = function (_p9) {
+	var wrap = function (_p11) {
 		return A2(
 			F2(
 				function (x, y) {
@@ -16062,32 +16078,20 @@ var _darrensiegel$elm_chess_client$Model_Moves$cross = function () {
 				}),
 			_elm_lang$core$List$singleton,
 			_elm_lang$core$List$concat(
-				_darrensiegel$elm_chess_client$Data_Tool$tupleToList(_p9)));
+				_darrensiegel$elm_chess_client$Data_Tool$tupleToList(_p11)));
 	};
 	return wrap(_darrensiegel$elm_chess_client$Model_Moves$cardinals);
 }();
-var _darrensiegel$elm_chess_client$Model_Moves$forward = function (piece) {
-	var _p10 = piece.color;
-	if (_p10.ctor === 'White') {
-		return _darrensiegel$elm_chess_client$Model_Moves$up;
-	} else {
-		return _darrensiegel$elm_chess_client$Model_Moves$down;
-	}
-};
-var _darrensiegel$elm_chess_client$Model_Moves$backward = function (piece) {
-	var _p11 = piece.color;
-	if (_p11.ctor === 'White') {
-		return _darrensiegel$elm_chess_client$Model_Moves$down;
-	} else {
-		return _darrensiegel$elm_chess_client$Model_Moves$up;
-	}
-};
-var _darrensiegel$elm_chess_client$Model_Moves$stay = function (l) {
+var _darrensiegel$elm_chess_client$Model_Moves$idle = function (l) {
 	return l;
 };
-var _darrensiegel$elm_chess_client$Model_Moves$stepSearch = F3(
-	function (piece, board, directions) {
-		var stepRange = A2(
+var _darrensiegel$elm_chess_client$Model_Moves$stepSearch = F5(
+	function (piece, board, semaphores, transforms, directions) {
+		var finish = _darrensiegel$elm_chess_client$Data_Tool$snd(transforms);
+		var relay = _darrensiegel$elm_chess_client$Data_Tool$fst(transforms);
+		var red = _darrensiegel$elm_chess_client$Data_Tool$snd(semaphores);
+		var green = _darrensiegel$elm_chess_client$Data_Tool$fst(semaphores);
+		var step = A2(
 			_elm_lang$core$List$map,
 			F2(
 				function (x, y) {
@@ -16106,7 +16110,7 @@ var _darrensiegel$elm_chess_client$Model_Moves$stepSearch = F3(
 						1) ? A2(
 						_elm_community$maybe_extra$Maybe_Extra_ops['?'],
 						_elm_lang$core$List$head(ways),
-						_elm_lang$core$Basics$always(_darrensiegel$elm_chess_client$Model_Moves$stay))(depth) : A2(
+						_elm_lang$core$Basics$always(_darrensiegel$elm_chess_client$Model_Moves$idle))(depth) : A2(
 						_elm_community$maybe_extra$Maybe_Extra_ops['?'],
 						A2(
 							_darrensiegel$elm_chess_client$Data_Tool$foldl1,
@@ -16124,7 +16128,7 @@ var _darrensiegel$elm_chess_client$Model_Moves$stepSearch = F3(
 										return y(x);
 									})(depth),
 								ways)),
-						_darrensiegel$elm_chess_client$Model_Moves$stay);
+						_darrensiegel$elm_chess_client$Model_Moves$idle);
 					var target = A2(
 						_elm_community$maybe_extra$Maybe_Extra_ops['?'],
 						A2(
@@ -16132,21 +16136,21 @@ var _darrensiegel$elm_chess_client$Model_Moves$stepSearch = F3(
 							tracePath(piece.location),
 							board),
 						_darrensiegel$elm_chess_client$Data_Pure$vacantSquare);
-					return _darrensiegel$elm_chess_client$Data_Query$isVacant(target) ? {
+					return green(target) ? {
 						ctor: '_Tuple2',
 						_0: _p15,
-						_1: {ctor: '::', _0: tracePath, _1: _p16}
-					} : ((!A2(_darrensiegel$elm_chess_client$Data_Query$friendlyOccupied, piece.color, target)) ? {
+						_1: A2(relay, tracePath, _p16)
+					} : (red(target) ? {
 						ctor: '_Tuple2',
 						_0: stop,
-						_1: {ctor: '::', _0: tracePath, _1: _p16}
+						_1: A2(finish, tracePath, _p16)
 					} : {ctor: '_Tuple2', _0: stop, _1: _p16});
 				} else {
 					return {ctor: '_Tuple2', _0: stop, _1: _p16};
 				}
 			});
 		var go = true;
-		var accum = {
+		var memo = {
 			ctor: '_Tuple2',
 			_0: go,
 			_1: {ctor: '[]'}
@@ -16158,11 +16162,35 @@ var _darrensiegel$elm_chess_client$Model_Moves$stepSearch = F3(
 					_elm_lang$core$List$foldl,
 					walk(ways),
 					{ctor: '_Tuple2', _0: go, _1: _p18._1},
-					stepRange);
+					step);
 			});
-		var _p19 = A3(_elm_lang$core$List$foldl, search, accum, directions);
+		var _p19 = A3(_elm_lang$core$List$foldl, search, memo, directions);
 		var paths = _p19._1;
 		return paths;
+	});
+var _darrensiegel$elm_chess_client$Model_Moves$linearMove = F3(
+	function (piece, board, directions) {
+		var consAll = {
+			ctor: '_Tuple2',
+			_0: F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			_1: F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				})
+		};
+		var search = A2(_darrensiegel$elm_chess_client$Model_Moves$stepSearch, piece, board);
+		var stopWhen = function (_p20) {
+			return !A2(_darrensiegel$elm_chess_client$Data_Query$friendlyOccupied, piece.color, _p20);
+		};
+		var searchWhen = _darrensiegel$elm_chess_client$Data_Query$isVacant;
+		return A3(
+			search,
+			{ctor: '_Tuple2', _0: searchWhen, _1: stopWhen},
+			consAll,
+			directions);
 	});
 
 var _darrensiegel$elm_chess_client$Model_Rules$capturing = F2(
@@ -16455,8 +16483,8 @@ var _darrensiegel$elm_chess_client$Model_Rules$pieceMoves = F2(
 		var find = function (f) {
 			return A2(f, piece, board);
 		};
-		var diagonals = A2(find, _darrensiegel$elm_chess_client$Model_Moves$stepSearch, _darrensiegel$elm_chess_client$Model_Moves$asterisk);
-		var parallels = A2(find, _darrensiegel$elm_chess_client$Model_Moves$stepSearch, _darrensiegel$elm_chess_client$Model_Moves$cross);
+		var diagonals = A2(find, _darrensiegel$elm_chess_client$Model_Moves$linearMove, _darrensiegel$elm_chess_client$Model_Moves$asterisk);
+		var parallels = A2(find, _darrensiegel$elm_chess_client$Model_Moves$linearMove, _darrensiegel$elm_chess_client$Model_Moves$cross);
 		var moves = function (role) {
 			var _p15 = role;
 			switch (_p15.ctor) {
