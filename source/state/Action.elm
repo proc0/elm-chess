@@ -75,7 +75,7 @@ endMove board select =
             | location = destination
             })        
         -- simulate pre-move piece 
-        focusPiece = 
+        ghost = 
             select.piece |>
             (\s -> 
             { s 
@@ -85,9 +85,9 @@ endMove board select =
             })
         -- test en passant
         isPassant = 
-            case focusPiece.role of
+            case ghost.role of
                 Pawn -> 
-                    isEnPassant focusPiece board
+                    isEnPassant ghost board
                 _ -> False
 
         -- capture target
@@ -96,7 +96,7 @@ endMove board select =
             if isPassant
             then -- change target capture
                 let captureLocation =
-                        backward focusPiece 1 destination
+                        backward ghost 1 destination
                     passantCapture = 
                         get captureLocation board ? vacantSquare
                 in -- and capture pawn

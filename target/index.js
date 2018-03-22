@@ -16875,7 +16875,7 @@ var _darrensiegel$elm_chess_client$Model_Board$grab = F2(
 
 var _darrensiegel$elm_chess_client$State_Action$endMove = F2(
 	function (board, select) {
-		var focusPiece = function (s) {
+		var ghost = function (s) {
 			return _elm_lang$core$Native_Utils.update(
 				s,
 				{
@@ -16884,9 +16884,9 @@ var _darrensiegel$elm_chess_client$State_Action$endMove = F2(
 				});
 		}(select.piece);
 		var isPassant = function () {
-			var _p0 = focusPiece.role;
+			var _p0 = ghost.role;
 			if (_p0.ctor === 'Pawn') {
-				return A2(_darrensiegel$elm_chess_client$Model_Rules$isEnPassant, focusPiece, board);
+				return A2(_darrensiegel$elm_chess_client$Model_Rules$isEnPassant, ghost, board);
 			} else {
 				return false;
 			}
@@ -16903,7 +16903,7 @@ var _darrensiegel$elm_chess_client$State_Action$endMove = F2(
 		}(select.piece);
 		var targetPiece = function () {
 			if (isPassant) {
-				var captureLocation = A3(_darrensiegel$elm_chess_client$Model_Moves$backward, focusPiece, 1, destination);
+				var captureLocation = A3(_darrensiegel$elm_chess_client$Model_Moves$backward, ghost, 1, destination);
 				var passantCapture = A2(
 					_elm_community$maybe_extra$Maybe_Extra_ops['?'],
 					A2(_chendrix$elm_matrix$Matrix$get, captureLocation, board),
