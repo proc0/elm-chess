@@ -19,15 +19,15 @@ openingBoard = fromFEN initialBoard
 --    let _ = log "piece" pc
 --    in bd
 
-lift : Piece -> Board -> Board
-lift piece board = 
+grab : Piece -> Board -> Board
+grab piece board = 
     clear board 
     |> remove piece
 
-place : Board -> Piece -> Board
-place board piece = 
+drop : Piece -> Board -> Board
+drop piece board = 
     board
-    |> drop piece
+    |> add piece
     |> ticks >> clear
 
 --=============================--
@@ -131,8 +131,8 @@ remove piece board =
     in 
     update lastLocation (activateSquare << emptySquare) board
 
-drop : Piece -> Board -> Board
-drop piece board = 
+add : Piece -> Board -> Board
+add piece board = 
     let target = piece.location
         newPiece = translatePiece target piece
     in 

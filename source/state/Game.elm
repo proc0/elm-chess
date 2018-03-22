@@ -135,8 +135,9 @@ update event { ui, chess, players } =
                         otherwise -> 
                             -- start moving (lift piece)
                             -- and highlight valid moves
-                            lift selected.piece chess.board 
+                            grab selected.piece chess.board 
                             |> analyze selected.piece
+                -- TODO: refactor using new Piece -> Board pattern
                 -- next move board
                 End move -> 
                     let isClick : Bool
@@ -150,16 +151,16 @@ update event { ui, chess, players } =
                             if isClick
                             -- lift from last loc 
                             -- and place piece
-                            then place bd mv.piece 
-                                    |> lift mv.piece
+                            then drop mv.piece bd
+                                    |> grab mv.piece
                             -- just place piece 
-                            else place bd mv.piece
+                            else drop mv.piece bd
                         eatPiece : Piece -> Board -> Board
                         eatPiece cp bd =
                             -- if click, lift captured piece
                             -- else player drops piece on it
                             if isClick
-                            then lift cp bd
+                            then grab cp bd
                             else bd
                         -- helpers
                         movePiece = placePiece move
