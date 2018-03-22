@@ -15,7 +15,7 @@ import Model.Moves exposing (..)
 
 pieceMoves : Piece -> Board -> List Translation
 pieceMoves piece board = 
-    let find f = f board piece
+    let find f = f piece board
         diagonals =
             find stepSearch asterisk
         parallels =
@@ -61,8 +61,8 @@ pieceMoves piece board =
 -- helpers
 -- =======--
 
-validate : Board -> Piece -> (Translation, Square -> Bool) -> List Translation -> List Translation
-validate board piece (move, rule) moves =
+validate : Piece -> Board -> (Translation, Square -> Bool) -> List Translation -> List Translation
+validate piece board (move, rule) moves =
     let target = Matrix.get (move piece.location) board
     in 
     (target |> Maybe.map 
@@ -71,7 +71,6 @@ validate board piece (move, rule) moves =
             then move::moves
             else moves)) ? moves
 
--- TODO: refactor and take out Rules, flip type
 distinct : Piece -> Board -> List Translation -> List Translation
 distinct piece board locations = 
     filterMap (\move -> 
@@ -85,17 +84,48 @@ distinct piece board locations =
                     _ -> Just move
             _ -> Nothing) locations
 
--- rules
--- =====--
+-- rule like queries
+-- =================--
 
-castle : Board -> Piece -> List Translation
-castle board king = 
+startingRank : Piece -> Int
+startingRank piece =
+    let offset n = 
+        case piece.color of
+            White -> 7 - n
+            Black -> n
+    in
+    case piece.role of
+        Pawn -> offset 1
+        _ -> offset 0
+
+starting : Piece -> Bool
+starting piece = 
+    let (y,x) = 
+        piece.location
+    in 
+    startingRank piece == y
+
+capturing : Player -> Maybe Selection -> Bool 
+capturing player selection =
+    selection |> Maybe.map (\s -> 
+                s.piece.color /= player.color
+              ) |> Maybe.withDefault False
+
+isEnPassant : Piece -> Board -> Bool
+isEnPassant piece board = 
+    passanting piece && (isJust << head <| enPassant piece board)
+    
+-- general rules
+-- =================--
+
+castle : Piece -> Board -> List Translation
+castle king board = 
     let sides = 
             [ right
             , left
             ]
         withKing fn =
-            fn board king
+            fn king board
         analizeK = 
             foldl (withKing validate) []
         clear tests =
@@ -123,12 +153,12 @@ castle board king =
     in
     stationary king ?? concatMap castling sides
 
-pawnMoves : Board -> Piece -> List Translation
-pawnMoves board pawn =
+pawnMoves : Piece -> Board -> List Translation
+pawnMoves pawn board =
     let (y,x) = pawn.location
         step = forward pawn
         checkPawn fn = 
-            fn board pawn
+            fn pawn board
         checkRules = 
             foldl (checkPawn validate) []
         rules : List (Translation, Square -> Bool)
@@ -148,10 +178,10 @@ pawnMoves board pawn =
     in
     checkRules rules ++ checkPawn enPassant
 
-enPassant : Board -> Piece -> List Translation
-enPassant board pawn = 
+enPassant : Piece -> Board -> List Translation
+enPassant pawn board = 
     let step = forward pawn
-        checkPawn = foldl (validate board pawn) []
+        checkPawn = foldl (validate pawn board) []
         passantRules move = 
             [ (move 1, isUntouched)
             , (move 1, hasPawn)
@@ -170,8 +200,4 @@ enPassant board pawn =
             ]
     in 
     checkPawn rules
-
-isEnPassant : Board -> Piece -> Bool
-isEnPassant board piece = 
-    passanting piece && (isJust << head <| enPassant board piece)
 

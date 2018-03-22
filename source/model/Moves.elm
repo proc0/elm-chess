@@ -60,9 +60,8 @@ backward piece =
         White -> down
         Black -> up
 
-
-stepSearch : Board -> Piece -> List Movements -> List Translation
-stepSearch board piece directions =
+stepSearch : Piece -> Board -> List Movements -> List Translation
+stepSearch piece board directions =
     let go = True
         stop = False
         accum = (go, [])

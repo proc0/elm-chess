@@ -9,23 +9,6 @@ import Data.Tool exposing (..)
 -- general queries
 --================--
 
-startingRank : Piece -> Int
-startingRank piece =
-    let offset n = 
-        case piece.color of
-            White -> 7 - n
-            Black -> n
-    in
-    case piece.role of
-        Pawn -> offset 1
-        _ -> offset 0
-
-starting : Piece -> Bool
-starting piece = 
-    let (y,x) = 
-        piece.location
-    in 
-    startingRank piece == y
 
 isColor : Color -> Piece -> Bool
 isColor color piece = 

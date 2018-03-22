@@ -58,12 +58,6 @@ clickMove board player pos loc =
             endMove board sim
         _ -> Idle
 
-capturing : Player -> Maybe Selection -> Bool 
-capturing player selection =
-    selection |> Maybe.map (\s -> 
-                s.piece.color /= player.color
-              ) |> Maybe.withDefault False
-
 endMove : Board -> Selection -> Action
 endMove board select = 
     let -- calculate moving position
@@ -92,7 +86,7 @@ endMove board select =
         isPassant = 
             case originPiece.role of
                 Pawn -> 
-                    isEnPassant board originPiece
+                    isEnPassant originPiece board
                 _ -> False
 
         -- capture target

@@ -2,7 +2,7 @@ module Data.Tool exposing (..)
 
 import Matrix exposing (Location, loc)
 import Mouse exposing (Position)
-import List exposing (range, foldl, map, map2, length)
+import List exposing (concatMap, range, foldl, map, map2, length)
 import Tuple exposing (first, second, mapFirst, mapSecond)
 import Maybe.Extra exposing ((?), isJust)
 
@@ -17,28 +17,29 @@ squareSize : Int
 squareSize = 54
 
 -- Global tools
--- Shorthand map over List-like
-($>>) f lx = map f lx  -- <$> in Haskell
-(<<$) lx f = map f lx
+-- map <$>
+($>>) f xs = 
+    map f xs  
+(<<$) xs f = map f xs
 infixr 2 $>>
 infixr 2 <<$
 
--- Shorthand sequential application 
--- <*> in Haskell
-($$>) lf lx = map2 (\f x -> f x) lf lx
--- <**> in Haskell
---(<$$) lx lf = map2 (|>) lf lx   
+-- ap <*>
+($$>) fs xs = 
+    concatMap (\f -> f $>> xs) fs
 infixr 1 $$>
---infixr 1 <$$
 
---Shorthand map over Maybe
-(<?) f mx = case mx of   
-  (Just x) -> Just (f x)
-  Nothing  -> Nothing
-(?>) mx f = case mx of 
-  Just x  -> Just (f x)
-  Nothing -> Nothing
+-- Maybe.map
+(<?) f ma = 
+    case ma of   
+        Just a -> Just (f a)
+        _  -> Nothing
 infixr 2 <?
+    
+(?>) ma f = 
+    case ma of 
+        Just a  -> Just (f a)
+        _ -> Nothing
 infixr 2 ?>
 
 (=>) = (,)

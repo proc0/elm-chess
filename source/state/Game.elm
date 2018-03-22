@@ -10,6 +10,7 @@ import Debug exposing (log)
 import Data.Type exposing (..)
 import Data.Tool exposing (..)
 import Model.Board exposing (..)
+import Model.Rules exposing (..)
 import State.Action exposing (..)
 
 newGame : (Game, Cmd Event)
