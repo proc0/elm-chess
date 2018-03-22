@@ -20,7 +20,8 @@ newGame =
             )
         -- UI events and subs
         ui = UI Material.model "" False
-        cmd = [Layout.sub0 Mdl]
+        gui = Layout.sub0 GUI
+        cmd = [gui]
     in 
     Game ui chess players ! cmd
 
@@ -30,8 +31,8 @@ zeroLoc = loc 0 0
 zeroPs : Position
 zeroPs = { x=0, y=0 }
 
-nullPiece : Piece
-nullPiece = 
+joker : Piece
+joker = 
     Piece zeroPs zeroLoc Black Joker 0 []
 
 vacantSquare : Square
@@ -44,4 +45,4 @@ newPlayer color =
 
 noMove : Move 
 noMove =
-    Move zeroLoc zeroLoc nullPiece Nothing False
+    Move zeroLoc zeroLoc joker Nothing False

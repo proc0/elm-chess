@@ -63,7 +63,7 @@ type alias Rule =
 --=======================--
 
 type alias Selection =
-    { origin : Location
+    { focus : Location
     , piece : Piece
     }
 
@@ -127,7 +127,7 @@ type Event =
       Click Position
     | Drag Position
     | Drop Position
-    | Mdl (Msg Event)
+    | GUI (Msg Event)
     | Debug Bool
 
 type alias UI =

@@ -26,12 +26,12 @@ select position board =
     selecting position
 
 startMoving : Position -> Selection -> Action
-startMoving ps ({origin, piece} as selection) =  
-    Moving <| Selection origin ({ piece | position = ps })
+startMoving ps ({focus, piece} as selection) =  
+    Moving <| Selection focus ({ piece | position = ps })
 
 updateMoving : Position -> Selection -> Action
-updateMoving ps ({origin, piece} as selection) = 
-    Moving <| Selection origin ({ piece | position = ps })
+updateMoving ps ({focus, piece} as selection) = 
+    Moving <| Selection focus ({ piece | position = ps })
 
 whileMoving : Action -> (Selection -> Action) -> Action
 whileMoving action change = 
@@ -75,19 +75,19 @@ endMove board select =
             | location = destination
             })        
         -- simulate pre-move piece 
-        originPiece = 
+        focusPiece = 
             select.piece |>
             (\s -> 
             { s 
-              -- triangulate moving piece origin
-            | position = toBoardPosition select.origin
-            , location = select.origin
+              -- triangulate moving piece focus
+            | position = toBoardPosition select.focus
+            , location = select.focus
             })
         -- test en passant
         isPassant = 
-            case originPiece.role of
+            case focusPiece.role of
                 Pawn -> 
-                    isEnPassant originPiece board
+                    isEnPassant focusPiece board
                 _ -> False
 
         -- capture target
@@ -96,7 +96,7 @@ endMove board select =
             if isPassant
             then -- change target capture
                 let captureLocation =
-                        backward originPiece 1 destination
+                        backward focusPiece 1 destination
                     passantCapture = 
                         get captureLocation board ? vacantSquare
                 in -- and capture pawn
@@ -105,6 +105,6 @@ endMove board select =
                 target.piece
     in 
     -- if not same square, and destination is a valid move
-    if destination /= select.origin && target.valid
-    then End <| Move select.origin destination movingPiece targetPiece isPassant
+    if destination /= select.focus && target.valid
+    then End <| Move select.focus destination movingPiece targetPiece isPassant
     else Playing select -- keep playing

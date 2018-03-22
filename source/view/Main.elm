@@ -39,7 +39,7 @@ render ({ ui, chess, players } as game) =
             else 
                 []     
     in 
-    (Layout.render Mdl ui.mdl [Layout.fixedHeader]
+    (Layout.render GUI ui.mdl [Layout.fixedHeader]
             { header = [
                   Options.div 
                     [ Typo.subhead
@@ -165,10 +165,10 @@ r_svg ({ position } as piece) =
 
 -- dragable svg markup
 r_dragSvg : Selection -> Html Event
-r_dragSvg { origin, piece } = 
+r_dragSvg { focus, piece } = 
     let x = piece.position.x
         y = piece.position.y
-        o = toBoardPosition origin
+        o = toBoardPosition focus
         -- minus 56px from header
         newPos = Position (x - 32) ((y - 32) - 56)
         l_t = newPos.x < o.x - 18

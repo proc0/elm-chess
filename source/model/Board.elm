@@ -197,7 +197,7 @@ castleRook move board =
             then ((loc y1 7), (loc y1 5))
             else ((loc y1 0), (loc y1 3))
         rook =
-            (get (fst rookMove) board ? vacantSquare).piece ? nullPiece
+            (get (fst rookMove) board ? vacantSquare).piece ? joker
     in
     remove rook board |> jump ({ rook | location = snd rookMove })
 

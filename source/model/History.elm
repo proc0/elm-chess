@@ -34,7 +34,7 @@ debugHistory history =
                 Joker -> ""
                 _ -> formatPiece pc         
     in
-    debugPiece lastMove.piece ++ "\ncapture:\n" ++ debugPiece (lastMove.capture ? nullPiece)
+    debugPiece lastMove.piece ++ "\ncapture:\n" ++ debugPiece (lastMove.capture ? joker)
 
 fullMove : Int -> (String, String) -> String
 fullMove i (w,b) =

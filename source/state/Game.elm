@@ -18,7 +18,7 @@ import State.Action exposing (..)
 subscribe : Game -> Sub Event
 subscribe { ui, players } = 
     let player = fst players
-        layout = Layout.subs Mdl ui.mdl
+        layout = Layout.subs GUI ui.mdl
         persistent =
             [ layout
             , Keyboard.presses (\k ->  
@@ -185,9 +185,9 @@ update event { ui, chess, players } =
     in 
     case event of
         -- Material UI 
-        Mdl message -> 
+        GUI message -> 
             let (mat_, sub_) = 
-                Material.update Mdl message ui_
+                Material.update GUI message ui_
             in 
             game mat_ ! [sub_]
         otherwise -> 
