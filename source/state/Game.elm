@@ -65,7 +65,7 @@ update event { ui, chess, players } =
                             toBoardLocation position
                         clickTo = 
                             -- click handler
-                            clickMove chess.board player
+                            clickMove player chess.board
                     in 
                     -- check selection 
                     case selection of
@@ -96,7 +96,15 @@ update event { ui, chess, players } =
         player_ : Player
         player_ = 
             { player 
-            | action = action 
+            | action = action
+            , pieces =
+                case action of
+                End move -> 
+                    player.pieces
+                    ++
+                    [move.piece]
+                _ -> 
+                    player.pieces
             }
 
         players_ = 
@@ -109,58 +117,43 @@ update event { ui, chess, players } =
         board : Board
         board = 
             case action of
+                -- neutral
                 Playing selected -> 
-                    -- return piece to its origin
                     revert selected.piece chess.board
                 -- dragging piece
                 Moving selected -> 
-                    -- check last frame action
-                    case player.action of
-                        -- last frame was moving
-                        Moving _ -> 
-                            -- highlight valid moves
-                            analyze selected.piece chess.board
-                        -- if last frame was not moving
-                        otherwise -> 
-                            -- start moving (lift piece)
-                            -- and highlight valid moves
-                            grab selected.piece chess.board 
-                            |> analyze selected.piece
-                -- TODO: refactor using new Piece -> Board pattern
-                -- next move board
-                End move -> 
-                    let placePiece : Move -> Board -> Board                    
-                        placePiece mv bd =
-                            -- if click (or drag)
-                            if isClick event
-                            -- lift from last loc 
-                            -- and place piece
-                            then drop mv.piece bd
-                                    |> grab mv.piece
-                            -- just place piece 
-                            else drop mv.piece bd
-                        eatPiece : Piece -> Board -> Board
-                        eatPiece cp bd =
-                            -- if click, lift captured piece
-                            -- else player drops piece on it
-                            if isClick event
-                            then grab cp bd
-                            else bd
-                        -- helpers
-                        movePiece = placePiece move
-                        checkEnPassant fn =
-                            ifEnPassant fn move
-                        ifCastling fn =
-                            whenCastling fn move
+                    let piece = selected.piece
+                        preform fn = fn piece chess.board
                     in
-                    chess.board
-                    |> movePiece 
-                    |> ifCastling castleRook
-                    |> checkEnPassant 
-                        (whenCapturing eatPiece)
+                    -- check last frame
+                    case player.action of
+                        -- highlight possible moves
+                        Moving _ -> preform analyze
+                        -- player started move
+                        otherwise -> 
+                            -- drag piece and highlight
+                            preform grab |> analyze piece
+                -- next board
+                End move -> 
+                    let eat : Piece -> Board -> Board
+                        eat captured board =
+                            if isClick event
+                            -- cleanup captured
+                            then grab captured board
+                            else board
+                        place : Piece -> Board -> Board                    
+                        place piece board =
+                            drop piece board
+                            -- cleanup captured
+                            |> (if isClick event
+                                then eat piece
+                                else identity)                          
+                    in
+                    place move.piece chess.board
+                    |> whenCastling castleRook move
+                    |> ifEnPassant (whenCapturing eat) move
                     
-                Idle -> 
-                    chess.board
+                Idle -> chess.board
 
         history : History
         history = 

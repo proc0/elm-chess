@@ -39,8 +39,8 @@ whileMoving action change =
         Moving selection -> change selection
         _ -> Idle
 
-clickMove : Board -> Player -> Position -> Location -> Action
-clickMove board player pos loc =
+clickMove : Player -> Board -> Position -> Location -> Action
+clickMove player board pos loc =
     case player.action of
         Playing selected -> 
             let selPiece = 
