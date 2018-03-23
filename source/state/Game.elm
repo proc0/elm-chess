@@ -2,7 +2,7 @@ module State.Game exposing (..)
 
 import Char exposing (fromCode, toCode)
 import Mouse exposing (Position, moves, ups)
-import Keyboard exposing (downs, ups)
+import Keyboard exposing (KeyCode, downs, ups)
 import Material
 import Material.Layout as Layout
 import Debug exposing (log)
@@ -15,31 +15,32 @@ import Model.Board exposing (..)
 import Model.Rules exposing (..)
 import State.Action exposing (..)
 
+toggleDebug : Bool -> KeyCode -> Event
+toggleDebug debugging key = 
+    let tilde =
+            fromCode key == '`'
+    in
+    Debug <| (tilde && not debugging) || (not debugging)
+
 subscribe : Game -> Sub Event
 subscribe { ui, players } = 
-    let player = fst players
-        layout = Layout.subs GUI ui.mdl
-        persistent =
-            [ layout
-            , Keyboard.presses (\k ->  
-                if fromCode k == '`' && ui.debug == False
-                then Debug True
-                else if fromCode k == '`'
-                then Debug False
-                else Debug ui.debug)
+    let default =
+            [ Keyboard.presses 
+                <| toggleDebug ui.debug
+            , Layout.subs GUI ui.mdl
             ]
-    in -- if player 
-    case player.action of
+    in -- if current player 
+    case (fst players).action of
         -- is moving
         Moving _ -> 
             Sub.batch <|
-                -- track position
+                -- trackey position
                 [ Mouse.moves Drag
                 , Mouse.ups Drop
                 ]
                 ++
-                persistent
-        _ -> Sub.batch persistent
+                default
+        _ -> Sub.batch default
 
 update : Event -> Game -> ( Game, Cmd Event )
 update event { ui, chess, players } =

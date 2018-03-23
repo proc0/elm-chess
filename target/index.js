@@ -17149,28 +17149,27 @@ var _darrensiegel$elm_chess_client$State_Game$update = F2(
 				{ctor: '[]'});
 		}
 	});
+var _darrensiegel$elm_chess_client$State_Game$toggleDebug = F2(
+	function (debugging, key) {
+		var tilde = _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$Char$fromCode(key),
+			_elm_lang$core$Native_Utils.chr('`'));
+		return _darrensiegel$elm_chess_client$Data_Type$Debug((tilde && (!debugging)) || (!debugging));
+	});
 var _darrensiegel$elm_chess_client$State_Game$subscribe = function (_p18) {
 	var _p19 = _p18;
 	var _p21 = _p19.ui;
-	var layout = A2(_debois$elm_mdl$Material_Layout$subs, _darrensiegel$elm_chess_client$Data_Type$GUI, _p21.mdl);
-	var persistent = {
+	var $default = {
 		ctor: '::',
-		_0: layout,
+		_0: _elm_lang$keyboard$Keyboard$presses(
+			_darrensiegel$elm_chess_client$State_Game$toggleDebug(_p21.debug)),
 		_1: {
 			ctor: '::',
-			_0: _elm_lang$keyboard$Keyboard$presses(
-				function (k) {
-					return (_elm_lang$core$Native_Utils.eq(
-						_elm_lang$core$Char$fromCode(k),
-						_elm_lang$core$Native_Utils.chr('`')) && _elm_lang$core$Native_Utils.eq(_p21.debug, false)) ? _darrensiegel$elm_chess_client$Data_Type$Debug(true) : (_elm_lang$core$Native_Utils.eq(
-						_elm_lang$core$Char$fromCode(k),
-						_elm_lang$core$Native_Utils.chr('`')) ? _darrensiegel$elm_chess_client$Data_Type$Debug(false) : _darrensiegel$elm_chess_client$Data_Type$Debug(_p21.debug));
-				}),
+			_0: A2(_debois$elm_mdl$Material_Layout$subs, _darrensiegel$elm_chess_client$Data_Type$GUI, _p21.mdl),
 			_1: {ctor: '[]'}
 		}
 	};
-	var player = _darrensiegel$elm_chess_client$Data_Tool$fst(_p19.players);
-	var _p20 = player.action;
+	var _p20 = _darrensiegel$elm_chess_client$Data_Tool$fst(_p19.players).action;
 	if (_p20.ctor === 'Moving') {
 		return _elm_lang$core$Platform_Sub$batch(
 			A2(
@@ -17184,9 +17183,9 @@ var _darrensiegel$elm_chess_client$State_Game$subscribe = function (_p18) {
 						_1: {ctor: '[]'}
 					}
 				},
-				persistent));
+				$default));
 	} else {
-		return _elm_lang$core$Platform_Sub$batch(persistent);
+		return _elm_lang$core$Platform_Sub$batch($default);
 	}
 };
 
