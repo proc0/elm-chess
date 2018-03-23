@@ -27,7 +27,7 @@ debugHistory history =
     let lastMove = 
             head history ? noMove
         formatPiece p =
-            String.join " " [(toString p.color), (toString p.role), (toString p.location)]
+            String.join " " [(toString p.color), (toString p.role), (toString p.point)]
         debugPiece : Piece -> String
         debugPiece pc =
             case pc.role of

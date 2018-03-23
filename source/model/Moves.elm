@@ -128,7 +128,7 @@ stepSearch piece board semaphores transforms directions =
                         else (foldl1 (>>) <| map ((|>) depth) ways) ? idle
                     target : Square
                     target = 
-                    get (tracePath piece.location) board ? vacantSquare
+                    get (tracePath piece.point) board ? vacantSquare
                 in 
                 if green target
                 then (go, relay tracePath paths)

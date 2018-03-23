@@ -12,26 +12,26 @@ import Model.Moves exposing (..)
 import Model.Rules exposing (..)
 
 select : Position -> Board -> Maybe Selection
-select position board = 
+select drag board = 
     let locate xy = 
             get (toBoardLocation xy) board
         selectPiece square = 
             let selection piece = 
-                Selection square.location piece
+                Selection square.point piece
             in 
             Maybe.map selection square.piece
         selecting = 
             join << Maybe.map selectPiece << locate
     in 
-    selecting position
+    selecting drag
 
 startMoving : Position -> Selection -> Action
 startMoving ps ({focus, piece} as selection) =  
-    Moving <| Selection focus ({ piece | position = ps })
+    Moving <| Selection focus ({ piece | drag = ps })
 
 updateMoving : Position -> Selection -> Action
 updateMoving ps ({focus, piece} as selection) = 
-    Moving <| Selection focus ({ piece | position = ps })
+    Moving <| Selection focus ({ piece | drag = ps })
 
 whileMoving : Action -> (Selection -> Action) -> Action
 whileMoving action change = 
@@ -51,8 +51,8 @@ clickMove board player pos loc =
                     { selected
                     | piece =
                         { selPiece
-                        | position = pos
-                        , location = loc
+                        | drag = pos
+                        , point = loc
                         }
                     }
             in 
@@ -61,18 +61,18 @@ clickMove board player pos loc =
 
 endMove : Board -> Selection -> Action
 endMove board select = 
-    let -- calculate moving position
+    let -- calculate moving drag
         destination = 
-            toBoardLocation select.piece.position
+            toBoardLocation select.piece.drag
         -- obtain target square
         target = 
             get destination board ? vacantSquare            
-        -- update moving piece location
+        -- update moving piece point
         boarded =
             select.piece |>
             (\s -> 
             { s 
-            | location = destination
+            | point = destination
             })        
         -- simulate pre-move piece 
         ghost = 
@@ -80,8 +80,8 @@ endMove board select =
             (\s -> 
             { s 
               -- triangulate moving piece focus
-            | position = toBoardPosition select.focus
-            , location = select.focus
+            | drag = toBoardPosition select.focus
+            , point = select.focus
             })
         -- test en passant
         isPassant = 

@@ -63,7 +63,7 @@ pieceMoves piece board =
 
 validate : Piece -> Board -> (Translation, Square -> Bool) -> Translations -> Translations
 validate piece board (move, rule) moves =
-    let target = Matrix.get (move piece.location) board
+    let target = Matrix.get (move piece.point) board
     in 
     (target |> Maybe.map 
         (\square ->
@@ -74,7 +74,7 @@ validate piece board (move, rule) moves =
 distinct : Piece -> Board -> Translations -> Translations
 distinct piece board locations = 
     filterMap (\move -> 
-        case Matrix.get (move piece.location) board of
+        case Matrix.get (move piece.point) board of
             Just square ->
                 case square.piece of
                     Just pc -> 
@@ -101,7 +101,7 @@ startingRank piece =
 starting : Piece -> Bool
 starting piece = 
     let (y,x) = 
-        piece.location
+        piece.point
     in 
     startingRank piece == y
 
@@ -155,7 +155,7 @@ castle king board =
 
 pawnMoves : Piece -> Board -> Translations
 pawnMoves pawn board =
-    let (y,x) = pawn.location
+    let (y,x) = pawn.point
         step = forward pawn
         checkPawn fn = 
             fn pawn board

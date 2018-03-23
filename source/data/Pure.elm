@@ -33,7 +33,7 @@ zeroPs = { x=0, y=0 }
 
 joker : Piece
 joker = 
-    Piece zeroPs zeroLoc Black Joker 0 []
+    Piece zeroLoc zeroPs Black Joker 0 []
 
 vacantSquare : Square
 vacantSquare = 

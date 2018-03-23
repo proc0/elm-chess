@@ -70,8 +70,8 @@ translatePiece target piece =
             Maybe.map different p ? False
     in
     { piece 
-    | position = destination
-    , location = target
+    | point = target
+    , drag = destination
     , path = 
         -- if the last path is 
         -- different than target
@@ -123,20 +123,20 @@ ticks board =
 remove : Piece -> Board -> Board
 remove piece board = 
     let lastLocation = 
-            last piece.path ? piece.location
+            last piece.path ? piece.point
     in 
     update lastLocation (activateSquare << emptySquare) board
 
 add : Piece -> Board -> Board
 add piece board = 
-    let target = piece.location
+    let target = piece.point
         newPiece = translatePiece target piece
     in 
     update target (withValidSquare <| occupySquare newPiece) board
 
 jump : Piece -> Board -> Board
 jump piece board = 
-    let target = piece.location
+    let target = piece.point
         newPiece = translatePiece target piece
     in 
     update target (occupySquare newPiece) board
@@ -151,7 +151,7 @@ revert piece board =
 analyze : Piece -> Board -> Board
 analyze piece board =
     let origin = 
-            piece.location
+            piece.point
         translations = 
             pieceMoves piece board
         movelist = 
@@ -199,5 +199,5 @@ castleRook move board =
         rook =
             (get (fst rookMove) board ? vacantSquare).piece ? joker
     in
-    remove rook board |> jump ({ rook | location = snd rookMove })
+    remove rook board |> jump ({ rook | point = snd rookMove })
 

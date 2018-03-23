@@ -23,7 +23,7 @@ isColor color piece =
 passanting : Piece -> Bool
 passanting pawn =
     let (y,x) =
-        pawn.location
+        pawn.point
     in 
     case pawn.color of
         White -> y == 3
@@ -44,7 +44,7 @@ isCastling piece =
                 ])
     in
     case piece.role of
-        King -> any ((==) piece.location) castlesLocations
+        King -> any ((==) piece.point) castlesLocations
         _ -> False
 
 withPiece : (Piece -> Bool) -> Square -> Bool

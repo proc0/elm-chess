@@ -35,8 +35,8 @@ type Role =
     | Joker
 
 type alias Piece =
-    { position : Position
-    , location : Location
+    { point : Location
+    , drag : Position
     , color : Color
     , role : Role
     , tick : Int
@@ -44,7 +44,7 @@ type alias Piece =
     }
 
 type alias Square = 
-    { location : Location
+    { point : Location
     , piece : Maybe Piece
     , valid : Bool
     , active : Bool

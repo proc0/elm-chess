@@ -79,17 +79,17 @@ toSquare lc ch =
     else occupied         -- piece letters
 
 toPiece : Char -> Location -> Piece
-toPiece ch location =
-    let position = 
-            toBoardPosition location
-        -- initial location
-        path = [location]
+toPiece ch point =
+    let drag = 
+            toBoardPosition point
+        -- initial point
+        path = [point]
         role = toRole ch
         tick = 0
         newPiece color = 
             (Piece 
-                position 
-                location 
+                point 
+                drag 
                 color 
                 role 
                 tick

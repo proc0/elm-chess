@@ -149,8 +149,8 @@ r_piece s = case s.piece of
 
 -- render svg piece
 r_svg : Piece -> Html Event
-r_svg ({ position } as piece) = 
-    let {x,y} = position
+r_svg ({ drag } as piece) = 
+    let {x,y} = drag
         --_ = log "coors" (x,y)
         styles = 
             [style 
@@ -166,8 +166,8 @@ r_svg ({ position } as piece) =
 -- dragable svg markup
 r_dragSvg : Selection -> Html Event
 r_dragSvg { focus, piece } = 
-    let x = piece.position.x
-        y = piece.position.y
+    let x = piece.drag.x
+        y = piece.drag.y
         o = toBoardPosition focus
         -- minus 56px from header
         newPos = Position (x - 32) ((y - 32) - 56)
