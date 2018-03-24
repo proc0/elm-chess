@@ -5,10 +5,11 @@ import Maybe.Extra exposing ((?), isJust)
 import List exposing (filterMap, concatMap, map, foldl, head, any, length)
 import Debug exposing (log)
 
-import Data.Tool exposing (..)
+import Data.Cast exposing (..)
 import Data.Type exposing (..)
 import Data.Query exposing (..)
-import Model.Moves exposing (..)
+import Depo.Moves exposing (..)
+import Depo.Lib exposing (..)
 
 -- main moves
 -- ==========--
@@ -114,10 +115,24 @@ capturing player selection =
 isEnPassant : Piece -> Board -> Bool
 isEnPassant piece board = 
     passanting piece && (isJust << head <| enPassant piece board)
-    
+
+isCastling : Piece -> Bool
+isCastling piece =
+    let castlesLocations = 
+            toLocations 
+               ([ (7,6)
+                , (7,2)
+                , (0,6)
+                , (0,2)
+                ])
+    in
+    case piece.role of
+        King -> any ((==) piece.point) castlesLocations
+        _ -> False
+
 -- general rules
 -- =================--
-
+   
 castle : Piece -> Board -> Translations
 castle king board = 
     let sides = 

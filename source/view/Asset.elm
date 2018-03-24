@@ -1,7 +1,7 @@
 module View.Asset exposing (..)
 
 import Data.Type exposing (..)
-import Model.FEN exposing (..)
+import Depo.SAN exposing (..)
 
 getSvg : Piece -> String
 getSvg  {color, role} = 

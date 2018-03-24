@@ -16,8 +16,9 @@ import Material.List as MList
 import Debug exposing (log)
 
 import Data.Type exposing (..)
-import Data.Tool exposing (..)
-import Model.FEN exposing (..)
+import Data.Cast exposing (..)
+import Depo.Lib exposing (..)
+import Depo.FEN exposing (..)
 import Model.History exposing (..)
 import View.Asset exposing (..)
 
@@ -158,8 +159,9 @@ r_svg ({ drag } as piece) =
                 , "left" => px x
                 ]
             ]
+    in 
     -- parse SVG from String
-    in case parse (getSvg piece) of
+    case parse (getSvg piece) of
         Err e -> text e
         Ok svg -> node "piece" styles [svg]
 

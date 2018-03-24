@@ -1,43 +1,48 @@
 module Data.Pure exposing (..)
 
-import Matrix exposing (Matrix, Location, loc)
+import Matrix exposing (Matrix, Location, loc, fromList)
 import Mouse exposing (Position)
 import Material
 import Material.Layout as Layout
 
 import Data.Type exposing (..)
-import Model.FEN exposing (..)
 
 -- Nuetral type instances
 
-newGame : (Game, Cmd Event)
+newGame : Game
 newGame = 
     let chess =
-            Chess (fromFEN initialBoard) [] 
+            Chess nullBoard newHistory
         players = 
             ( newPlayer White
             , newPlayer Black
             )
-        -- UI events and subs
-        ui = UI Material.model "" False
-        gui = Layout.sub0 GUI
-        cmd = [gui]
+        ui = 
+        UI Material.model "" False
     in 
-    Game ui chess players ! cmd
+    Game ui chess players
 
-zeroLoc : Location
-zeroLoc = loc 0 0
+startCommands : List (Cmd Event)
+startCommands = 
+    [Layout.sub0 GUI]
 
-zeroPs : Position
-zeroPs = { x=0, y=0 }
+origin : Location
+origin = loc 0 0
+
+originPos : Position
+originPos = { x=0, y=0 }
 
 joker : Piece
 joker = 
-    Piece zeroLoc zeroPs Black Joker 0 []
+    Piece origin originPos Black Joker 0 []
 
 vacantSquare : Square
 vacantSquare = 
-    Square zeroLoc Nothing False False
+    Square origin Nothing False False
+
+nullBoard : Board
+nullBoard =
+    fromList [[vacantSquare]]
 
 newPlayer : Color -> Player 
 newPlayer color =
@@ -45,4 +50,7 @@ newPlayer color =
 
 noMove : Move 
 noMove =
-    Move zeroLoc zeroLoc joker Nothing False
+    Move origin origin joker Nothing False
+
+newHistory : History
+newHistory = []

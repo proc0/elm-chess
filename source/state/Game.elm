@@ -8,9 +8,10 @@ import Material.Layout as Layout
 import Debug exposing (log)
 
 import Data.Type exposing (..)
-import Data.Tool exposing (..)
+import Data.Cast exposing (..)
 import Data.Query exposing (..)
 import Data.Pure exposing (..)
+import Depo.Lib exposing (..)
 import Model.Board exposing (..)
 import Model.Rules exposing (..)
 import State.Action exposing (..)
@@ -56,8 +57,7 @@ update event { ui, chess, players } =
                 _ -> Nothing
 
         -- next frame action
-        action : Action
-        action = 
+        action_ = 
             case event of
                 -- !! click board
                 Click position -> 
@@ -91,32 +91,30 @@ update event { ui, chess, players } =
                     whileMoving player.action
                         <| endMove chess.board 
                             
-                othewise -> Idle
+                other -> Idle
 
-        player_ : Player
         player_ = 
             { player 
-            | action = action
+            | action = action_
             , pieces =
-                case action of
+                case action_ of
                 End move -> 
                     player.pieces
                     ++
                     [move.piece]
-                _ -> 
+                other -> 
                     player.pieces
             }
 
         players_ = 
-            case action of
+            case action_ of
                 -- if end move, swap players 
                 End mv -> (snd players, player_)
                 -- update current player
-                otherwise -> (player_, snd players)
+                other -> (player_, snd players)
 
-        board : Board
-        board = 
-            case action of
+        board_ = 
+            case action_ of
                 -- neutral
                 Playing selected -> 
                     revert selected.piece chess.board
@@ -130,22 +128,22 @@ update event { ui, chess, players } =
                         -- highlight possible moves
                         Moving _ -> preform analyze
                         -- player started move
-                        otherwise -> 
+                        other -> 
                             -- drag piece and highlight
                             preform grab |> analyze piece
                 -- next board
                 End move -> 
                     let eat : Piece -> Board -> Board
-                        eat captured board =
+                        eat captured =
                             if isClick event
                             -- cleanup captured
-                            then grab captured board
-                            else board
+                            then grab captured
+                            else identity
                         place : Piece -> Board -> Board                    
-                        place piece board =
-                            drop piece board
+                        place piece =
+                            drop piece
                             -- cleanup captured
-                            |> (if isClick event
+                            >> (if isClick event
                                 then eat piece
                                 else identity)                          
                     in
@@ -155,13 +153,11 @@ update event { ui, chess, players } =
                     
                 Idle -> chess.board
 
-        history : History
-        history = 
-            case action of
+        history_ = 
+            case action_ of
                 End move -> move::chess.history
-                otherwise -> chess.history
+                other -> chess.history
 
-        ui_ : UI
         ui_ = 
             let currentPlayer = fst players_
                 currentColor = toString currentPlayer.color
@@ -175,7 +171,7 @@ update event { ui, chess, players } =
             }
 
         game mat_ =
-            Game mat_ (Chess board history) players_ 
+            Game mat_ (Chess board_ history_) players_ 
     in 
     case event of
         -- Material UI 
@@ -184,5 +180,5 @@ update event { ui, chess, players } =
                 Material.update GUI message ui_
             in 
             game mat_ ! [sub_]
-        otherwise -> 
+        other -> 
             game ui_ ! []

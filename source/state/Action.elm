@@ -6,9 +6,10 @@ import Mouse exposing (Position)
 import Debug exposing (log)
 
 import Data.Type exposing (..)
-import Data.Tool exposing (..)
+import Data.Cast exposing (..)
 import Data.Pure exposing (..)
-import Model.Moves exposing (..)
+import Depo.Lib exposing (..)
+import Depo.Moves exposing (..)
 import Model.Rules exposing (..)
 
 select : Position -> Board -> Maybe Selection

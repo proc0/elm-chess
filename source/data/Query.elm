@@ -4,7 +4,7 @@ import Maybe.Extra exposing (isJust)
 import List exposing (head, any)
 
 import Data.Type exposing (..)
-import Data.Tool exposing (..)
+import Data.Cast exposing (..)
 
 -- general queries
 --================--
@@ -32,20 +32,6 @@ passanting pawn =
 stationary : Piece -> Bool
 stationary piece = 
     piece.tick == 0
-
-isCastling : Piece -> Bool
-isCastling piece =
-    let castlesLocations = 
-            toLocations 
-               ([ (7,6)
-                , (7,2)
-                , (0,6)
-                , (0,2)
-                ])
-    in
-    case piece.role of
-        King -> any ((==) piece.point) castlesLocations
-        _ -> False
 
 withPiece : (Piece -> Bool) -> Square -> Bool
 withPiece fn square =

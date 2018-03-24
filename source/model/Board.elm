@@ -5,10 +5,11 @@ import Maybe.Extra exposing ((?))
 import Debug exposing (log)
 
 import Data.Type exposing (..)
-import Data.Tool exposing (..)
+import Data.Cast exposing (..)
 import Data.Pure exposing (..)
-import Model.Rules exposing (..)
 import Data.Query exposing (..)
+import Depo.Lib exposing (..)
+import Model.Rules exposing (..)
 
 --logPiece : Piece -> Board -> Board
 --logPiece pc bd =

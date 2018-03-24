@@ -1,32 +1,37 @@
-module Model.Moves exposing (..)
+module Depo.Moves exposing (..)
 
 import Matrix exposing (Location, loc, get)
 import List exposing (foldl, any, map, concat, concatMap, filterMap, length, head, reverse, singleton)
 import Maybe.Extra exposing ((?))
 import Debug exposing (log)
 
-import Data.Tool exposing (..)
+import Data.Cast exposing (..)
 import Data.Type exposing (..)
 import Data.Query exposing (..)
 import Data.Pure exposing (..)
+import Depo.Lib exposing (..)
+import Config.Settings exposing (..)
 
 -- board translations
 -- ==================
 idle : Translation
 idle l = l
 
--- Location y is reversed
 up : Movement
-up n (y,x) = loc (y - n) x
+up n (y,x) = 
+    loc (y - n) x
 
 down : Movement
-down n (y,x) = loc (y + n) x
+down n (y,x) = 
+    loc (y + n) x
 
 left : Movement
-left n (y,x) = loc y (x - n)
+left n (y,x) = 
+    loc y (x - n)
 
 right : Movement
-right n (y,x) = loc y (x + n)
+right n (y,x) = 
+    loc y (x + n)
 
 forward : Piece -> Movement
 forward piece = 
@@ -55,7 +60,8 @@ asterisk =
     let cartesian = 
         (uncurry <| liftAp (++)) 
             << mapBoth (($>>) singleton)
-    in cartesian cardinals
+    in 
+    cartesian cardinals
 
         {-  
   ↑     [[up], [down], 
@@ -65,7 +71,8 @@ cross : List Movements
 cross = 
     let wrap = 
         ($>>) singleton << concat << tupleToList
-    in wrap cardinals
+    in 
+    wrap cardinals
 
 {-       ♝
   ↑    ↙  ↑ ↘ 

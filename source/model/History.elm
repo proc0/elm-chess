@@ -7,10 +7,11 @@ import Maybe.Extra exposing ((?))
 import Debug exposing (log)
 
 import Data.Type exposing (..)
-import Data.Tool exposing (..)
+import Data.Cast exposing (..)
 import Data.Pure exposing (..)
-import Model.FEN exposing (..)
-import Model.SAN exposing (..)
+import Depo.FEN exposing (..)
+import Depo.SAN exposing (..)
+import Depo.Lib exposing (..)
 
 formatHistory : History -> List String
 formatHistory =

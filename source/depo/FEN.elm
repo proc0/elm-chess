@@ -1,27 +1,32 @@
-module Model.FEN exposing (..)
+module Depo.FEN exposing (..)
 
 import Regex
-import String exposing (contains, split, toInt)
-import Char exposing (isUpper, toLower)
+import String exposing (contains, split, toInt, toList)
+import Char exposing (isUpper, toCode)
 import Array exposing (get)
-import Matrix exposing (Location, loc)
+import Matrix exposing (Location, loc, fromList)
+import List exposing (head, map, map2)
 import Debug exposing (log)
 
 import Data.Type exposing (..)
-import Data.Tool exposing (..)
+import Data.Cast exposing (..)
+import Depo.SAN exposing (..)
+import Depo.Moves exposing (..)
+import Depo.Lib exposing (..)
+import Config.Settings exposing (..)
 
 --             Forsythe Edwards Notation (FEN)             --
 --=========================================================--
 
 initialPieces = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-initialBoard = initialPieces ++ " w KQkq - 0 1"
---initialBoard = blackCastlingAvailable
+--openingBoard = initialPieces ++ " w KQkq - 0 1"
+openingBoard = enPassantBoard
 
 -- other examples
 --testingEngine = "K6k/3n2pp/8/1P6/B7/8/6PP/8 w - - 0 1"
 --whiteInCheck = "rnb1kbnr/pppppppp/4q3/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"
 --blackCheckMate = "1R6/8/kQ6/8/8/8/6K1/8 w - - 0 1"
---enPassantBoard = "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/RNBQKBNR w KQkq a6 0 1"
+enPassantBoard = "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/RNBQKBNR w KQkq a6 0 1"
 --whiteCastlingAvailable = "rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/R3K2R w KQkq - 0 1"
 --blackCastlingAvailable = "r3k2r/1ppppppp/8/pP6/8/8/P1PPPPPP/R3K2R b KQkq - 0 1"
 
@@ -30,10 +35,10 @@ fromFEN fen =
     let parts =
         String.split " " fen |> Array.fromList
         -- TODO: update state when initial FEN has en passant flag
-        --hasEnPassant = Maybe.withDefault "-" (Array.get 3 parts)
+        hasEnPassant = Maybe.withDefault "-" (Array.get 3 parts)
         board = parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))
     in
-    board
+    board |> (if hasEnPassant /= "-" then fenPassant hasEnPassant else identity)
             --(maybeContains (Array.get 1 parts) "w")
             --(maybeContains (Array.get 2 parts) "Q")
             --(maybeContains (Array.get 2 parts) "K")
@@ -49,6 +54,14 @@ fromFEN fen =
 --            String.contains value s
 --        Nothing ->
 --            False
+
+fenPassant : String -> Board -> Board
+fenPassant coor board =
+    let point = 
+            toSANLocation coor
+        _ = log "enpassant piece" point
+    in
+    board
 
 parsePieces : String -> Board
 parsePieces s =
@@ -98,25 +111,3 @@ toPiece ch point =
     if isUpper ch
     then newPiece White
     else newPiece Black
-
-toRole : Char -> Role
-toRole ch =
-    case (toLower ch) of 
-        'p' -> Pawn
-        'n' -> Knight
-        'b' -> Bishop
-        'r' -> Rook
-        'q' -> Queen
-        'k' -> King
-        _   -> Joker
-
-fromRole : Role -> Char
-fromRole fig = 
-    case fig of
-        Pawn    -> 'p'
-        Rook    -> 'r'
-        Bishop  -> 'b'
-        Knight  -> 'n'
-        Queen   -> 'q'
-        King    -> 'k'
-        Joker   -> 'j'
