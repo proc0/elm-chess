@@ -33,14 +33,18 @@ right : Movement
 right n (y,x) = 
     loc y (x + n)
 
-forward : Piece -> Movement
-forward piece = 
+--forward : Location -> Location
+--forward (y,x) =
+--backward : Location -> Location
+
+forwardMove : Piece -> Movement
+forwardMove piece = 
     case piece.color of
         White -> up
         Black -> down
 
-backward : Piece -> Movement
-backward piece = 
+backwardMove : Piece -> Movement
+backwardMove piece = 
     case piece.color of
         White -> down
         Black -> up

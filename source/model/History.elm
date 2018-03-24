@@ -29,6 +29,7 @@ debugHistory history =
             head history ? noMove
         formatPiece p =
             String.join " " [(toString p.color), (toString p.role), (toString p.point)]
+            ++ "\ntick: " ++ (toString p.tick) 
         debugPiece : Piece -> String
         debugPiece pc =
             case pc.role of

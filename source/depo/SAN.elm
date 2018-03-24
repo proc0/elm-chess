@@ -9,6 +9,7 @@ import List exposing (head)
 import Debug exposing (log)
 
 import Data.Type exposing (..)
+import Data.Pure exposing (..)
 import Depo.Lib exposing (..)
 import Data.Cast exposing (..)
 
@@ -58,37 +59,35 @@ toSAN move =
             noCapture move
 
 
-toSANLocation : String -> Maybe Location
+toSANLocation : String -> Location
 toSANLocation san =
     let file = dropRight 1 san
         rank = dropLeft 1 san
-        y_ = 
+        x_ = 
             (<?) toInt 
             << (<?) toString 
             << (<?) toCode 
             << head 
             << toList 
             <| String.toLower file
-        y =
-            case y_ ? Err "" of
-                Ok y0 ->
-                    let y1 = y0 - 97
-                    in
-                    if y1 >= 0 && y1 < 8
-                    then Just y1
-                    else Nothing
-                _ -> Nothing
         x =
-            case toInt rank of
-                Ok x_ -> 
-                    if x_ > 0 && x_ < 8
-                    then Just x_
+            case x_ ? Err "" of
+                Ok x0 ->
+                    let x1 = x0 - 97
+                    in
+                    if x1 >= 0 && x1 < 8
+                    then Just x1
                     else Nothing
                 _ -> Nothing
-        _ = log "xy_" (y,x)
-
+        y =
+            case toInt rank of
+                Ok y_ -> 
+                    if y_ >= 0 && y_ < 8
+                    then Just (abs <| 8 - y_)
+                    else Nothing
+                _ -> Nothing
     in
-    map2 loc y x
+    map2 loc y x ? origin
 
 toRole : Char -> Role
 toRole ch =

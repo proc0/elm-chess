@@ -171,7 +171,7 @@ castle king board =
 pawnMoves : Piece -> Board -> Translations
 pawnMoves pawn board =
     let (y,x) = pawn.point
-        step = forward pawn
+        step = forwardMove pawn
         checkPawn fn = 
             fn pawn board
         checkRules = 
@@ -184,7 +184,7 @@ pawnMoves pawn board =
             then [(step 2, isVacant)] 
             else []) 
             ++ 
-            -- can step forward if vacant
+            -- can step forwardMove if vacant
             [ (step 1, isVacant)
             -- can eat diagonals if occupied
             , (step 1 >> left 1, isOccupied)
@@ -195,7 +195,7 @@ pawnMoves pawn board =
 
 enPassant : Piece -> Board -> Translations
 enPassant pawn board = 
-    let step = forward pawn
+    let step = forwardMove pawn
         checkPawn = foldl (validate pawn board) []
         passantRules move = 
             [ (move 1, isUntouched)

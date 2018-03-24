@@ -4,12 +4,16 @@ import Regex
 import String exposing (contains, split, toInt, toList)
 import Char exposing (isUpper, toCode)
 import Array exposing (get)
-import Matrix exposing (Location, loc, fromList)
+import Matrix exposing (Location, loc, fromList, mapWithLocation)
 import List exposing (head, map, map2)
+import Tuple exposing (mapFirst)
+import Maybe.Extra exposing ((?))
 import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Cast exposing (..)
+import Data.Pure exposing (..)
+import Data.Query exposing (..)
 import Depo.SAN exposing (..)
 import Depo.Moves exposing (..)
 import Depo.Lib exposing (..)
@@ -35,10 +39,19 @@ fromFEN fen =
     let parts =
         String.split " " fen |> Array.fromList
         -- TODO: update state when initial FEN has en passant flag
-        hasEnPassant = Maybe.withDefault "-" (Array.get 3 parts)
+        passantPoint = Maybe.withDefault "-" (Array.get 3 parts)
+        colorTurn = 
+            case (Array.get 1 parts ? "w") of
+                "w" -> White
+                "b" -> Black
+                _ -> White
+        processPassant =
+            if passantPoint /= "-" 
+            then fenPassant passantPoint colorTurn 
+            else identity
         board = parsePieces (Maybe.withDefault initialPieces (Array.get 0 parts))
     in
-    board |> (if hasEnPassant /= "-" then fenPassant hasEnPassant else identity)
+    board |> processPassant
             --(maybeContains (Array.get 1 parts) "w")
             --(maybeContains (Array.get 2 parts) "Q")
             --(maybeContains (Array.get 2 parts) "K")
@@ -48,20 +61,35 @@ fromFEN fen =
             --(Result.withDefault 0 (String.toInt (Maybe.withDefault "0" (Array.get 4 parts))))
             --(Result.withDefault 1 (String.toInt (Maybe.withDefault "0" (Array.get 5 parts))))
 
---maybeContains str value =
---    case str of
---        Just s ->
---            String.contains value s
---        Nothing ->
---            False
+maybeContains str value =
+    case str of
+        Just s ->
+            String.contains value s
+        Nothing ->
+            False
 
-fenPassant : String -> Board -> Board
-fenPassant coor board =
-    let point = 
+fenPassant : String -> Color -> Board -> Board
+fenPassant coor player board =
+    let capturePoint = 
             toSANLocation coor
-        _ = log "enpassant piece" point
+        jester = ({ joker | color = opponent player })
+        opponentPoint =
+            forwardMove jester 1 capturePoint
+        adjustPassant lc sq =
+            if lc == opponentPoint
+            then
+                case sq.piece of
+                Just pc ->
+                    case pc.role of
+                        Pawn ->
+                            ({ sq 
+                             | piece = 
+                                Just ({ pc | tick = 1, path = pc.path ++ [forwardMove jester 1 capturePoint] })})
+                        _ -> sq
+                _ -> sq
+            else sq
     in
-    board
+    mapWithLocation adjustPassant board
 
 parsePieces : String -> Board
 parsePieces s =

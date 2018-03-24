@@ -149,7 +149,9 @@ update event { ui, chess, players } =
                     in
                     place move.piece chess.board
                     |> whenCastling castleRook move
-                    |> ifEnPassant (whenCapturing eat) move
+                    |> (if move.enPassant 
+                        then whenCapturing eat move 
+                        else identity)
                     
                 Idle -> chess.board
 

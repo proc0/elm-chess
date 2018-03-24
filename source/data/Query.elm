@@ -20,6 +20,12 @@ isColor : Color -> Piece -> Bool
 isColor color piece = 
     piece.color == color
 
+opponent : Color -> Color
+opponent col =
+    case col of
+        White -> Black
+        Black -> White
+        
 passanting : Piece -> Bool
 passanting pawn =
     let (y,x) =

@@ -97,7 +97,7 @@ endMove board select =
             if isPassant
             then -- change target capture
                 let captureLocation =
-                        backward ghost 1 destination
+                        backwardMove boarded 1 destination
                     passantCapture = 
                         get captureLocation board ? vacantSquare
                 in -- and capture pawn
