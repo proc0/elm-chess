@@ -16590,7 +16590,7 @@ var _darrensiegel$elm_chess_client$Model_Rules$pawnMoves = F2(
 		return A2(
 			_elm_lang$core$Basics_ops['++'],
 			checkRules(rules),
-			checkPawn(_darrensiegel$elm_chess_client$Model_Rules$enPassant));
+			_darrensiegel$elm_chess_client$Data_Query$passanting(pawn) ? checkPawn(_darrensiegel$elm_chess_client$Model_Rules$enPassant) : {ctor: '[]'});
 	});
 var _darrensiegel$elm_chess_client$Model_Rules$pieceMoves = F2(
 	function (piece, board) {

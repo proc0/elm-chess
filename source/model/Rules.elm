@@ -191,7 +191,7 @@ pawnMoves pawn board =
             , (step 1 >> right 1, isOccupied)
             ]
     in
-    checkRules rules ++ checkPawn enPassant
+    checkRules rules ++ (if passanting pawn then checkPawn enPassant else [])
 
 enPassant : Piece -> Board -> Translations
 enPassant pawn board = 
