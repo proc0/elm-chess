@@ -1,6 +1,6 @@
 module Depo.SAN exposing (..)
 
-import Char exposing (fromCode, toUpper, toCode)
+import Char exposing (fromCode, toCode, toLower, toUpper)
 import Matrix exposing (Location, loc)
 import String exposing (dropLeft, dropRight, fromChar, toInt, toLower, toList)
 import Maybe exposing (map2)
@@ -20,19 +20,42 @@ toSAN move =
                     then toUpper c
                     else c
             in String.fromChar l
-        rank x_ = String.fromChar <| fromCode (x_ + 97)
-        file y_ = toString <| 8-y_
-        translate pc (x,y) =
-            if pc.role /= Pawn
-            then letter pc ++ rank x ++ file y
-            else rank x ++ file y          
+        file x_ = String.fromChar <| fromCode (x_ + 97)
+        rank y_ = toString <| 8-y_
+        noCapture mov =
+            let (y,x) = mov.end
+            in
+            if mov.piece.role /= Pawn
+            then 
+                letter mov.piece 
+                ++ file x 
+                ++ rank y
+            else 
+                file x 
+                ++ rank y 
+        wCapture cap mov =
+            let (y,x) = mov.end
+            in
+            if mov.piece.role == Pawn
+            then
+                file x
+                ++ "x" 
+                ++ file x 
+                ++ rank y
+                ++ (if move.enPassant 
+                    then " e.p." 
+                    else "")                
+            else
+                letter cap 
+                ++ "x" 
+                ++ file x 
+                ++ rank y
     in 
     case move.capture of
         Just captured -> 
-            translate move.piece move.start 
-            ++ "x" 
-            ++ translate captured move.end
-        _ -> translate move.piece move.end
+            wCapture captured move               
+        _ -> 
+            noCapture move
 
 
 toSANLocation : String -> Maybe Location

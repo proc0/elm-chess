@@ -15851,10 +15851,10 @@ var _darrensiegel$elm_chess_client$Depo_SAN$toSANLocation = function (san) {
 	return A3(_elm_lang$core$Maybe$map2, _chendrix$elm_matrix$Matrix$loc, y, x);
 };
 var _darrensiegel$elm_chess_client$Depo_SAN$toSAN = function (move) {
-	var file = function (y_) {
+	var rank = function (y_) {
 		return _elm_lang$core$Basics$toString(8 - y_);
 	};
-	var rank = function (x_) {
+	var file = function (x_) {
 		return _elm_lang$core$String$fromChar(
 			_elm_lang$core$Char$fromCode(x_ + 97));
 	};
@@ -15863,33 +15863,54 @@ var _darrensiegel$elm_chess_client$Depo_SAN$toSAN = function (move) {
 		var l = _elm_lang$core$Native_Utils.eq(p.color, _darrensiegel$elm_chess_client$Data_Type$White) ? _elm_lang$core$Char$toUpper(c) : c;
 		return _elm_lang$core$String$fromChar(l);
 	};
-	var translate = F2(
-		function (pc, _p7) {
-			var _p8 = _p7;
-			var _p10 = _p8._1;
-			var _p9 = _p8._0;
-			return (!_elm_lang$core$Native_Utils.eq(pc.role, _darrensiegel$elm_chess_client$Data_Type$Pawn)) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				letter(pc),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					rank(_p9),
-					file(_p10))) : A2(
-				_elm_lang$core$Basics_ops['++'],
-				rank(_p9),
-				file(_p10));
-		});
-	var _p11 = move.capture;
-	if (_p11.ctor === 'Just') {
-		return A2(
+	var noCapture = function (mov) {
+		var _p7 = mov.end;
+		var y = _p7._0;
+		var x = _p7._1;
+		return (!_elm_lang$core$Native_Utils.eq(mov.piece.role, _darrensiegel$elm_chess_client$Data_Type$Pawn)) ? A2(
 			_elm_lang$core$Basics_ops['++'],
-			A2(translate, move.piece, move.start),
+			letter(mov.piece),
 			A2(
 				_elm_lang$core$Basics_ops['++'],
-				'x',
-				A2(translate, _p11._0, move.end)));
+				file(x),
+				rank(y))) : A2(
+			_elm_lang$core$Basics_ops['++'],
+			file(x),
+			rank(y));
+	};
+	var wCapture = F2(
+		function (cap, mov) {
+			var _p8 = mov.end;
+			var y = _p8._0;
+			var x = _p8._1;
+			return _elm_lang$core$Native_Utils.eq(mov.piece.role, _darrensiegel$elm_chess_client$Data_Type$Pawn) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				file(x),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'x',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						file(x),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							rank(y),
+							move.enPassant ? ' e.p.' : '')))) : A2(
+				_elm_lang$core$Basics_ops['++'],
+				letter(cap),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'x',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						file(x),
+						rank(y))));
+		});
+	var _p9 = move.capture;
+	if (_p9.ctor === 'Just') {
+		return A2(wCapture, _p9._0, move);
 	} else {
-		return A2(translate, move.piece, move.end);
+		return noCapture(move);
 	}
 };
 
@@ -16523,8 +16544,7 @@ var _darrensiegel$elm_chess_client$Model_Rules$enPassant = F2(
 var _darrensiegel$elm_chess_client$Model_Rules$isEnPassant = F2(
 	function (piece, board) {
 		return _darrensiegel$elm_chess_client$Data_Query$passanting(piece) && function (_p12) {
-			return _elm_community$maybe_extra$Maybe_Extra$isJust(
-				_elm_lang$core$List$head(_p12));
+			return !_elm_lang$core$List$isEmpty(_p12);
 		}(
 			A2(_darrensiegel$elm_chess_client$Model_Rules$enPassant, piece, board));
 	});

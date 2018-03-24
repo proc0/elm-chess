@@ -2,7 +2,7 @@ module Model.Rules exposing (..)
 
 import Matrix exposing (Location, get)
 import Maybe.Extra exposing ((?), isJust)
-import List exposing (filterMap, concatMap, map, foldl, head, any, length)
+import List exposing (filterMap, concatMap, map, foldl, head, isEmpty, any, length)
 import Debug exposing (log)
 
 import Data.Cast exposing (..)
@@ -114,7 +114,7 @@ capturing player selection =
 
 isEnPassant : Piece -> Board -> Bool
 isEnPassant piece board = 
-    passanting piece && (isJust << head <| enPassant piece board)
+    passanting piece && (not << isEmpty <| enPassant piece board)
 
 isCastling : Piece -> Bool
 isCastling piece =
