@@ -88,6 +88,19 @@ findKing : Piece -> Board -> List Movements -> Translations
 findKing piece board = 
     stepSearch piece board (isVacant, isKingSquare) (flip always,(::))
 
+findThreat : Piece -> Board -> Translations
+findThreat piece board = 
+    let stopWhen sq =
+            let pinner =
+                case sq.piece of
+                    Just pc -> isPinner pc && pc.color /= piece.color
+                    _ -> False
+            in
+            pinner
+        res = stepSearch piece board (isVacant, stopWhen) (flip always,(::)) asterisk
+        _ = log "-" res
+    in res
+
 -- rule like queries
 -- =================--
 

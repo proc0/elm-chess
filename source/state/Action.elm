@@ -1,8 +1,8 @@
 module State.Action exposing (..)
 
-import Matrix exposing (Location, get, mapWithLocation)
+import Matrix exposing (Location, flatten, get, update)
 import Maybe.Extra exposing ((?), join, isJust)
-import List exposing (any, length, head, map)
+import List exposing (any, filterMap, length, head, map)
 import Mouse exposing (Position)
 import Debug exposing (log)
 
@@ -105,6 +105,29 @@ endMove board select =
                             King -> pc.color /= piece.color
                             _ -> False
                     _ -> False) (pieceMoves piece board) |> any identity
+
+        checkCleared =
+            let king =
+                (flatten board |> filterMap (\sq ->
+                    case sq.piece of
+                        Just pc -> 
+                            case pc.role of
+                                King ->
+                                    if pc.color == piece.color
+                                    then Just pc
+                                    else Nothing
+                                _ -> Nothing
+                        _ -> Nothing
+                    ) |> head) ? joker
+                simBoard =
+                    update piece.point (\sq -> { sq | piece = Just piece }) board
+            in  
+            if piece.role == King && piece.check
+            then findThreat piece board |> length >> (==) 0
+            else if king.check
+            then findThreat king simBoard |> length >> (==) 0
+            else True
+
         pinTarget =
             let targetSquare = 
                     head <| withPinner piece board findNextOpponent
@@ -134,6 +157,6 @@ endMove board select =
         --    isJust kingThreat && (isJust <| (pinTarget ?> isKing))
     in 
     -- if not same square, and destination is a valid move
-    if destination /= select.focus && target.valid && not piece.lock
+    if destination /= select.focus && target.valid && not piece.lock && checkCleared
     then End <| Move select.focus destination piece captured pinPiece isCheck isPassant
     else Playing select -- keep playing

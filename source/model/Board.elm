@@ -1,7 +1,8 @@
 module Model.Board exposing (..)
 
-import Matrix exposing (Location, get, loc, map, mapWithLocation, update)
+import Matrix exposing (Location, flatten, get, loc, map, mapWithLocation, update)
 import Maybe.Extra exposing ((?))
+import List exposing (head, filterMap)
 import Debug exposing (log)
 
 import Data.Type exposing (..)
@@ -50,11 +51,9 @@ pinPiece pc bd =
 --            }) bd
 --        _ -> bd
 
-checkKing : Piece -> Board -> Board
-checkKing piece board =
-    mapWithLocation (\lc sq -> 
-        if sq.valid
-        then 
+checkKing : Location -> Board -> Board
+checkKing pt board =
+    update pt (\sq ->
             case sq.piece of
                 Just p ->
                     case p.role of
@@ -66,8 +65,7 @@ checkKing piece board =
                                 })
                             }
                         _ -> sq
-                _ -> sq
-        else sq) board
+                _ -> sq) board
 
 --=============================--
 
@@ -229,10 +227,23 @@ withPinned fn mv bd =
             fn pc bd
         _ -> bd
 
-whenCheck : (Piece -> Board -> Board) -> Move -> Board -> Board
+whenCheck : (Location -> Board -> Board) -> Move -> Board -> Board
 whenCheck fn mv bd =
+    let enemyKingLoc =
+        (flatten bd |> filterMap (\sq ->
+            case sq.piece of
+                Just pc -> 
+                    case pc.role of
+                        King ->
+                            if pc.color == opponent mv.piece.color
+                            then Just sq.point
+                            else Nothing
+                        _ -> Nothing
+                _ -> Nothing
+            ) |> head) ? joker.point
+    in
     if mv.check
-    then fn mv.piece bd
+    then fn enemyKingLoc bd
     else bd
 
 ifEnPassant : (Move -> Board -> Board) -> Move -> Board -> Board

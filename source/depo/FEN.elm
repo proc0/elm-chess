@@ -23,8 +23,8 @@ import Config.Settings exposing (..)
 --=========================================================--
 
 initialPieces = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
---openingBoard = initialPieces ++ " w KQkq - 0 1"
-openingBoard = enPassantBoard
+openingBoard = initialPieces ++ " w KQkq - 0 1"
+--openingBoard = enPassantBoard
 
 -- other examples
 --testingEngine = "K6k/3n2pp/8/1P6/B7/8/6PP/8 w - - 0 1"

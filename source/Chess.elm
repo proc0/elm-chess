@@ -15,7 +15,7 @@ startGame =
     let start = 
             newGame.chess
         newBoard = 
-        fromFEN openingBoard
+            fromFEN openingBoard
     in 
     ({ newGame
      | chess =

@@ -58,7 +58,12 @@ render ({ ui, chess, players } as game) =
             , main = [
                 r_game game
                 , Options.div [ Options.cs "hud" ]
-                    [ Options.div
+                    [ Options.div 
+                        [ Typo.subhead
+                        ] 
+                        [ text ui.turn
+                        ]
+                    , Options.div
                         [ Options.cs "player"
                         ]
                         [ text blackPlayer.name
@@ -66,12 +71,7 @@ render ({ ui, chess, players } as game) =
                     , Options.div 
                         [ Options.cs "history"
                         ] 
-                        [ Options.div 
-                            [ Typo.subhead
-                            ] 
-                            [ text ui.turn
-                            ]
-                        , MList.ul 
+                        [ MList.ul 
                             [ Options.cs "moves" 
                             ]
                             (chess.history 
