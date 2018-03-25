@@ -52,11 +52,15 @@ toSAN move =
                 ++ file x 
                 ++ rank y
     in 
-    case move.capture of
+    (case move.capture of
         Just captured -> 
             wCapture captured move               
         _ -> 
-            noCapture move
+            noCapture move)
+    ++
+    (if move.check
+    then "+"
+    else "")
 
 
 toSANLocation : String -> Location

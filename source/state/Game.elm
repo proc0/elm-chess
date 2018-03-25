@@ -120,8 +120,10 @@ update event { ui, chess, players } =
                     revert selected.piece chess.board
                 -- dragging piece
                 Moving selected -> 
-                    let piece = selected.piece
-                        preform fn = fn piece chess.board
+                    let piece = 
+                        selected.piece
+                        preform fn = 
+                        fn piece chess.board
                     in
                     -- check last frame
                     case player.action of
@@ -149,10 +151,12 @@ update event { ui, chess, players } =
                     in
                     place move.piece chess.board
                     |> whenCastling castleRook move
+                    |> withPinned pinPiece move
                     |> (if move.enPassant 
                         then whenCapturing eat move 
                         else identity)
-                    
+                    |> whenCheck checkKing move
+
                 Idle -> chess.board
 
         history_ = 

@@ -40,6 +40,8 @@ type alias Piece =
     , color : Color
     , role : Role
     , tick : Int
+    , lock : Bool
+    , check : Bool
     , path : List Location
     }
 
@@ -72,6 +74,8 @@ type alias Move =
     , end : Location
     , piece : Piece
     , capture : Maybe Piece
+    , pin : Maybe Piece
+    , check : Bool
     , enPassant : Bool
     }
 

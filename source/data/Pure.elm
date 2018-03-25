@@ -34,7 +34,7 @@ originPos = { x=0, y=0 }
 
 joker : Piece
 joker = 
-    Piece origin originPos Black Joker 0 []
+    Piece origin originPos Black Joker 0 False False []
 
 vacantSquare : Square
 vacantSquare = 
@@ -50,7 +50,7 @@ newPlayer color =
 
 noMove : Move 
 noMove =
-    Move origin origin joker Nothing False
+    Move origin origin joker Nothing Nothing False False
 
 newHistory : History
 newHistory = []

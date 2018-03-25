@@ -27,6 +27,48 @@ drop piece board =
     |> add piece
     |> ticks >> clear
 
+pinPiece : Piece -> Board -> Board
+pinPiece pc bd =
+    update pc.point (\sq ->
+        { sq
+        | piece =
+            Just ({ pc
+            | lock = True
+            })
+        }) bd
+
+--checkKing : Piece -> Board -> Board
+--checkKing pc bd =
+--    case pc.role of
+--        King ->
+--            update pc.point (\sq ->
+--            { sq
+--            | piece =
+--                Just ({ pc
+--                | check = True
+--                })
+--            }) bd
+--        _ -> bd
+
+checkKing : Piece -> Board -> Board
+checkKing piece board =
+    mapWithLocation (\lc sq -> 
+        if sq.valid
+        then 
+            case sq.piece of
+                Just p ->
+                    case p.role of
+                        King -> 
+                            { sq
+                            | piece =
+                                Just ({ p
+                                | check = True
+                                })
+                            }
+                        _ -> sq
+                _ -> sq
+        else sq) board
+
 --=============================--
 
 clearSquare :  Square -> Square
@@ -179,7 +221,20 @@ whenCapturing fn mv bd =
         Just captured -> 
             fn captured bd
         _ -> bd
-        
+
+withPinned : (Piece -> Board -> Board) -> Move -> Board -> Board
+withPinned fn mv bd =
+    case mv.pin of
+        Just pc -> 
+            fn pc bd
+        _ -> bd
+
+whenCheck : (Piece -> Board -> Board) -> Move -> Board -> Board
+whenCheck fn mv bd =
+    if mv.check
+    then fn mv.piece bd
+    else bd
+
 ifEnPassant : (Move -> Board -> Board) -> Move -> Board -> Board
 ifEnPassant fn mv bd =
     if mv.enPassant 

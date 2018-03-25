@@ -35,6 +35,14 @@ passanting pawn =
         White -> y == 3
         Black -> y == 4
 
+isPinner : Piece -> Bool
+isPinner piece =
+    case piece.role of
+        Bishop -> True
+        Rook -> True
+        Queen -> True
+        _ -> False
+
 stationary : Piece -> Bool
 stationary piece = 
     piece.tick == 0
@@ -50,6 +58,20 @@ isOccupied square = isJust square.piece
 
 isVacant : Square -> Bool
 isVacant = not << isOccupied
+
+isKing : Piece -> Bool
+isKing piece =
+    case piece.role of
+        King -> True
+        _ -> False
+
+isKingSquare : Square -> Bool
+isKingSquare sq =
+    case sq.piece of
+        Just pc ->
+            isKing pc
+        _ -> False
+
 
 isNewRook : Square -> Bool
 isNewRook square =

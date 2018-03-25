@@ -1,8 +1,8 @@
 module Model.Rules exposing (..)
 
-import Matrix exposing (Location, get)
+import Matrix exposing (Location, get, mapWithLocation, flatten)
 import Maybe.Extra exposing ((?), isJust)
-import List exposing (filterMap, concatMap, map, foldl, head, isEmpty, any, length)
+import List exposing (any, concat, concatMap, filterMap, foldl, head, isEmpty, length, map)
 import Debug exposing (log)
 
 import Data.Cast exposing (..)
@@ -17,18 +17,13 @@ import Depo.Lib exposing (..)
 pieceMoves : Piece -> Board -> Translations
 pieceMoves piece board = 
     let find f = f piece board
-        diagonals =
-            find linearMove asterisk
-        parallels =
-            find linearMove cross
+        linear = find linearMove
         moves role =
             case role of
                 Pawn   -> find pawnMoves
-                Bishop -> diagonals
-                Rook   -> parallels
-                Queen  -> diagonals 
-                          ++ 
-                          parallels               
+                Bishop -> linear diagonals
+                Rook   -> linear straights
+                Queen  -> linear asterisk               
                 Knight -> 
                     [ up 2 >> right 1
                     , up 2 >> left 1
@@ -85,9 +80,31 @@ distinct piece board locations =
                     _ -> Just move
             _ -> Nothing) locations
 
+findNextOpponent : Piece -> Board -> List Movements -> Translations
+findNextOpponent piece board =
+    stepSearch piece board (isVacant, (not << friendlyOccupied piece.color)) (flip always, (::))
+
+findKing : Piece -> Board -> List Movements -> Translations
+findKing piece board = 
+    stepSearch piece board (isVacant, isKingSquare) (flip always,(::))
+
 -- rule like queries
 -- =================--
 
+withKing : Piece -> Board -> (Piece -> Board -> Board) -> Board
+withKing piece board fn =
+    case piece.role of
+        King -> fn piece board
+        _ -> board
+        
+withPinner : Piece -> Board -> (Piece -> Board -> List Movements -> Translations) -> Translations
+withPinner piece board fn =
+    case piece.role of
+        Bishop -> fn piece board diagonals
+        Rook -> fn piece board straights
+        Queen -> fn piece board asterisk
+        _ -> []
+        
 startingRank : Piece -> Int
 startingRank piece =
     let offset n = 
@@ -129,6 +146,19 @@ isCastling piece =
     case piece.role of
         King -> any ((==) piece.point) castlesLocations
         _ -> False
+
+isChecking : Piece -> Board -> Bool
+isChecking piece board =
+    any identity <| flatten <| mapWithLocation (\lc sq -> 
+        if sq.valid
+        then 
+            case sq.piece of
+                Just p ->
+                    case p.role of
+                        King -> True
+                        _ -> False
+                _ -> False
+        else False) board
 
 -- general rules
 -- =================--

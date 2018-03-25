@@ -55,28 +55,35 @@ cardinals =
     , [left, right]
     )
 
+        {-  
+  ↑     [[up], [down], 
+← · →   [left], [right]]
+  ↓     -}
+straights : List Movements
+straights = 
+    let wrap = 
+        ($>>) singleton << concat << tupleToList
+    in 
+    wrap cardinals
+
         {-
-↖ ↑ ↗   all possible movements,    
-← · →   asterisk shaped arrows
-↙ ↓ ↘   -}
-asterisk : List Movements
-asterisk = 
+↖   ↗   [... [up, left],    
+  ·     [down, right] ... ]
+↙   ↘   -}
+diagonals : List Movements
+diagonals = 
     let cartesian = 
         (uncurry <| liftAp (++)) 
             << mapBoth (($>>) singleton)
     in 
     cartesian cardinals
 
-        {-  
-  ↑     [[up], [down], 
-← · →   [left], [right]]
-  ↓     -}
-cross : List Movements
-cross = 
-    let wrap = 
-        ($>>) singleton << concat << tupleToList
-    in 
-    wrap cardinals
+        {-
+↖ ↑ ↗   all possible movements,    
+← · →   asterisk shaped arrows
+↙ ↓ ↘   -}
+asterisk : List Movements
+asterisk = diagonals ++ straights
 
 {-       ♝
   ↑    ↙  ↑ ↘ 

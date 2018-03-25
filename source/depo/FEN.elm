@@ -127,6 +127,8 @@ toPiece ch point =
         path = [point]
         role = toRole ch
         tick = 0
+        lock = False
+        check = False
         newPiece color = 
             (Piece 
                 point 
@@ -134,6 +136,8 @@ toPiece ch point =
                 color 
                 role 
                 tick
+                lock
+                check
                 path)
     in 
     if isUpper ch

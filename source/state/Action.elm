@@ -1,13 +1,15 @@
 module State.Action exposing (..)
 
-import Matrix exposing (Location, get)
-import Maybe.Extra exposing ((?), join)
+import Matrix exposing (Location, get, mapWithLocation)
+import Maybe.Extra exposing ((?), join, isJust)
+import List exposing (any, length, head, map)
 import Mouse exposing (Position)
 import Debug exposing (log)
 
 import Data.Type exposing (..)
 import Data.Cast exposing (..)
 import Data.Pure exposing (..)
+import Data.Query exposing (..)
 import Depo.Lib exposing (..)
 import Depo.Moves exposing (..)
 import Model.Rules exposing (..)
@@ -17,12 +19,14 @@ select drag board =
     let locate xy = 
             get (toBoardLocation xy) board
         selectPiece square = 
-            let selection piece = 
-                Selection square.point piece
+            let selectP piece = 
+                if not piece.lock
+                then Just <| Selection square.point piece
+                else Nothing
             in 
-            Maybe.map selection square.piece
+            join <| square.piece ?> selectP
         selecting = 
-            join << Maybe.map selectPiece << locate
+            join << (<?) selectPiece << locate
     in 
     selecting drag
 
@@ -69,7 +73,7 @@ endMove board select =
         target = 
             get destination board ? vacantSquare            
         -- update moving piece point
-        boarded =
+        piece =
             select.piece |>
             (\s -> 
             { s 
@@ -90,22 +94,46 @@ endMove board select =
                 Pawn -> 
                     isEnPassant ghost board
                 _ -> False
-
+        isCheck =
+            map (\tr -> 
+                let sq = 
+                    get (tr destination) board ? vacantSquare
+                in
+                case sq.piece of
+                    Just pc -> 
+                        case pc.role of
+                            King -> pc.color /= piece.color
+                            _ -> False
+                    _ -> False) (pieceMoves piece board) |> any identity
+        pinTarget =
+            let targetSquare = 
+                    head <| withPinner piece board findNextOpponent
+                target = 
+                    targetSquare ?> (flip get board << (|>) piece.point) |> join
+            in
+            (target ? vacantSquare).piece
         -- capture target
         captured =
             -- check pawns for enpassant
             if isPassant
             then -- change target capture
                 let captureLocation =
-                        backwardMove boarded 1 destination
+                        backwardMove piece 1 destination
                     passantCapture = 
                         get captureLocation board ? vacantSquare
                 in -- and capture pawn
                 passantCapture.piece
             else -- or capture target
                 target.piece
+        pinPiece =
+           if not <| isCheck
+           then pinTarget ?> (\p -> if not <| isKing p then Just p else Nothing) |> join
+           else Nothing
+
+        --isCheck =
+        --    isJust kingThreat && (isJust <| (pinTarget ?> isKing))
     in 
     -- if not same square, and destination is a valid move
-    if destination /= select.focus && target.valid
-    then End <| Move select.focus destination boarded captured isPassant
+    if destination /= select.focus && target.valid && not piece.lock
+    then End <| Move select.focus destination piece captured pinPiece isCheck isPassant
     else Playing select -- keep playing
