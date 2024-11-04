@@ -21,7 +21,7 @@ git clone https://github.com/proc0/center-game.git
 
 2. Navigate to root directory:
 ```bash
-cd center-game
+cd elm-chess
 ```
 
 3. Build: 
